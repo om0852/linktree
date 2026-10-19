@@ -173,7 +173,7 @@ export default function ScheduleMeetingModal({ profile, onClose, onBookingSucces
         setStep(3);
         if (onBookingSuccess) onBookingSuccess(data.booking);
       } else {
-        setErrorMsg(data.error || 'Failed to confirm booking. Please try another slot.');
+        setErrorMsg(data.error || 'Failed to send booking request. Please try another slot.');
       }
     } catch (err) {
       console.error('Booking submission error:', err);
@@ -432,11 +432,11 @@ export default function ScheduleMeetingModal({ profile, onClose, onBookingSucces
                   className="w-2/3 py-2.5 rounded-sm bg-[#52796F] hover:bg-[#3D5C54] text-white font-semibold text-xs shadow-sm flex items-center justify-center gap-2 cursor-pointer transition-all"
                 >
                   {submitting ? (
-                    <span>Booking Call...</span>
+                    <span>Sending Request...</span>
                   ) : (
                     <>
                       <Sparkles className="w-3.5 h-3.5 fill-white" />
-                      <span>Confirm &amp; Book Meeting</span>
+                      <span>Request Booking</span>
                     </>
                   )}
                 </button>

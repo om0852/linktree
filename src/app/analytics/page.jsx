@@ -33,7 +33,8 @@ import {
   Activity,
   Calendar,
   Lock,
-  Copy
+  Copy,
+  Info
 } from 'lucide-react';
 
 export default function AnalyticsPage() {
@@ -254,23 +255,33 @@ export default function AnalyticsPage() {
         {/* Main Analytics Content */}
         <main className="flex-1 pt-16 sm:pt-20 px-5 sm:px-8 lg:px-10 pb-12 max-w-[1780px] mx-auto w-full flex flex-col gap-4 sm:gap-5">
           {/* Top Banner */}
-          <div className="bg-[#F5F3ED] border border-[#CAD8CE]/80 rounded-xl p-4 sm:p-5 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4 relative overflow-hidden">
-            <div className="flex items-start sm:items-center gap-3.5 relative z-10">
+          <div className="bg-[#F5F3ED] border border-[#CAD8CE]/80 rounded-xl p-4 sm:p-5 shadow-xs flex flex-col xl:flex-row xl:items-center justify-between gap-4 relative overflow-visible">
+            <div className="flex items-center gap-3.5 relative z-10 min-w-0">
               <div className="w-10 h-10 rounded-lg bg-white border border-[#CAD8CE] flex items-center justify-center text-[#2D6A4F] shadow-xs shrink-0">
                 <BarChart3 className="w-5 h-5 text-[#2D6A4F]" />
               </div>
-              <div>
-                <div className="flex items-center gap-2 flex-wrap">
-                  <h1 className="font-sans font-bold text-lg sm:text-xl text-[#1B4332] tracking-tight">
-                    Real-time Telemetry &amp; Audience Intelligence
-                  </h1>
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-[#2D6A4F]/10 text-[#2D6A4F] border border-[#2D6A4F]/20">
-                    <ShieldCheck className="w-3.5 h-3.5" /> Edge Verified &amp; GDPR Compliant
-                  </span>
+              <div className="flex items-center gap-2 flex-wrap min-w-0">
+                <h1 className="font-sans font-bold text-lg sm:text-xl text-[#1B4332] tracking-tight whitespace-normal sm:whitespace-nowrap">
+                  Real-time Telemetry &amp; Audience Intelligence
+                </h1>
+                {/* Information Tooltip */}
+                <div className="relative group/tooltip inline-flex items-center">
+                  <button
+                    type="button"
+                    className="text-[#406856]/70 hover:text-[#2D6A4F] transition-colors p-1 rounded-full cursor-pointer focus:outline-hidden"
+                    aria-label="Telemetry and compliance details"
+                  >
+                    <Info className="w-4 h-4" />
+                  </button>
+                  <div className="absolute left-0 sm:left-1/2 sm:-translate-x-1/2 top-full mt-2 hidden group-hover/tooltip:flex group-focus-within/tooltip:flex flex-col w-72 p-3 bg-[#1B4332] text-white text-xs rounded-xl shadow-xl border border-[#2D6A4F]/40 z-50 pointer-events-none">
+                    <div className="flex items-center gap-1.5 font-semibold text-emerald-300 mb-1">
+                      <ShieldCheck className="w-3.5 h-3.5" /> Edge Verified &amp; GDPR Compliant
+                    </div>
+                    <p className="text-slate-200 text-xs leading-relaxed font-normal">
+                      Sub-millisecond edge metrics, deterministic privacy hashes, zero-latency geo-routing, and live visitor streams.
+                    </p>
+                  </div>
                 </div>
-                <p className="text-xs sm:text-sm text-[#406856] mt-0.5 leading-normal">
-                  Sub-millisecond edge metrics, deterministic privacy hashes, zero-latency geo-routing, and live visitor streams.
-                </p>
               </div>
             </div>
 

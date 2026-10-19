@@ -3,7 +3,6 @@ import assert from 'node:assert/strict';
 import jwt from 'jsonwebtoken';
 
 const BASE_URL = process.env.TEST_BASE_URL || 'http://localhost:3000';
-const JWT_SECRET = process.env.JWT_SECRET || 'treeinbio_jwt_secret_production_key_2026_secured';
 
 const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$/;
 const PHONE_REGEX = /^(\+?[0-9\s\-().]{7,20})$/;
@@ -126,7 +125,7 @@ describe('Bookings API & Double-Booking Prevention End-to-End Suite', () => {
     assert.equal(res.status, 400);
   });
 
-  test('POST /api/bookings - Successfully books free slot and generates Google Meet room', async () => {
+  test('POST /api/bookings - Creates a pending request without inventing meeting details', async () => {
     const res = await fetch(`${BASE_URL}/api/bookings`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -151,7 +150,10 @@ describe('Bookings API & Double-Booking Prevention End-to-End Suite', () => {
     assert.equal(data.booking.clientName, 'Sarah Casting Director');
     assert.equal(data.booking.date, testDate);
     assert.equal(data.booking.timeSlot, testSlot);
-    assert.match(data.booking.meetingUrl, /meet\.google\.com/);
+    assert.equal(data.booking.status, 'pending');
+    assert.equal(data.booking.meetingUrl, '');
+    assert.equal(data.booking.calendarEventId, '');
+    assert.match(data.message, /after the creator confirms/i);
     createdBookingId = data.booking._id;
   });
 
@@ -175,9 +177,13 @@ describe('Bookings API & Double-Booking Prevention End-to-End Suite', () => {
     assert.match(data.error, /already booked/i);
   });
 
-  const getAuthHeaders = () => ({
-    Authorization: `Bearer ${jwt.sign({ id: 'test_admin_id', username: 'emilyvance', role: 'admin' }, JWT_SECRET, { expiresIn: '7d' })}`,
-  });
+  const getAuthHeaders = () => {
+    const jwtSecret = process.env.TEST_JWT_SECRET || process.env.JWT_SECRET;
+    assert.ok(jwtSecret && jwtSecret.length >= 32, 'Set TEST_JWT_SECRET (and use the same JWT_SECRET on the test server) to run authenticated API cases.');
+    return {
+      Authorization: `Bearer ${jwt.sign({ id: 'test_admin_id', username: 'emilyvance', role: 'admin' }, jwtSecret, { expiresIn: '7d' })}`,
+    };
+  };
 
   test('GET /api/bookings - Retrieves creator bookings and includes booked slot', async () => {
     const res = await fetch(`${BASE_URL}/api/bookings?creator=emilyvance&date=${testDate}`, {
@@ -189,6 +195,24 @@ describe('Bookings API & Double-Booking Prevention End-to-End Suite', () => {
     assert.ok(data.bookings.length >= 1);
     const found = data.bookings.some(b => b.timeSlot === testSlot);
     assert.equal(found, true);
+  });
+
+  test('PATCH /api/bookings/[id] - Confirms a request only with creator-provided meeting details', async () => {
+    assert.ok(createdBookingId, 'Booking request must be created first');
+    const res = await fetch(`${BASE_URL}/api/bookings/${createdBookingId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+      body: JSON.stringify({
+        status: 'confirmed',
+        meetingUrl: 'https://meet.google.com/real-room-code',
+      }),
+    });
+
+    assert.equal(res.status, 200);
+    const data = await res.json();
+    assert.equal(data.success, true);
+    assert.equal(data.booking.status, 'confirmed');
+    assert.equal(data.booking.meetingUrl, 'https://meet.google.com/real-room-code');
   });
 
   test('DELETE /api/bookings/[id] - Cancels booking cleanly', async () => {

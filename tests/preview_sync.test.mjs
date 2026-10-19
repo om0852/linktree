@@ -2,8 +2,59 @@ import test, { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import mongoose from 'mongoose';
 import Profile from '../src/models/Profile.js';
+import { CURATED_THEMES, THEME_PRESETS } from '../src/constants/app.js';
+import { getReadableThemeColors } from '../src/lib/theme-contrast.js';
+
+const NAMED_THEME_BACKGROUNDS = {
+  'slate-950': '#020617',
+  'amber-700': '#b45309',
+  'rose-700': '#be123c',
+  'purple-800': '#5b21b6',
+};
+
+function themeBackgroundSamples(preset) {
+  const background = String(preset.bg || '');
+  const hexColors = background.match(/#[\da-f]{3}(?:[\da-f]{3})?\b/gi) || [];
+  if (hexColors.length) return hexColors;
+  const named = Object.entries(NAMED_THEME_BACKGROUNDS)
+    .filter(([name]) => background.includes(name))
+    .map(([, color]) => color);
+  return named.length ? named : ['#ffffff'];
+}
+
+function colorLuminance(hex) {
+  const normalized = hex.slice(1).length === 3
+    ? hex.slice(1).split('').map((channel) => channel + channel).join('')
+    : hex.slice(1);
+  const channels = [0, 2, 4].map((index) => parseInt(normalized.slice(index, index + 2), 16) / 255);
+  const linear = channels.map((channel) => channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4);
+  return 0.2126 * linear[0] + 0.7152 * linear[1] + 0.0722 * linear[2];
+}
+
+function contrastRatio(foreground, background) {
+  const foregroundLuminance = colorLuminance(foreground);
+  const backgroundLuminance = colorLuminance(background);
+  return (Math.max(foregroundLuminance, backgroundLuminance) + 0.05)
+    / (Math.min(foregroundLuminance, backgroundLuminance) + 0.05);
+}
 
 describe('Theme, Appearance & Feature Add-ons Field Synchronization Suite', () => {
+
+  it('resolves readable title, body, and muted text for every built-in theme', () => {
+    for (const preset of [...THEME_PRESETS, ...CURATED_THEMES]) {
+      const readable = getReadableThemeColors(preset);
+      for (const [role, color] of Object.entries(readable)) {
+        if (role === 'isDark') continue;
+        assert.match(color, /^#[\da-f]{6}$/i, `${preset.id} ${role} should resolve to a solid hex color`);
+        for (const background of themeBackgroundSamples(preset)) {
+          assert.ok(
+            contrastRatio(color, background) >= 4.5,
+            `${preset.id} ${role} should meet WCAG AA contrast on ${background}`
+          );
+        }
+      }
+    }
+  });
 
   it('validates all theme options including atelier, emerald-gold, dark-glass, sunset, minimal-light, neon', () => {
     const validThemes = ['atelier', 'emerald-gold', 'dark-glass', 'sunset', 'minimal-light', 'neon', 'emerald'];

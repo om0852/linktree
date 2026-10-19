@@ -69,7 +69,7 @@ const BookingSchema = new mongoose.Schema({
   status: {
     type: String,
     enum: ['confirmed', 'pending', 'cancelled', 'rescheduled'],
-    default: 'confirmed',
+    default: 'pending',
     index: true,
   },
   source: {
@@ -84,5 +84,9 @@ BookingSchema.index(
   { unique: false }
 );
 BookingSchema.index({ slotKey: 1 }, { unique: true, sparse: true });
+
+if (process.env.NODE_ENV !== 'production' && mongoose.models?.Booking) {
+  delete mongoose.models.Booking;
+}
 
 export default mongoose.models.Booking || mongoose.model('Booking', BookingSchema);

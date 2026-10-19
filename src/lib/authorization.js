@@ -4,6 +4,7 @@ import connectToDatabase from '@/lib/mongodb';
 import User from '@/models/User';
 import Profile from '@/models/Profile';
 import { getAuthUser } from '@/lib/auth';
+import { canAccessProfile } from '@/lib/profileOwnership';
 
 export async function requireAuth(request) {
   const session = await getAuthUser(request);
@@ -28,17 +29,13 @@ export async function requireAuth(request) {
 }
 
 export async function requireProfileOwner(request, username) {
-  if (process.env.NODE_ENV === 'test') {
-    return { user: { _id: 'test_user_id', username: String(username || 'testuser'), role: 'admin', profiles: [] } };
-  }
   const result = await requireAuth(request);
   if (result.error) return result;
   const { user } = result;
   const normalized = String(username || '').toLowerCase().trim();
-  if (user.role === 'admin' || user.username === normalized) return { user };
+  if (canAccessProfile(user, normalized)) return { user };
   const profile = await Profile.findOne({ username: normalized }).select('_id').lean();
-  const ownsWorkspace = profile && (user.profiles || []).some((id) => String(id) === String(profile._id));
-  return ownsWorkspace
+  return canAccessProfile(user, normalized, profile?._id)
     ? { user }
     : { error: NextResponse.json({ success: false, error: 'You are not authorized to access this profile.' }, { status: 403 }) };
 }

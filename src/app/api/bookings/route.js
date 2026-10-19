@@ -9,23 +9,6 @@ import { consumeRateLimit } from '@/lib/rateLimit';
 const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$/;
 const PHONE_REGEX = /^(\+?[0-9\s\-().]{7,20})$/;
 
-// Helper to generate a realistic meeting room link
-function generateMeetingLink(platform, clientName, creatorUsername) {
-  const code1 = Math.random().toString(36).substring(2, 5);
-  const code2 = Math.random().toString(36).substring(2, 6);
-  const code3 = Math.random().toString(36).substring(2, 5);
-
-  if (platform === 'zoom') {
-    const zoomId = Math.floor(1000000000 + Math.random() * 9000000000);
-    return `https://zoom.us/j/${zoomId}?pwd=tb${code1}`;
-  }
-  if (platform === 'phone') {
-    return 'Phone Conference / Direct Dial';
-  }
-  // Default: Google Meet
-  return `https://meet.google.com/${code1}-${code2}-${code3}`;
-}
-
 function bookingConflictResponse() {
   return NextResponse.json({ success: false, error: 'This slot is already booked. Please choose another time.', slotTaken: true }, { status: 409 });
 }
@@ -167,12 +150,8 @@ export async function POST(req) {
       return bookingConflictResponse();
     }
 
-    // 4. Generate meeting URL (Google Meet / Zoom)
-    const meetingUrl = typeof meetingSettings.customLocationUrl === 'string' && /^https:\/\//i.test(meetingSettings.customLocationUrl.trim())
-      ? meetingSettings.customLocationUrl.trim()
-      : generateMeetingLink(allowedPlatform, clientName.trim(), normalizedCreator);
-
-    // 5. Create and persist booking document
+    // A request does not create a calendar event or meeting room. The owner
+    // can confirm it and add real meeting details through the booking PATCH route.
     const newBooking = await Booking.create({
       slotKey,
       creatorUsername: normalizedCreator,
@@ -185,15 +164,15 @@ export async function POST(req) {
       durationMinutes: requestedDuration,
       price: meetingSettings.price || 'Free',
       meetingPlatform: allowedPlatform,
-      meetingUrl,
-      calendarEventId: `evt_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+      meetingUrl: '',
+      calendarEventId: '',
       timezone: meetingSettings.timezone || timezone || 'UTC',
-      status: 'confirmed',
+      status: 'pending',
     });
 
     return NextResponse.json({
       success: true,
-      message: 'Meeting confirmed successfully!',
+      message: 'Booking request sent. Meeting details will be shared after the creator confirms.',
       booking: newBooking,
     }, { status: 201 });
   } catch (error) {

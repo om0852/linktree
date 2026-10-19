@@ -3,7 +3,6 @@ import assert from 'node:assert/strict';
 import jwt from 'jsonwebtoken';
 
 const BASE_URL = process.env.TEST_BASE_URL || 'http://localhost:3000';
-const JWT_SECRET = process.env.JWT_SECRET || 'treeinbio_jwt_secret_production_key_2026_secured';
 
 // Regex patterns used by the application
 const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$/;
@@ -204,9 +203,13 @@ describe('Lead Capture Platform API End-to-End Suite', () => {
     createdLeadId = data.lead._id;
   });
 
-  const getAuthHeaders = () => ({
-    Authorization: `Bearer ${jwt.sign({ id: 'test_admin_id', username: testUsername, role: 'admin' }, JWT_SECRET, { expiresIn: '7d' })}`,
-  });
+  const getAuthHeaders = () => {
+    const jwtSecret = process.env.TEST_JWT_SECRET || process.env.JWT_SECRET;
+    assert.ok(jwtSecret && jwtSecret.length >= 32, 'Set TEST_JWT_SECRET (and use the same JWT_SECRET on the test server) to run authenticated API cases.');
+    return {
+      Authorization: `Bearer ${jwt.sign({ id: 'test_admin_id', username: testUsername, role: 'admin' }, jwtSecret, { expiresIn: '7d' })}`,
+    };
+  };
 
   test('GET /api/leads - Retrieves captured leads and metrics for creator', async () => {
     assert.ok(createdLeadId, 'Previous test must have created a lead');

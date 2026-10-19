@@ -89,7 +89,7 @@ export async function PATCH(request, { params }) {
     const { username: rawUsername } = await params;
     const username = decodeURIComponent(rawUsername || '').trim().toLowerCase();
     const access = await requireProfileOwner(request, username);
-    if (access.error) return json({ error: access.error.status === 401 ? 'Authentication required.' : 'Not authorized.' }, access.error.status);
+    if (access.error) return access.error;
 
     const body = await request.json();
     if (typeof body.enabled !== 'boolean') return json({ error: 'enabled must be a boolean.' }, 400);
