@@ -27,13 +27,27 @@ export async function POST(req) {
     }
 
     // Update active profile on user document
-    await User.findByIdAndUpdate(
-      authUser.userId || authUser._id,
-      {
-        $set: { activeProfileId: targetProfile._id },
-        $addToSet: { profiles: targetProfile._id }
-      }
-    );
+    const targetUserId = authUser.id || authUser.userId || authUser._id || authUser.sub;
+    let updatedUser = targetUserId 
+      ? await User.findByIdAndUpdate(
+          targetUserId,
+          {
+            $set: { activeProfileId: targetProfile._id },
+            $addToSet: { profiles: targetProfile._id }
+          },
+          { new: true }
+        )
+      : null;
+
+    if (!updatedUser && authUser.username) {
+      await User.findOneAndUpdate(
+        { username: authUser.username.toLowerCase() },
+        {
+          $set: { activeProfileId: targetProfile._id },
+          $addToSet: { profiles: targetProfile._id }
+        }
+      );
+    }
 
     return NextResponse.json({
       success: true,

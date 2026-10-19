@@ -74,7 +74,16 @@ export async function getAuthUser(request) {
 
   if (!token) return null;
 
-  return verifyToken(token);
+  const decoded = verifyToken(token);
+  if (!decoded) return null;
+
+  const userId = decoded.id || decoded.userId || decoded._id || decoded.sub;
+  return {
+    ...decoded,
+    id: userId,
+    userId: userId,
+    _id: userId,
+  };
 }
 
 /**

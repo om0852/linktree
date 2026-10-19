@@ -31,7 +31,11 @@ export async function POST(req) {
       return NextResponse.json({ success: false, error: `@${cleanUsername} is already registered. Please choose another.` }, { status: 409 });
     }
 
-    const user = await User.findById(authUser.userId || authUser._id);
+    const targetUserId = authUser.id || authUser.userId || authUser._id || authUser.sub;
+    let user = targetUserId ? await User.findById(targetUserId) : null;
+    if (!user && authUser.username) {
+      user = await User.findOne({ username: authUser.username.toLowerCase() });
+    }
     if (!user) {
       return NextResponse.json({ success: false, error: 'User account not found' }, { status: 404 });
     }

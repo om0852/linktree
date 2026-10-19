@@ -12,7 +12,11 @@ export async function GET(req) {
     }
     await connectMongo();
 
-    const user = await User.findById(authUser.userId || authUser._id).lean();
+    const targetUserId = authUser.id || authUser.userId || authUser._id || authUser.sub;
+    let user = targetUserId ? await User.findById(targetUserId).lean() : null;
+    if (!user && authUser.username) {
+      user = await User.findOne({ username: authUser.username.toLowerCase() }).lean();
+    }
     if (!user) {
       return NextResponse.json({ success: false, error: 'User account not found' }, { status: 404 });
     }
