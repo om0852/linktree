@@ -1,12 +1,13 @@
 import { NextResponse } from 'next/server';
 import { getComposioClient, isComposioConfigured } from '@/lib/composio';
-import { getAuthUser } from '@/lib/auth';
+import { requireAuth } from '@/lib/authorization';
 
 export async function GET(req) {
   try {
-    const authUser = await getAuthUser(req);
-    const { searchParams } = new URL(req.url);
-    const userId = searchParams.get('userId') || authUser?.username || 'creator';
+    const access = await requireAuth(req);
+    if (access.error) return access.error;
+    const authUser = access.user;
+    const userId = authUser.username;
 
     if (!isComposioConfigured()) {
       return NextResponse.json({
@@ -40,6 +41,8 @@ export async function GET(req) {
 
 export async function DELETE(req) {
   try {
+    const access = await requireAuth(req);
+    if (access.error) return access.error;
     const body = await req.json();
     const { accountId } = body;
 
@@ -52,6 +55,10 @@ export async function DELETE(req) {
     }
 
     const client = getComposioClient();
+    const accounts = await client.connectedAccounts.list({ userIds: [access.user.username] });
+    if (!(accounts.items || []).some((account) => String(account.id || account.nanoid) === String(accountId))) {
+      return NextResponse.json({ error: 'Connected account not found for this user.' }, { status: 404 });
+    }
     await client.connectedAccounts.delete(accountId);
 
     return NextResponse.json({

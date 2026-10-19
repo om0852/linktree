@@ -11,6 +11,7 @@ try {
 }
 
 import { DOMAIN_TARGET_CNAME as TARGET_CNAME, DOMAIN_TARGET_IP as TARGET_IP } from '@/constants/domains';
+import { requireAuth } from '@/lib/authorization';
 
 function sanitizeHostname(raw) {
   if (!raw) return '';
@@ -33,6 +34,8 @@ function sanitizeHostname(raw) {
  */
 export async function POST(request) {
   try {
+    const access = await requireAuth(request);
+    if (access.error) return access.error;
     await connectToDatabase();
     const body = await request.json();
 
@@ -55,6 +58,9 @@ export async function POST(request) {
         { status: 404 }
       );
     }
+    if (access.user.role !== 'admin' && access.user.username !== domainRecord.username) {
+      return NextResponse.json({ success: false, error: 'You are not authorized to verify this domain.' }, { status: 403 });
+    }
 
     const hostname = domainRecord.hostname;
     let resolvedCnames = [];
@@ -68,7 +74,7 @@ export async function POST(request) {
       const cnames = await dns.promises.resolveCname(hostname);
       resolvedCnames = cnames.map((c) => c.toLowerCase().replace(/\.$/, ''));
       isCnameOk = resolvedCnames.some(
-        (c) => c === TARGET_CNAME || c.includes(TARGET_CNAME)
+        (c) => c === TARGET_CNAME
       );
     } catch (err) {
       dnsErrors.push(`CNAME lookup: ${err.code || err.message}`);

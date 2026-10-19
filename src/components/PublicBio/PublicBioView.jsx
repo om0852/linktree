@@ -74,7 +74,9 @@ const ICON_MAP = {
   Imdb: ImdbIcon
 };
 
-export default function PublicBioView({ profile, onBackToEditor, onIncrementClick }) {
+export default function PublicBioView({ profile: initialProfile, onBackToEditor, onIncrementClick }) {
+  const [unlockedProfile, setUnlockedProfile] = useState(null);
+  const profile = unlockedProfile || initialProfile;
   // Start with responsive default based on client screen size, with clean switching to 'tablet' and 'mobile'
   const [deviceMode, setDeviceMode] = useState('mobile');
 
@@ -1676,7 +1678,11 @@ export default function PublicBioView({ profile, onBackToEditor, onIncrementClic
             <AccessGateScreen 
               accessGate={profile.accessGate} 
               profileTitle={profile.name || profile.title || profile.username}
-              onUnlock={() => setIsGateUnlocked(true)}
+              onUnlock={(nextProfile) => {
+                if (nextProfile) setUnlockedProfile(nextProfile);
+                setIsGateUnlocked(true);
+              }}
+              username={profile.username}
             />
           </div>
         ) : (

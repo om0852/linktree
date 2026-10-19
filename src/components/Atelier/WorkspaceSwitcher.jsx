@@ -18,7 +18,6 @@ export default function WorkspaceSwitcher({
   currentUsername, 
   onProfileSwitched 
 }) {
-  const [mounted, setMounted] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [workspaces, setWorkspaces] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -30,27 +29,23 @@ export default function WorkspaceSwitcher({
   const [creating, setCreating] = useState(false);
   const dropdownRef = useRef(null);
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
   // Fetch workspaces on mount
-  const loadWorkspaces = async () => {
-    try {
-      const res = await fetch('/api/profile/workspaces');
-      if (res.ok) {
+  useEffect(() => {
+    let cancelled = false;
+    const fetchWorkspaces = async () => {
+      try {
+        const res = await fetch('/api/profile/workspaces');
+        if (!res.ok) return;
         const data = await res.json();
-        if (data.success && data.workspaces) {
+        if (!cancelled && data.success && data.workspaces) {
           setWorkspaces(data.workspaces);
         }
+      } catch (err) {
+        if (!cancelled) console.error('Failed to load workspaces:', err);
       }
-    } catch (err) {
-      console.error('Failed to load workspaces:', err);
-    }
-  };
-
-  useEffect(() => {
-    loadWorkspaces();
+    };
+    fetchWorkspaces();
+    return () => { cancelled = true; };
   }, [currentUsername]);
 
   // Click outside listener
@@ -227,7 +222,7 @@ export default function WorkspaceSwitcher({
       )}
 
       {/* Create New Workspace Modal */}
-      {showCreateModal && mounted && createPortal(
+      {showCreateModal && typeof document !== 'undefined' && createPortal(
         <div 
           className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn"
           onClick={() => setShowCreateModal(false)}

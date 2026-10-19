@@ -49,12 +49,9 @@ export async function syncLeadToGoogleContacts(lead, creatorUsername = 'creator_
     let accounts = null;
     try {
       accounts = await client.connectedAccounts.list({ userIds: [userId] });
-    } catch {
-      try {
-        accounts = await client.connectedAccounts.list();
-      } catch {
-        accounts = null;
-      }
+    } catch (error) {
+      console.error('Could not retrieve connected account for lead owner:', error.message);
+      accounts = null;
     }
 
     const connectedGoogleAcc = accounts?.items?.find((acc) => {
@@ -92,13 +89,11 @@ export async function syncLeadToGoogleContacts(lead, creatorUsername = 'creator_
       try {
         result = await client.tools.execute('googlecontacts_create_contact', {
           userId,
-          dangerouslySkipVersionCheck: true,
           arguments: contactParams,
         });
       } catch (primaryErr) {
         result = await client.tools.execute('GOOGLECONTACTS_CREATE_CONTACT', {
           userId,
-          dangerouslySkipVersionCheck: true,
           arguments: contactParams,
         });
       }
@@ -109,7 +104,6 @@ export async function syncLeadToGoogleContacts(lead, creatorUsername = 'creator_
 
       result = await client.tools.execute('GMAIL_CREATE_EMAIL_DRAFT', {
         userId,
-        dangerouslySkipVersionCheck: true,
         arguments: {
           recipient_email: email || connectedGoogleAcc.data?.displayName || 'lead@example.com',
           subject: draftSubject,

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import connectToDatabase from '@/lib/mongodb';
 import AnalyticsEvent from '@/models/AnalyticsEvent';
+import { requireProfileOwner } from '@/lib/authorization';
 
 export async function GET(request) {
   try {
@@ -11,6 +12,8 @@ export async function GET(request) {
     if (!targetId) {
       return new NextResponse('target_id or username parameter is required', { status: 400 });
     }
+    const access = await requireProfileOwner(request, targetId);
+    if (access.error) return access.error;
 
     await connectToDatabase();
 
@@ -22,7 +25,7 @@ export async function GET(request) {
     } else if (range === '7d') {
       startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
     } else if (range === 'all') {
-      startDate = new Date(0);
+      startDate = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
     }
 
     const events = await AnalyticsEvent.find({

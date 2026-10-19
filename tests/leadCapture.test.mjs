@@ -1,7 +1,9 @@
 import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
+import jwt from 'jsonwebtoken';
 
 const BASE_URL = process.env.TEST_BASE_URL || 'http://localhost:3000';
+const JWT_SECRET = process.env.JWT_SECRET || 'treeinbio_jwt_secret_production_key_2026_secured';
 
 // Regex patterns used by the application
 const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$/;
@@ -202,10 +204,16 @@ describe('Lead Capture Platform API End-to-End Suite', () => {
     createdLeadId = data.lead._id;
   });
 
+  const getAuthHeaders = () => ({
+    Authorization: `Bearer ${jwt.sign({ id: 'test_admin_id', username: testUsername, role: 'admin' }, JWT_SECRET, { expiresIn: '7d' })}`,
+  });
+
   test('GET /api/leads - Retrieves captured leads and metrics for creator', async () => {
     assert.ok(createdLeadId, 'Previous test must have created a lead');
 
-    const res = await fetch(`${BASE_URL}/api/leads?username=${testUsername}`);
+    const res = await fetch(`${BASE_URL}/api/leads?username=${testUsername}`, {
+      headers: getAuthHeaders(),
+    });
     assert.equal(res.status, 200);
 
     const data = await res.json();
@@ -227,7 +235,9 @@ describe('Lead Capture Platform API End-to-End Suite', () => {
   });
 
   test('GET /api/leads - Filters leads by search query', async () => {
-    const res = await fetch(`${BASE_URL}/api/leads?username=${testUsername}&q=Cyberdyne`);
+    const res = await fetch(`${BASE_URL}/api/leads?username=${testUsername}&q=Cyberdyne`, {
+      headers: getAuthHeaders(),
+    });
     assert.equal(res.status, 200);
 
     const data = await res.json();
@@ -237,7 +247,9 @@ describe('Lead Capture Platform API End-to-End Suite', () => {
   });
 
   test('GET /api/leads/export - Generates downloadable RFC 4180 CSV export', async () => {
-    const res = await fetch(`${BASE_URL}/api/leads/export?username=${testUsername}`);
+    const res = await fetch(`${BASE_URL}/api/leads/export?username=${testUsername}`, {
+      headers: getAuthHeaders(),
+    });
     assert.equal(res.status, 200);
 
     const contentType = res.headers.get('content-type');
@@ -258,7 +270,7 @@ describe('Lead Capture Platform API End-to-End Suite', () => {
 
     const res = await fetch(`${BASE_URL}/api/leads/sync`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
       body: JSON.stringify({
         leadId: createdLeadId,
         username: testUsername,
@@ -277,6 +289,7 @@ describe('Lead Capture Platform API End-to-End Suite', () => {
 
     const res = await fetch(`${BASE_URL}/api/leads?id=${createdLeadId}&username=${testUsername}`, {
       method: 'DELETE',
+      headers: getAuthHeaders(),
     });
 
     assert.equal(res.status, 200);
@@ -284,7 +297,9 @@ describe('Lead Capture Platform API End-to-End Suite', () => {
     assert.equal(data.success, true);
 
     // Verify lead is gone
-    const verifyRes = await fetch(`${BASE_URL}/api/leads?username=${testUsername}`);
+    const verifyRes = await fetch(`${BASE_URL}/api/leads?username=${testUsername}`, {
+      headers: getAuthHeaders(),
+    });
     const verifyData = await verifyRes.json();
     const stillExists = verifyData.leads.some((l) => l._id === createdLeadId);
     assert.equal(stillExists, false, 'Deleted lead should no longer exist in database');

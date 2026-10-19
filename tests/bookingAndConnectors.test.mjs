@@ -1,7 +1,9 @@
 import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
+import jwt from 'jsonwebtoken';
 
 const BASE_URL = process.env.TEST_BASE_URL || 'http://localhost:3000';
+const JWT_SECRET = process.env.JWT_SECRET || 'treeinbio_jwt_secret_production_key_2026_secured';
 
 const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$/;
 const PHONE_REGEX = /^(\+?[0-9\s\-().]{7,20})$/;
@@ -64,9 +66,16 @@ describe('Meeting Scheduling & Booking Unit Suite', () => {
 });
 
 describe('Bookings API & Double-Booking Prevention End-to-End Suite', () => {
-  const runId = Math.random().toString(36).substring(2, 6);
-  const testDate = `2027-03-${String(10 + Math.floor(Math.random() * 18)).padStart(2, '0')}`;
-  const testSlot = `${(Math.floor(Math.random() * 8) + 1)}:30 PM`;
+  const futureYear = 2029 + Math.floor(Math.random() * 5);
+  const futureMonth = Math.floor(Math.random() * 12);
+  const futureDay = 1 + Math.floor(Math.random() * 20);
+  const d = new Date(Date.UTC(futureYear, futureMonth, futureDay));
+  while (d.getUTCDay() === 0 || d.getUTCDay() === 6) {
+    d.setUTCDate(d.getUTCDate() + 1);
+  }
+  const testDate = d.toISOString().slice(0, 10);
+  const availableSlots = generateSlots('10:00', '16:00', 30);
+  const testSlot = availableSlots[Math.floor(Math.random() * availableSlots.length)];
   let createdBookingId = null;
 
   test('POST /api/bookings - Rejects submission without creator username', async () => {
@@ -166,8 +175,14 @@ describe('Bookings API & Double-Booking Prevention End-to-End Suite', () => {
     assert.match(data.error, /already booked/i);
   });
 
+  const getAuthHeaders = () => ({
+    Authorization: `Bearer ${jwt.sign({ id: 'test_admin_id', username: 'emilyvance', role: 'admin' }, JWT_SECRET, { expiresIn: '7d' })}`,
+  });
+
   test('GET /api/bookings - Retrieves creator bookings and includes booked slot', async () => {
-    const res = await fetch(`${BASE_URL}/api/bookings?creator=emilyvance&date=${testDate}`);
+    const res = await fetch(`${BASE_URL}/api/bookings?creator=emilyvance&date=${testDate}`, {
+      headers: getAuthHeaders(),
+    });
     assert.equal(res.status, 200);
     const data = await res.json();
     assert.equal(data.success, true);
@@ -181,6 +196,7 @@ describe('Bookings API & Double-Booking Prevention End-to-End Suite', () => {
 
     const res = await fetch(`${BASE_URL}/api/bookings/${createdBookingId}`, {
       method: 'DELETE',
+      headers: getAuthHeaders(),
     });
     assert.equal(res.status, 200);
     const data = await res.json();

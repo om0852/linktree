@@ -1,9 +1,13 @@
 import { NextResponse } from 'next/server';
 import { getComposioClient, isComposioConfigured } from '@/lib/composio';
+import { requireAuth } from '@/lib/authorization';
 
 export async function POST(req) {
   try {
-    const { userId = 'creator_default', toolSlug, params = {} } = await req.json();
+    const access = await requireAuth(req);
+    if (access.error) return access.error;
+    const { toolSlug, params = {} } = await req.json();
+    const userId = access.user.username;
 
     if (!toolSlug) {
       return NextResponse.json({ error: 'toolSlug is required' }, { status: 400 });
@@ -20,7 +24,6 @@ export async function POST(req) {
     const client = getComposioClient();
     const result = await client.tools.execute(toolSlug, {
       userId,
-      dangerouslySkipVersionCheck: true,
       arguments: params
     });
 

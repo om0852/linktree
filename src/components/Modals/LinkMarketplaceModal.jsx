@@ -458,7 +458,7 @@ export default function LinkMarketplaceModal({
             {filteredItems.length === 0 ? (
               <div className="text-center py-16 flex flex-col items-center justify-center gap-2 text-[#5C6B64]">
                 <Search className="w-8 h-8 opacity-40" />
-                <p className="text-sm font-semibold text-[#28352F]">No integration apps match "{search}"</p>
+                <p className="text-sm font-semibold text-[#28352F]">No integration apps match &quot;{search}&quot;</p>
                 <p className="text-xs">Press Enter to add it as a direct URL link.</p>
               </div>
             ) : (

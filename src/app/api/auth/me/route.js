@@ -3,6 +3,7 @@ import connectToDatabase from '@/lib/mongodb';
 import User from '@/models/User';
 import Profile from '@/models/Profile';
 import { getAuthUser } from '@/lib/auth';
+import { toOwnerProfile } from '@/lib/publicProfile';
 
 export async function GET(request) {
   try {
@@ -47,7 +48,7 @@ export async function GET(request) {
         activeProfileId: user.activeProfileId?.toString() || profile?._id?.toString() || null,
         activeUsername: profile?.username || user.username,
       },
-      profile: profile || null,
+      profile: toOwnerProfile(profile),
     });
   } catch (error) {
     console.error('Auth me error:', error);

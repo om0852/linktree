@@ -5,6 +5,7 @@ import connectToDatabase from '@/lib/mongodb';
 import Profile from '@/models/Profile';
 import CustomDomain from '@/models/CustomDomain';
 import PublicBioView from '@/components/PublicBio/PublicBioView';
+import { toPublicProfile } from '@/lib/publicProfile';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -78,20 +79,21 @@ export async function generateMetadata({ params }) {
   }
 
   const titlePrefix = customDomainHeader ? `${profile.name || profile.title}` : `${profile.name || profile.title} (@${profile.username})`;
+  const isPasscodeGated = Boolean(profile.accessGate?.enabled && profile.accessGate.type === 'passcode');
 
   return {
     title: `${titlePrefix} | TreeInBio`,
-    description: profile.bio || `Explore links, videos, and portfolio for ${profile.name}`,
+    description: isPasscodeGated ? 'This profile requires a passcode to view.' : (profile.bio || `Explore links, videos, and portfolio for ${profile.name}`),
     openGraph: {
       title: `${titlePrefix}`,
-      description: profile.bio,
-      images: profile.avatar ? [{ url: profile.avatar }] : [],
+      description: isPasscodeGated ? 'This profile requires a passcode to view.' : profile.bio,
+      images: !isPasscodeGated && profile.avatar ? [{ url: profile.avatar }] : [],
     },
     twitter: {
       card: 'summary_large_image',
       title: `${titlePrefix}`,
-      description: profile.bio,
-      images: profile.avatar ? [profile.avatar] : [],
+      description: isPasscodeGated ? 'This profile requires a passcode to view.' : profile.bio,
+      images: !isPasscodeGated && profile.avatar ? [profile.avatar] : [],
     },
   };
 }
@@ -108,7 +110,23 @@ export default async function PublicProfilePage({ params }) {
   }
 
   const profile = await resolveProfile(username, customDomainHeader);
-  const profileData = profile ? JSON.parse(JSON.stringify(profile)) : null;
+  const isPasscodeGated = Boolean(profile?.accessGate?.enabled && profile.accessGate.type === 'passcode');
+  const profileData = profile ? toPublicProfile(profile) : null;
+  if (profileData && isPasscodeGated) {
+    profileData.bio = '';
+    profileData.avatar = '';
+    profileData.socials = {};
+    profileData.links = [];
+    profileData.collections = [];
+    profileData.widgets = {
+      hasNewsletter: false,
+      hasTipJar: false,
+      mediaKitStats: { followers: '0', engagement: '0%', monthlyViews: '0' },
+    };
+    profileData.shop = { enabled: false, products: [] };
+    profileData.leadCapture = { enabled: false };
+    profileData.designSettings = { ...profileData.designSettings, stickers: [] };
+  }
 
   if (!profileData) {
     const isDomain = username?.includes('.') || Boolean(customDomainHeader);

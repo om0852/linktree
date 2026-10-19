@@ -103,9 +103,9 @@ const ProfileSchema = new mongoose.Schema({
     newsletterTitle: { type: String, default: '' },
     hasTipJar: { type: Boolean, default: true },
     mediaKitStats: {
-      followers: { type: String, default: '100K' },
-      engagement: { type: String, default: '4.5%' },
-      monthlyViews: { type: String, default: '500K' },
+      followers: { type: String, default: '0' },
+      engagement: { type: String, default: '0%' },
+      monthlyViews: { type: String, default: '0' },
     },
   },
   storyBubble: {

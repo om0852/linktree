@@ -2,15 +2,15 @@ import { NextResponse } from 'next/server';
 import connectMongo from '@/lib/mongodb';
 import User from '@/models/User';
 import Profile from '@/models/Profile';
-import { getAuthUser } from '@/lib/auth';
 import { INITIAL_USER_PROFILE } from '@/constants/app';
+import { requireAuth } from '@/lib/authorization';
+import { toOwnerProfile } from '@/lib/publicProfile';
 
 export async function POST(req) {
   try {
-    const authUser = await getAuthUser(req);
-    if (!authUser) {
-      return NextResponse.json({ success: false, error: 'Sign-in required' }, { status: 401 });
-    }
+    const access = await requireAuth(req);
+    if (access.error) return access.error;
+    const authUser = access.user;
     await connectMongo();
 
     const body = await req.json();
@@ -40,11 +40,13 @@ export async function POST(req) {
       return NextResponse.json({ success: false, error: 'User account not found' }, { status: 404 });
     }
 
-    const maxProfiles = user.maxProfiles || 10;
-    const currentProfilesCount = (user.profiles || []).length;
-    if (currentProfilesCount >= maxProfiles && user.role !== 'admin' && user.role !== 'agency') {
-      // Automatically upgrade user role to agency to allow multi-brand workspace management
-      user.role = 'agency';
+    const maxProfiles = user.maxProfiles ?? 1;
+    const primaryProfile = await Profile.findOne({ username: user.username }).select('_id').lean();
+    const currentProfileIds = new Set((user.profiles || []).map((id) => String(id)));
+    if (primaryProfile) currentProfileIds.add(String(primaryProfile._id));
+    const currentProfilesCount = currentProfileIds.size;
+    if (currentProfilesCount >= maxProfiles && user.role !== 'admin') {
+      return NextResponse.json({ success: false, error: 'Workspace limit reached for this account.' }, { status: 403 });
     }
 
     // Create new profile with clean defaults
@@ -72,7 +74,7 @@ export async function POST(req) {
     return NextResponse.json({
       success: true,
       message: `New brand workspace @${newProfile.username} created successfully!`,
-      profile: newProfile.toObject ? newProfile.toObject() : newProfile,
+      profile: toOwnerProfile(newProfile),
     });
   } catch (error) {
     console.error('Create workspace error:', error);

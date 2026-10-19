@@ -12,27 +12,31 @@ import {
   EyeOff
 } from 'lucide-react';
 
-export default function AccessGateScreen({ accessGate, profileTitle, onUnlock }) {
+export default function AccessGateScreen({ accessGate, profileTitle, onUnlock, username }) {
   const [enteredPasscode, setEnteredPasscode] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [isUnlocked, setIsUnlocked] = useState(false);
 
   const gateType = accessGate?.type || 'sensitive'; // 'passcode' | 'age_18' | 'sensitive'
-  const targetPasscode = accessGate?.passcode || '';
-
-  const handleVerifyPasscode = (e) => {
+  const handleVerifyPasscode = async (e) => {
     e.preventDefault();
     if (!enteredPasscode.trim()) {
       setErrorMsg('Please enter the profile passcode.');
       return;
     }
 
-    if (enteredPasscode.trim() === targetPasscode.trim()) {
+    try {
+      const response = await fetch('/api/profile/access', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, passcode: enteredPasscode }),
+      });
+      const result = await response.json();
+      if (!response.ok || !result.success) throw new Error(result.error || 'Incorrect passcode.');
       setErrorMsg('');
       setIsUnlocked(true);
-      setTimeout(() => onUnlock(), 400);
-    } else {
-      setErrorMsg('Incorrect passcode. Please try again.');
+      setTimeout(() => onUnlock(result.profile), 400);
+    } catch (error) {
+      setErrorMsg(error.message || 'Incorrect passcode. Please try again.');
     }
   };
 

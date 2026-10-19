@@ -5,6 +5,7 @@ import Profile from '@/models/Profile';
 import Booking from '@/models/Booking';
 import Subscriber from '@/models/Subscriber';
 import { getCountryFlag } from '@/lib/telemetry';
+import { requireProfileOwner } from '@/lib/authorization';
 
 export async function GET(request) {
   try {
@@ -15,6 +16,8 @@ export async function GET(request) {
     if (!targetId) {
       return NextResponse.json({ success: false, error: 'target_id or username parameter is required' }, { status: 400 });
     }
+    const access = await requireProfileOwner(request, targetId);
+    if (access.error) return access.error;
 
     await connectToDatabase();
 
@@ -27,7 +30,7 @@ export async function GET(request) {
     } else if (range === '7d') {
       startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
     } else if (range === 'all') {
-      startDate = new Date(0); // Epoch start
+      startDate = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
     }
 
     const queryFilter = {
@@ -60,6 +63,7 @@ export async function GET(request) {
       // A. All Human Events (views & clicks) in range
       AnalyticsEvent.find({ ...queryFilter, is_bot: false })
         .select('event_type link_id timestamp ip_hash latency_ms')
+        .limit(10000)
         .lean(),
 
       // B. Bot Events count

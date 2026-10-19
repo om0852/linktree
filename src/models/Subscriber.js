@@ -23,6 +23,7 @@ const SubscriberSchema = new mongoose.Schema({
     trim: true,
     default: '',
   },
+  publicSocialProof: { type: Boolean, default: false },
   leadMagnetLinkId: {
     type: String,
     default: '',

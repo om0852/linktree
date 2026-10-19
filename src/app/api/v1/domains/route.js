@@ -11,7 +11,7 @@ try {
 }
 
 import { DOMAIN_TARGET_CNAME as TARGET_CNAME, DOMAIN_TARGET_IP as TARGET_IP, RESERVED_HOSTNAMES } from '@/constants/domains';
-import { getAuthUser } from '@/lib/auth';
+import { requireAuth } from '@/lib/authorization';
 
 function sanitizeHostname(raw) {
   if (!raw) return '';
@@ -33,29 +33,14 @@ function isValidDomain(hostname) {
 export async function GET(request) {
   try {
     await connectToDatabase();
-    const authUser = await getAuthUser(request);
+    const access = await requireAuth(request);
+    if (access.error) return access.error;
+    const authUser = access.user;
     const { searchParams } = new URL(request.url);
     const rawUsername = searchParams.get('username')?.toLowerCase()?.trim();
     const username = rawUsername || authUser?.username;
 
-    if (!username && !authUser) {
-      return NextResponse.json({
-        success: true,
-        domains: [],
-        instructions: {
-          cname: {
-            type: 'CNAME',
-            target: TARGET_CNAME,
-            recommendedFor: 'Subdomains (e.g., bio.yourbrand.com, links.yoursite.com)',
-          },
-          aRecord: {
-            type: 'A',
-            target: TARGET_IP,
-            recommendedFor: 'Apex / Root domains (e.g., yoursite.com)',
-          },
-        },
-      });
-    }
+    if (rawUsername && authUser.role !== 'admin' && rawUsername !== authUser.username) return NextResponse.json({ success: false, error: 'Forbidden.' }, { status: 403 });
 
     const query = username ? { username } : {};
     const domains = await CustomDomain.find(query).sort({ createdAt: -1 }).lean();
@@ -86,7 +71,9 @@ export async function GET(request) {
 export async function POST(request) {
   try {
     await connectToDatabase();
-    const authUser = await getAuthUser(request);
+    const access = await requireAuth(request);
+    if (access.error) return access.error;
+    const authUser = access.user;
     const body = await request.json();
 
     const rawHostname = body.hostname || body.domain;
@@ -102,7 +89,7 @@ export async function POST(request) {
     const hostname = sanitizeHostname(rawHostname);
     const username = rawUsername.toLowerCase().trim();
 
-    if (authUser && authUser.username !== username && authUser.role !== 'admin') {
+    if (authUser.username !== username && authUser.role !== 'admin') {
       return NextResponse.json(
         { success: false, error: 'You are not authorized to add domains for another user.' },
         { status: 403 }
@@ -183,7 +170,9 @@ export async function POST(request) {
 export async function DELETE(request) {
   try {
     await connectToDatabase();
-    const authUser = await getAuthUser(request);
+    const access = await requireAuth(request);
+    if (access.error) return access.error;
+    const authUser = access.user;
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
     const hostname = searchParams.get('hostname');
@@ -202,7 +191,7 @@ export async function DELETE(request) {
       return NextResponse.json({ success: false, error: 'Domain not found.' }, { status: 404 });
     }
 
-    if (authUser && authUser.username !== domainRecord.username && authUser.role !== 'admin') {
+    if (authUser.username !== domainRecord.username && authUser.role !== 'admin') {
       return NextResponse.json(
         { success: false, error: 'You are not authorized to delete this domain.' },
         { status: 403 }

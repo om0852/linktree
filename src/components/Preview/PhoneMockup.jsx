@@ -85,7 +85,19 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
   const contentCanvasTabletRef = React.useRef(null);
   const contentCanvasLaptopRef = React.useRef(null);
   const phoneViewportRef = React.useRef(null);
-  const lastStickerInteractionTimeRef = React.useRef(0);
+  const ignoreNextViewportClickRef = React.useRef(false);
+  const interactionTimerRef = React.useRef(null);
+  const stickerSequenceRef = React.useRef(0);
+  const stickerInstanceId = React.useId();
+
+  const markStickerInteraction = () => {
+    ignoreNextViewportClickRef.current = true;
+    if (interactionTimerRef.current) clearTimeout(interactionTimerRef.current);
+    interactionTimerRef.current = setTimeout(() => {
+      ignoreNextViewportClickRef.current = false;
+      interactionTimerRef.current = null;
+    }, 800);
+  };
 
   const getActiveCanvasRef = React.useCallback(() => {
     if (deviceMode === 'tablet') return contentCanvasTabletRef;
@@ -148,7 +160,8 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
 
   const handleViewportClick = (e) => {
     // If user just dragged, resized, rotated, or clicked a sticker, do NOT deselect!
-    if (Date.now() < lastStickerInteractionTimeRef.current) {
+    if (ignoreNextViewportClickRef.current) {
+      ignoreNextViewportClickRef.current = false;
       return;
     }
     // Only deselect if user explicitly clicked outside stickers
@@ -587,8 +600,9 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
         ? Number((relativeY * targetEl.offsetHeight / targetRect.height).toFixed(3))
         : Math.max(2, Math.min(98, Math.round((relativeY / targetRect.height) * 100)));
 
+      const stickerSequence = ++stickerSequenceRef.current;
       const baseSticker = {
-        id: `stk_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
+        id: `stk_${stickerInstanceId}_${stickerSequence}`,
         src: isImageUrl(stickerData.src) ? stickerData.src : '',
         emoji: stickerData.emoji || '✨',
         name: stickerData.name || 'Sticker',
@@ -597,7 +611,7 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
         y,
         coordinateMode,
         scale: 1,
-        rotate: Math.floor(Math.random() * 20) - 10,
+        rotate: ((stickerSequence * 7) % 20) - 10,
         flipX: false,
       };
 
@@ -690,7 +704,7 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
     }
     e.stopPropagation();
     setSelectedStickerId(stickerId);
-    lastStickerInteractionTimeRef.current = Date.now() + 800;
+    markStickerInteraction();
     if (!onUpdateStickers) return;
 
     const canvasEl = targetCanvasRef?.current || contentCanvasRef.current;
@@ -713,7 +727,7 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
     const onMouseMove = (moveEvent) => {
       moveEvent.preventDefault();
       hasMoved = true;
-      lastStickerInteractionTimeRef.current = Date.now() + 800;
+      markStickerInteraction();
       const currentX = moveEvent.clientX - targetRect.left;
       const currentY = moveEvent.clientY - targetRect.top;
       const xPct = Math.max(2, Math.min(98, Math.round((currentX / targetRect.width) * 100)));
@@ -727,7 +741,7 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
     const onMouseUp = () => {
       window.removeEventListener('mousemove', onMouseMove);
       window.removeEventListener('mouseup', onMouseUp);
-      lastStickerInteractionTimeRef.current = Date.now() + 800;
+      markStickerInteraction();
       setSelectedStickerId(stickerId);
 
       if (hasMoved) {
@@ -751,7 +765,7 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
   const handleStickerResizeMouseDown = (e, stickerId) => {
     e.stopPropagation();
     setSelectedStickerId(stickerId);
-    lastStickerInteractionTimeRef.current = Date.now() + 800;
+    markStickerInteraction();
     if (!onUpdateStickers) return;
 
     const currentStickers = profile?.designSettings?.stickers || [];
@@ -796,7 +810,7 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
     const onMouseMove = (moveEvent) => {
       moveEvent.preventDefault();
       hasMoved = true;
-      lastStickerInteractionTimeRef.current = Date.now() + 800;
+      markStickerInteraction();
       const cornerVectorX = moveEvent.clientX - grabOffsetX - fixedCornerX;
       const cornerVectorY = moveEvent.clientY - grabOffsetY - fixedCornerY;
       const normalizedVectorX = cornerVectorX / (screenScaleX || 1);
@@ -826,7 +840,7 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
     const onMouseUp = () => {
       window.removeEventListener('mousemove', onMouseMove);
       window.removeEventListener('mouseup', onMouseUp);
-      lastStickerInteractionTimeRef.current = Date.now() + 800;
+      markStickerInteraction();
       setSelectedStickerId(stickerId);
 
       if (hasMoved) {
@@ -849,7 +863,7 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
   const handleStickerRotateMouseDown = (e, stickerId) => {
     e.stopPropagation();
     setSelectedStickerId(stickerId);
-    lastStickerInteractionTimeRef.current = Date.now() + 800;
+    markStickerInteraction();
     if (!onUpdateStickers) return;
 
     const currentStickers = profile?.designSettings?.stickers || [];
@@ -870,7 +884,7 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
     const onMouseMove = (moveEvent) => {
       moveEvent.preventDefault();
       hasMoved = true;
-      lastStickerInteractionTimeRef.current = Date.now() + 800;
+      markStickerInteraction();
       const currentAngle = Math.atan2(moveEvent.clientY - centerY, moveEvent.clientX - centerX) * (180 / Math.PI);
       const angleDiff = currentAngle - initialAngle;
       let newRotate = Math.round((startRotate + angleDiff) % 360);
@@ -887,7 +901,7 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
     const onMouseUp = () => {
       window.removeEventListener('mousemove', onMouseMove);
       window.removeEventListener('mouseup', onMouseUp);
-      lastStickerInteractionTimeRef.current = Date.now() + 800;
+      markStickerInteraction();
       setSelectedStickerId(stickerId);
 
       if (hasMoved) {
@@ -980,7 +994,7 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
               onClick={(e) => {
                 e.stopPropagation();
                 setSelectedStickerId(stk.id);
-                lastStickerInteractionTimeRef.current = Date.now() + 800;
+                markStickerInteraction();
               }}
               onMouseDown={(e) => handleStickerMouseDown(e, stk.id, targetCanvasRef)}
               title={`[${deviceMode.toUpperCase()}] Drag to move, click to edit sticker`}

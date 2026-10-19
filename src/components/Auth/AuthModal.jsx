@@ -175,7 +175,9 @@ export default function AuthModal({ isOpen = true, onClose, onSuccess, initialMo
                   id="tb-auth-password"
                   type="password"
                   required
-                  placeholder={mode === 'register' ? 'At least 6 characters' : 'Enter your password'}
+                  placeholder={mode === 'register' ? 'At least 12 characters' : 'Enter your password'}
+                  minLength={mode === 'register' ? 12 : undefined}
+                  maxLength={128}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full pl-8 pr-3 py-1.5 bg-[#F5F3ED] border border-[#CAD8CE] rounded text-xs text-[#28352F] focus:outline-none focus:border-[#52796F]"

@@ -2,15 +2,18 @@ import { NextResponse } from 'next/server';
 import connectToDatabase from '@/lib/mongodb';
 import User from '@/models/User';
 import { verifyPassword, signToken, setAuthCookie } from '@/lib/auth';
+import { consumeRateLimit } from '@/lib/rateLimit';
 
 export async function POST(request) {
   try {
+    const rate = consumeRateLimit(request, 'login', 10, 15 * 60 * 1000);
+    if (!rate.allowed) return NextResponse.json({ success: false, error: 'Too many sign-in attempts. Try again later.' }, { status: 429, headers: { 'Retry-After': String(rate.retryAfter) } });
     await connectToDatabase();
     const body = await request.json();
 
     const { emailOrUsername, password } = body;
 
-    if (!emailOrUsername || !emailOrUsername.trim()) {
+    if (typeof emailOrUsername !== 'string' || !emailOrUsername.trim()) {
       return NextResponse.json({ success: false, error: 'Email or username is required.' }, { status: 400 });
     }
     if (!password) {

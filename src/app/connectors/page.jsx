@@ -94,7 +94,6 @@ export default function ConnectorsPage() {
   // Fetch real connected accounts from Composio
   const fetchAccounts = useCallback(async () => {
     try {
-      setLoadingAccounts(true);
       const res = await fetch(`/api/connectors/accounts?userId=${encodeURIComponent(currentUserId)}`);
       const data = await res.json();
       setIsConfigured(data.configured !== false);
@@ -109,8 +108,23 @@ export default function ConnectorsPage() {
   }, [currentUserId]);
 
   useEffect(() => {
-    fetchAccounts();
-  }, [fetchAccounts]);
+    let cancelled = false;
+    const loadInitialAccounts = async () => {
+      try {
+        const res = await fetch(`/api/connectors/accounts?userId=${encodeURIComponent(currentUserId)}`);
+        const data = await res.json();
+        if (cancelled) return;
+        setIsConfigured(data.configured !== false);
+        if (data.accounts) setConnectedAccounts(data.accounts);
+      } catch (err) {
+        if (!cancelled) console.error('Failed to load connected accounts:', err);
+      } finally {
+        if (!cancelled) setLoadingAccounts(false);
+      }
+    };
+    loadInitialAccounts();
+    return () => { cancelled = true; };
+  }, [currentUserId]);
 
   // Initiate real Composio OAuth link
   const handleConnect = async (connector) => {

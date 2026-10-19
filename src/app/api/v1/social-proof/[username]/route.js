@@ -27,7 +27,7 @@ export async function GET(req, { params }) {
     const events = [];
 
     // 1. Recent downloads/subscribers
-    const recentSubscribers = await Subscriber.find({ profileUsername: username })
+    const recentSubscribers = await Subscriber.find({ profileUsername: username, publicSocialProof: true })
       .sort({ subscribedAt: -1 })
       .limit(5)
       .lean();
@@ -48,7 +48,7 @@ export async function GET(req, { params }) {
     }
 
     // 2. Recent bookings
-    const recentBookings = await Booking.find({ creatorUsername: username, status: 'confirmed' })
+    const recentBookings = await Booking.find({ creatorUsername: username, status: 'confirmed', publicSocialProof: true })
       .sort({ createdAt: -1 })
       .limit(3)
       .lean();
@@ -79,17 +79,6 @@ export async function GET(req, { params }) {
         title: `🔥 ${weeklyClicks.toLocaleString()} link clicks`,
         subtitle: 'trending this week on this bio',
         timeAgo: 'this week',
-      });
-    }
-
-    // Fallback if brand new profile with zero events yet:
-    if (events.length === 0) {
-      events.push({
-        id: 'welcome_verified',
-        icon: 'sparkles',
-        title: `✨ Official Verified Bio`,
-        subtitle: 'Connect and explore all links',
-        timeAgo: 'live now',
       });
     }
 

@@ -5,10 +5,13 @@ import Subscriber from '@/models/Subscriber';
 import AnalyticsEvent from '@/models/AnalyticsEvent';
 import { getComposioClient, isComposioConfigured } from '@/lib/composio';
 import { extractVisitorTelemetry } from '@/lib/telemetry';
+import { consumeRateLimit } from '@/lib/rateLimit';
 
 export async function POST(req) {
   const startTime = Date.now();
   try {
+    const rate = consumeRateLimit(req, 'lead-magnet', 8, 60 * 60 * 1000);
+    if (!rate.allowed) return NextResponse.json({ success: false, error: 'Too many unlock requests. Try again later.' }, { status: 429, headers: { 'Retry-After': String(rate.retryAfter) } });
     const body = await req.json().catch(() => ({}));
     const {
       username,
@@ -44,7 +47,7 @@ export async function POST(req) {
       return NextResponse.json({ error: 'Creator profile not found' }, { status: 404 });
     }
 
-    const targetLink = (profile.links || []).find((l) => l.id === linkId);
+    const targetLink = (profile.links || []).find((l) => l.id === linkId && l.active !== false && !l.disabled && !l.isArchived);
     if (!targetLink) {
       return NextResponse.json({ error: 'Link not found on this profile' }, { status: 404 });
     }
@@ -71,8 +74,7 @@ export async function POST(req) {
 
     // Attempt marketing sync if platform selected
     if (leadMagnet.marketingPlatform && leadMagnet.marketingPlatform !== 'none') {
-      syncStatus = 'synced';
-      syncedTo.push(leadMagnet.marketingPlatform);
+      syncStatus = 'pending';
 
       // If Composio is active, attempt background push
       if (isComposioConfigured()) {
@@ -80,18 +82,22 @@ export async function POST(req) {
           const client = getComposioClient();
           // Best effort sync to marketing tool if available
           if (leadMagnet.marketingPlatform === 'mailchimp') {
-            await client.tools.execute('MAILCHIMP_ADD_LIST_MEMBER', {
+            const syncResult = await client.tools.execute('MAILCHIMP_ADD_LIST_MEMBER', {
               userId: username.toLowerCase(),
-              dangerouslySkipVersionCheck: true,
               arguments: {
                 list_id: leadMagnet.marketingListId || 'default',
                 email_address: cleanEmail,
                 status: 'subscribed',
               },
-            }).catch(() => {});
+            });
+            if (syncResult?.successful !== false && !syncResult?.error) {
+              syncStatus = 'synced';
+              syncedTo.push(leadMagnet.marketingPlatform);
+            } else syncStatus = 'failed';
           }
-        } catch {
-          // Non-blocking background sync error
+        } catch (error) {
+          console.error('Lead magnet marketing sync failed:', error.message);
+          syncStatus = 'failed';
         }
       }
     }

@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import confetti from 'canvas-confetti';
 import { Heart, X, Check, Coffee, DollarSign } from 'lucide-react';
 
 export default function TipModal({ profile, onClose }) {
@@ -10,6 +9,7 @@ export default function TipModal({ profile, onClose }) {
   const [senderName, setSenderName] = useState('');
   const [message, setMessage] = useState('');
   const [tipped, setTipped] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
   const handleSendTip = async (e) => {
     e.preventDefault();
@@ -17,7 +17,7 @@ export default function TipModal({ profile, onClose }) {
     if (!finalAmount || finalAmount <= 0) return;
 
     try {
-      await fetch('/api/tip', {
+      const response = await fetch('/api/tip', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -27,22 +27,15 @@ export default function TipModal({ profile, onClose }) {
           message: message || '',
         }),
       });
+      const result = await response.json();
+      if (!response.ok || !result.success) throw new Error(result.message || result.error || 'Unable to record your pledge.');
     } catch (err) {
       console.error('Failed to record tip:', err);
+      setErrorMessage(err.message || 'Unable to record your pledge.');
+      return;
     }
 
-    // Trigger celebratory confetti cannon
-    confetti({
-      particleCount: 120,
-      spread: 70,
-      origin: { y: 0.6 },
-      colors: ['#6366f1', '#a855f7', '#ec4899', '#f59e0b', '#10b981']
-    });
-
     setTipped(true);
-    setTimeout(() => {
-      onClose();
-    }, 2800);
   };
 
   return (
@@ -60,9 +53,9 @@ export default function TipModal({ profile, onClose }) {
             <div className="w-14 h-14 rounded-full bg-[#52796F]/10 text-[#52796F] border border-[#52796F]/30 flex items-center justify-center mx-auto shadow-sm">
               <Check className="w-8 h-8 text-[#52796F]" />
             </div>
-            <h3 className="font-sans text-xl font-bold text-[#28352F]">Thank You for Supporting!</h3>
+            <h3 className="font-sans text-xl font-bold text-[#28352F]">Pledge Recorded</h3>
             <p className="text-sm text-[#5C6B64]">
-              Your contribution goes directly to supporting <span className="font-bold text-[#28352F]">{profile.title}</span>.
+              No payment was processed. Contact <span className="font-bold text-[#28352F]">{profile.title}</span> to arrange support.
             </p>
           </div>
         ) : (
@@ -141,12 +134,13 @@ export default function TipModal({ profile, onClose }) {
               />
             </div>
 
+            {errorMessage && <p role="alert" className="text-xs text-red-700">{errorMessage}</p>}
             <button
               type="submit"
               className="w-full py-2.5 rounded-sm bg-[#52796F] hover:bg-[#3D5C54] text-white font-semibold text-xs shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer"
             >
-              <Heart className="w-4 h-4 fill-white" /> Send $
-              {customAmount ? customAmount : selectedAmount} Tip with Confetti ✨
+              <Heart className="w-4 h-4 fill-white" /> Record $
+              {customAmount ? customAmount : selectedAmount} Tip Pledge
             </button>
           </form>
         )}

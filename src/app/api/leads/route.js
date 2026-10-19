@@ -4,6 +4,8 @@ import Lead from '@/models/Lead';
 import Profile from '@/models/Profile';
 import { syncLeadToGoogleContacts } from '@/lib/googleContactsSync';
 import { getAuthUser } from '@/lib/auth';
+import { requireProfileOwner } from '@/lib/authorization';
+import { consumeRateLimit } from '@/lib/rateLimit';
 
 // Validation Regex
 const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$/;
@@ -69,6 +71,8 @@ function validateLeadInput(body, leadConfig) {
 // POST /api/leads - Public Lead Capture Submission from Visitor
 export async function POST(request) {
   try {
+    const rate = consumeRateLimit(request, 'lead-capture', 10, 60 * 60 * 1000);
+    if (!rate.allowed) return NextResponse.json({ success: false, error: 'Too many submissions. Try again later.' }, { status: 429, headers: { 'Retry-After': String(rate.retryAfter) } });
     await connectToDatabase();
     const body = await request.json();
 
@@ -191,13 +195,8 @@ export async function GET(request) {
       );
     }
 
-    // Authorization check
-    if (authUser && authUser.username !== creatorUsername && authUser.role !== 'admin') {
-      return NextResponse.json(
-        { success: false, error: 'You are not authorized to view leads for this creator.' },
-        { status: 403 }
-      );
-    }
+    const access = await requireProfileOwner(request, creatorUsername);
+    if (access.error) return access.error;
 
     const filter = { creatorUsername };
 
@@ -267,21 +266,13 @@ export async function DELETE(request) {
       return NextResponse.json({ success: false, error: 'Lead ID is required.' }, { status: 400 });
     }
 
-    const authUser = await getAuthUser(request);
-    let creatorUsername = rawUsername ? rawUsername.toLowerCase().trim() : authUser?.username;
+    const lead = await Lead.findById(id).select('creatorUsername').lean();
+    if (!lead) return NextResponse.json({ success: false, error: 'Lead not found.' }, { status: 404 });
+    const creatorUsername = rawUsername ? rawUsername.toLowerCase().trim() : lead.creatorUsername;
+    const access = await requireProfileOwner(request, creatorUsername);
+    if (access.error) return access.error;
 
-    // Authorization check
-    if (authUser && creatorUsername && authUser.username !== creatorUsername && authUser.role !== 'admin') {
-      return NextResponse.json(
-        { success: false, error: 'You are not authorized to delete leads for this creator.' },
-        { status: 403 }
-      );
-    }
-
-    const query = { _id: id };
-    if (creatorUsername) {
-      query.creatorUsername = creatorUsername;
-    }
+    const query = { _id: id, creatorUsername };
 
     const deleted = await Lead.findOneAndDelete(query);
     if (!deleted) {

@@ -1,23 +1,20 @@
 import { NextResponse } from 'next/server';
 import { getComposioClient, isComposioConfigured, createAuthorizationLink } from '@/lib/composio';
-import { getAuthUser } from '@/lib/auth';
+import { requireAuth } from '@/lib/authorization';
 
 export async function POST(req) {
   try {
-    const authUser = await getAuthUser(req);
+    const access = await requireAuth(req);
+    if (access.error) return access.error;
     const body = await req.json();
-    const { 
-      userId = authUser?.username || 'creator', 
-      toolkitSlug, 
-      apiKeyOverride,
-      callbackUrl 
-    } = body;
+    const { toolkitSlug } = body;
+    const userId = access.user.username;
 
     if (!toolkitSlug) {
       return NextResponse.json({ error: 'toolkitSlug is required' }, { status: 400 });
     }
 
-    const hasKey = isComposioConfigured() || Boolean(apiKeyOverride && apiKeyOverride.trim());
+    const hasKey = isComposioConfigured();
 
     if (!hasKey) {
       return NextResponse.json({
@@ -28,9 +25,11 @@ export async function POST(req) {
     }
 
     try {
-      const client = getComposioClient(apiKeyOverride);
+      const client = getComposioClient();
 
       // Use modern Composio /api/v3/connected_accounts/link API
+      const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+      const callbackUrl = new URL('/connectors', appUrl).toString();
       const connectionRequest = await createAuthorizationLink(client, userId, toolkitSlug, callbackUrl);
 
       return NextResponse.json({

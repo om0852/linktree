@@ -5,6 +5,9 @@ import Profile from '@/models/Profile';
 import User from '@/models/User';
 import { getAuthUser } from '@/lib/auth';
 import { INITIAL_USER_PROFILE } from '@/constants/app';
+import { toPublicProfile, toOwnerProfile } from '@/lib/publicProfile';
+import { requireProfileOwner } from '@/lib/authorization';
+import { hashPassword } from '@/lib/auth';
 
 // GET profile by ?username=xyz or current authenticated user
 export async function GET(request) {
@@ -29,7 +32,7 @@ export async function GET(request) {
         if (user?.activeProfileId) {
           const activeProf = await Profile.findById(user.activeProfileId).lean();
           if (activeProf) {
-            return NextResponse.json({ success: true, profile: activeProf });
+            return NextResponse.json({ success: true, profile: toOwnerProfile(activeProf) });
           }
         }
         targetUsername = authUser.username;
@@ -45,7 +48,12 @@ export async function GET(request) {
       return NextResponse.json({ success: false, message: 'Profile not found' }, { status: 404 });
     }
 
-    return NextResponse.json({ success: true, profile });
+    const authUser = await getAuthUser(request);
+    const isOwner = authUser && (authUser.role === 'admin' || authUser.username === targetUsername);
+    if (isOwner) {
+      return NextResponse.json({ success: true, profile: toOwnerProfile(profile) });
+    }
+    return NextResponse.json({ success: true, profile: toPublicProfile(profile) });
   } catch (error) {
     console.error('API Profile GET error:', error);
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
@@ -65,29 +73,16 @@ export async function POST(request) {
     const normalizedUsername = body.username.toLowerCase().trim();
 
     // Verify session authorization
-    const authUser = await getAuthUser(request);
-    if (!authUser && process.env.NODE_ENV !== 'test') {
-      return NextResponse.json({ success: false, error: 'Authentication required. Please sign in.' }, { status: 401 });
-    }
-
-    if (authUser && authUser.role !== 'admin') {
-      const targetUserId = authUser.id || authUser.userId || authUser._id;
-      let user = targetUserId 
-        ? await User.findById(targetUserId).lean() 
-        : null;
-      if (!user && authUser.username) {
-        user = await User.findOne({ username: authUser.username.toLowerCase() }).lean();
-      }
-
-      const profileDoc = await Profile.findOne({ username: normalizedUsername }).select('_id').lean();
-      const userProfileIds = (user?.profiles || []).map(id => id.toString());
-      const isOwner = authUser.username === normalizedUsername || 
-        (profileDoc && userProfileIds.includes(profileDoc._id.toString()));
-
-      if (!isOwner) {
-        return NextResponse.json({ success: false, error: 'You are not authorized to modify this profile.' }, { status: 403 });
-      }
-    }
+    const access = await requireProfileOwner(request, normalizedUsername);
+    if (access.error) return access.error;
+    const existingGate = await Profile.findOne({ username: normalizedUsername }).select('accessGate').lean();
+    const submittedPasscode = typeof body.accessGate?.passcode === 'string' ? body.accessGate.passcode : '';
+    if (submittedPasscode.length > 128) return NextResponse.json({ success: false, error: 'Passcode must be 128 characters or fewer.' }, { status: 400 });
+    const passcodeHash = submittedPasscode.startsWith('$2')
+      ? submittedPasscode
+      : submittedPasscode
+        ? await hashPassword(submittedPasscode.trim())
+        : existingGate?.accessGate?.passcode || '';
 
     // Clean links structure preserving power attributes
     const cleanedLinks = Array.isArray(body.links)
@@ -218,10 +213,10 @@ export async function POST(request) {
       accessGate: body.accessGate ? {
         enabled: Boolean(body.accessGate.enabled),
         type: ['none', 'passcode', 'age_18', 'sensitive'].includes(body.accessGate.type) ? body.accessGate.type : 'none',
-        passcode: body.accessGate.passcode || '',
+        passcode: passcodeHash,
         title: body.accessGate.title || 'Restricted Profile',
         description: body.accessGate.description || 'This profile requires verification before viewing content.',
-      } : INITIAL_USER_PROFILE.accessGate,
+      } : (existingGate?.accessGate || INITIAL_USER_PROFILE.accessGate),
       leadCapture: body.leadCapture || INITIAL_USER_PROFILE.leadCapture,
       scheduleMeeting: body.scheduleMeeting || INITIAL_USER_PROFILE.scheduleMeeting,
       shop: body.shop || { enabled: false, products: [] },
@@ -305,7 +300,7 @@ export async function POST(request) {
     return NextResponse.json({
       success: true,
       message: 'Profile saved and published successfully!',
-      profile: savedProfile,
+      profile: toOwnerProfile(savedProfile),
       publicUrl: `/${savedProfile.username}`,
     });
   } catch (error) {

@@ -6,7 +6,11 @@ import Script from 'next/script';
 export default function TrackingPixels({ trackingPixels }) {
   if (!trackingPixels) return null;
 
-  const { metaPixelId, ga4MeasurementId, tiktokPixelId, pinterestTagId } = trackingPixels;
+  const valid = (value, pattern) => typeof value === 'string' && pattern.test(value.trim()) ? value.trim() : '';
+  const metaPixelId = valid(trackingPixels.metaPixelId, /^\d{5,20}$/);
+  const ga4MeasurementId = valid(trackingPixels.ga4MeasurementId, /^G-[A-Z0-9]{4,20}$/i);
+  const tiktokPixelId = valid(trackingPixels.tiktokPixelId, /^[A-Z0-9]{10,40}$/i);
+  const pinterestTagId = valid(trackingPixels.pinterestTagId, /^\d{5,20}$/);
 
   const hasAnyPixel = Boolean(
     metaPixelId?.trim() || 

@@ -3,7 +3,13 @@ import jwt from 'jsonwebtoken';
 import { cookies } from 'next/headers';
 import { AUTH_COOKIE_NAME, AUTH_TOKEN_EXPIRY_DAYS } from '@/constants/app';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'treeinbio_jwt_secret_production_key_2026_secured';
+function getJwtSecret() {
+  const secret = process.env.JWT_SECRET;
+  if (!secret || secret.length < 32) {
+    throw new Error('JWT_SECRET must be configured with at least 32 characters.');
+  }
+  return secret;
+}
 
 /**
  * Hash a plain text password with bcrypt
@@ -25,7 +31,7 @@ export async function verifyPassword(plainPassword, storedHash) {
  * Sign a signed JWT token
  */
 export function signToken(payload) {
-  return jwt.sign(payload, JWT_SECRET, {
+  return jwt.sign(payload, getJwtSecret(), {
     expiresIn: `${AUTH_TOKEN_EXPIRY_DAYS}d`,
   });
 }
@@ -35,7 +41,7 @@ export function signToken(payload) {
  */
 export function verifyToken(token) {
   try {
-    return jwt.verify(token, JWT_SECRET);
+    return jwt.verify(token, getJwtSecret());
   } catch {
     return null;
   }

@@ -12,11 +12,14 @@ import {
   isBotOrCrawler, 
   isDuplicateBeacon 
 } from '@/lib/telemetry';
+import { consumeRateLimit } from '@/lib/rateLimit';
 
 export async function POST(request) {
   const startEdgeTime = Date.now();
 
   try {
+    const rate = consumeRateLimit(request, 'telemetry', 120, 60 * 1000);
+    if (!rate.allowed) return NextResponse.json({ success: false, error: 'Too many tracking events.' }, { status: 429, headers: { 'Retry-After': String(rate.retryAfter) } });
     const body = await request.json().catch(() => ({}));
     const targetId = (body.target_id || body.profile_id || body.username || body.profileUsername || '').toLowerCase().trim();
 
@@ -26,6 +29,9 @@ export async function POST(request) {
 
     const eventType = body.event_type || (body.link_id ? 'link_click' : 'profile_view');
     const linkId = body.link_id || null;
+    if (!['profile_view', 'view', 'link_click', 'click'].includes(eventType)) {
+      return NextResponse.json({ success: false, error: 'Unsupported event type.' }, { status: 400 });
+    }
 
     // 1. Zero-latency client IP extraction & deterministic SHA-256 privacy hash
     const clientIp = extractClientIp(request);
@@ -42,7 +48,7 @@ export async function POST(request) {
     }
 
     // 3. Bot & Crawler Detection
-    const isBot = isBotOrCrawler(uaString) || Boolean(body.is_bot);
+  const isBot = isBotOrCrawler(uaString);
 
     // 4. Edge Geographic Extraction (Zero-latency CDN headers)
     const geo = extractGeoIntelligence(request);
@@ -54,6 +60,14 @@ export async function POST(request) {
     const attr = extractAttribution(request, body);
 
     await connectToDatabase();
+    const profile = await Profile.findOne({ username: targetId }).select('links').lean();
+    if (!profile) return NextResponse.json({ success: false, error: 'Profile not found.' }, { status: 404 });
+    let destinationUrl = '';
+    if (['link_click', 'click'].includes(eventType)) {
+      const link = (profile.links || []).find((item) => item.id === linkId && item.active !== false && !item.disabled && !item.isArchived);
+      if (!link) return NextResponse.json({ success: false, error: 'Link not found.' }, { status: 404 });
+      destinationUrl = link.url || '';
+    }
 
     // 7. Server-Side Uniqueness Check: Check if this ip_hash has visited this target entity before
     const priorEvent = await AnalyticsEvent.exists({
@@ -78,8 +92,8 @@ export async function POST(request) {
     }
 
     // 9. Generate Deterministic Event ID & Persist Telemetry Event
-    const eventId = body.event_id || `evt_${crypto.randomUUID().replace(/-/g, '').slice(0, 24)}`;
-    const latencyMs = Number(body.latency_ms) || (Date.now() - startEdgeTime);
+    const eventId = `evt_${crypto.randomUUID().replace(/-/g, '').slice(0, 24)}`;
+    const latencyMs = Date.now() - startEdgeTime;
 
     await AnalyticsEvent.create({
       id: eventId,
@@ -88,7 +102,7 @@ export async function POST(request) {
       target_id: targetId,
       profileUsername: targetId,
       link_id: linkId,
-      destination_url: body.destination_url || '',
+      destination_url: destinationUrl,
       timestamp: new Date(),
       ip_hash: ipHash,
       country: geo.country,

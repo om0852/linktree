@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import connectToDatabase from '@/lib/mongodb';
 import Lead from '@/models/Lead';
+import { requireProfileOwner } from '@/lib/authorization';
 
 function escapeCsvField(field) {
   if (field === null || field === undefined) return '""';
@@ -17,6 +18,9 @@ export async function GET(request) {
     if (!username) {
       return new NextResponse('Username parameter is required', { status: 400 });
     }
+
+    const access = await requireProfileOwner(request, username);
+    if (access.error) return access.error;
 
     const leads = await Lead.find({ creatorUsername: username.toLowerCase().trim() })
       .sort({ createdAt: -1 })

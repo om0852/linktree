@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server';
 import connectToDatabase from '@/lib/mongodb';
-import { getAuthUser } from '@/lib/auth';
 import AnalyticsEvent from '@/models/AnalyticsEvent';
 import Booking from '@/models/Booking';
 import Lead from '@/models/Lead';
 import Profile from '@/models/Profile';
 import Subscriber from '@/models/Subscriber';
+import { requireProfileOwner } from '@/lib/authorization';
 
 const json = (body, status = 200) => NextResponse.json(body, {
   status,
@@ -88,9 +88,8 @@ export async function PATCH(request, { params }) {
   try {
     const { username: rawUsername } = await params;
     const username = decodeURIComponent(rawUsername || '').trim().toLowerCase();
-    const authUser = await getAuthUser(request);
-    if (!authUser) return json({ error: 'Authentication required.' }, 401);
-    if (authUser.username?.toLowerCase() !== username && authUser.role !== 'admin') return json({ error: 'Not authorized.' }, 403);
+    const access = await requireProfileOwner(request, username);
+    if (access.error) return json({ error: access.error.status === 401 ? 'Authentication required.' : 'Not authorized.' }, access.error.status);
 
     const body = await request.json();
     if (typeof body.enabled !== 'boolean') return json({ error: 'enabled must be a boolean.' }, 400);

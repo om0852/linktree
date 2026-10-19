@@ -452,9 +452,9 @@ export default function ScheduleMeetingModal({ profile, onClose, onBookingSucces
               </div>
 
               <div>
-                <h4 className="font-sans text-lg font-bold text-[#28352F]">Meeting Confirmed!</h4>
+                <h4 className="font-sans text-lg font-bold text-[#28352F]">Booking Request Sent</h4>
                 <p className="text-xs text-[#5C6B64] mt-1">
-                  A calendar invite and direct link have been generated for you and @{profile.username}.
+                  @{profile.username} needs to confirm this time. Meeting details will be shared after confirmation.
                 </p>
               </div>
 
@@ -477,9 +477,9 @@ export default function ScheduleMeetingModal({ profile, onClose, onBookingSucces
                   </span>
                 </div>
 
-                {/* Meeting Link Box */}
+                {confirmedBooking.meetingUrl && (
                 <div className="pt-1">
-                  <span className="text-[11px] text-[#5C6B64] block mb-1">Encrypted Video Room:</span>
+                  <span className="text-[11px] text-[#5C6B64] block mb-1">Meeting details:</span>
                   <div className="flex items-center gap-2 p-2 rounded-lg bg-[#FFFEFA] border border-[#CAD8CE]">
                     <Video className="w-4 h-4 text-[#52796F] shrink-0" />
                     <span className="text-xs text-[#28352F] font-mono truncate flex-1">
@@ -495,11 +495,12 @@ export default function ScheduleMeetingModal({ profile, onClose, onBookingSucces
                     </button>
                   </div>
                 </div>
+                )}
               </div>
 
               {/* Action Buttons */}
               <div className="space-y-2">
-                <a
+                {confirmedBooking.status === 'confirmed' && confirmedBooking.meetingUrl && <a
                   href={googleCalendarUrl}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -508,9 +509,9 @@ export default function ScheduleMeetingModal({ profile, onClose, onBookingSucces
                   <CalendarCheck className="w-4 h-4" />
                   <span>Add to Google Calendar</span>
                   <ExternalLink className="w-3 h-3 opacity-70" />
-                </a>
+                </a>}
 
-                {confirmedBooking.meetingUrl && confirmedBooking.meetingUrl.startsWith('http') && (
+                {confirmedBooking.status === 'confirmed' && confirmedBooking.meetingUrl && confirmedBooking.meetingUrl.startsWith('http') && (
                   <a
                     href={confirmedBooking.meetingUrl}
                     target="_blank"

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import connectToDatabase from '@/lib/mongodb';
 import Lead from '@/models/Lead';
 import { syncLeadToGoogleContacts } from '@/lib/googleContactsSync';
+import { requireProfileOwner } from '@/lib/authorization';
 
 export async function POST(request) {
   try {
@@ -9,7 +10,6 @@ export async function POST(request) {
     const body = await request.json();
 
     const leadId = body.leadId || body.id;
-    const username = body.username || body.creatorUsername;
 
     if (!leadId) {
       return NextResponse.json({ success: false, error: 'leadId is required.' }, { status: 400 });
@@ -20,7 +20,11 @@ export async function POST(request) {
       return NextResponse.json({ success: false, error: 'Lead not found.' }, { status: 404 });
     }
 
-    const syncResult = await syncLeadToGoogleContacts(lead, username || lead.creatorUsername);
+    const username = String(lead.creatorUsername || '').toLowerCase();
+    const access = await requireProfileOwner(request, username);
+    if (access.error) return access.error;
+
+    const syncResult = await syncLeadToGoogleContacts(lead, username);
 
     lead.syncedToGoogleContacts = syncResult.success;
     lead.googleContactId = syncResult.googleContactId || lead.googleContactId;

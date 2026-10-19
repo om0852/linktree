@@ -21,10 +21,25 @@ export async function GET(request, { params }) {
     const { linkId } = await params;
     const { searchParams } = new URL(request.url);
     const username = searchParams.get('u')?.toLowerCase()?.trim();
-    const destination = searchParams.get('dest');
+    const requestedDestination = searchParams.get('dest');
 
     if (!linkId) {
       return NextResponse.json({ success: false, message: 'linkId is required' }, { status: 400 });
+    }
+    if (!username) return NextResponse.json({ success: false, message: 'username is required' }, { status: 400 });
+    await connectToDatabase();
+    const profile = await Profile.findOne({ username }).select('links').lean();
+    const link = profile?.links?.find((item) => item.id === linkId && item.active !== false && !item.disabled && !item.isArchived);
+    if (!link) return NextResponse.json({ success: false, message: 'Link not found' }, { status: 404 });
+    let destination;
+    try {
+      destination = new URL(link.url);
+      if (!['http:', 'https:'].includes(destination.protocol)) throw new Error('invalid protocol');
+    } catch {
+      return NextResponse.json({ success: false, message: 'Link destination is invalid' }, { status: 400 });
+    }
+    if (requestedDestination && requestedDestination !== link.url) {
+      console.warn('Ignoring caller-supplied click destination that differs from the saved link.');
     }
 
     const clientIp = extractClientIp(request);
@@ -35,9 +50,7 @@ export async function GET(request, { params }) {
     if (username && !isDuplicateBeacon(username, ipHash, 'link_click', linkId)) {
       const geo = extractGeoIntelligence(request);
       const dev = extractDeviceAndBrowser(request, uaString);
-      const attr = extractAttribution(request, { destination });
-
-      await connectToDatabase();
+      const attr = extractAttribution(request, { destination: destination.toString() });
 
       const priorEvent = await AnalyticsEvent.exists({
         target_id: username,
@@ -61,7 +74,7 @@ export async function GET(request, { params }) {
         target_id: username,
         profileUsername: username,
         link_id: linkId,
-        destination_url: destination || '',
+        destination_url: destination.toString(),
         timestamp: new Date(),
         ip_hash: ipHash,
         country: geo.country,
@@ -85,11 +98,7 @@ export async function GET(request, { params }) {
       }).catch((err) => console.error('Error logging click telemetry:', err));
     }
 
-    if (destination && destination.startsWith('http')) {
-      return NextResponse.redirect(destination, { status: 302 });
-    }
-
-    return NextResponse.json({ success: true, message: 'Click recorded' });
+    return NextResponse.redirect(destination.toString(), { status: 302 });
   } catch (error) {
     console.error('API Click GET error:', error);
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
@@ -104,7 +113,6 @@ export async function POST(request, { params }) {
     const { linkId } = await params;
     const body = await request.json().catch(() => ({}));
     const username = (body.username || body.target_id || '').toLowerCase()?.trim();
-    const destination = body.destination;
 
     if (!linkId || !username) {
       return NextResponse.json(
@@ -124,9 +132,12 @@ export async function POST(request, { params }) {
 
     const geo = extractGeoIntelligence(request);
     const dev = extractDeviceAndBrowser(request, uaString);
-    const attr = extractAttribution(request, body);
-
     await connectToDatabase();
+    const profile = await Profile.findOne({ username }).select('links').lean();
+    const link = profile?.links?.find((item) => item.id === linkId && item.active !== false && !item.disabled && !item.isArchived);
+    if (!link) return NextResponse.json({ success: false, message: 'Link not found' }, { status: 404 });
+    const destination = link.url || '';
+    const attr = extractAttribution(request, { destination });
 
     const priorEvent = await AnalyticsEvent.exists({
       target_id: username,
@@ -141,8 +152,8 @@ export async function POST(request, { params }) {
       ).catch((err) => console.error('Atomic click increment error:', err));
     }
 
-    const eventId = body.event_id || `evt_${crypto.randomUUID().replace(/-/g, '').slice(0, 24)}`;
-    const latencyMs = Number(body.latency_ms) || (Date.now() - startEdgeTime);
+    const eventId = `evt_${crypto.randomUUID().replace(/-/g, '').slice(0, 24)}`;
+    const latencyMs = Date.now() - startEdgeTime;
 
     await AnalyticsEvent.create({
       id: eventId,

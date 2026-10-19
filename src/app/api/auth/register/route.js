@@ -4,12 +4,15 @@ import User from '@/models/User';
 import Profile from '@/models/Profile';
 import { hashPassword, signToken, setAuthCookie } from '@/lib/auth';
 import { INITIAL_USER_PROFILE } from '@/constants/app';
+import { consumeRateLimit } from '@/lib/rateLimit';
 
 const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$/;
 const USERNAME_REGEX = /^[a-z0-9_-]{3,30}$/;
 
 export async function POST(request) {
   try {
+    const rate = consumeRateLimit(request, 'register', 5, 60 * 60 * 1000);
+    if (!rate.allowed) return NextResponse.json({ success: false, error: 'Too many account creation attempts. Try again later.' }, { status: 429, headers: { 'Retry-After': String(rate.retryAfter) } });
     await connectToDatabase();
     const body = await request.json();
 
@@ -33,8 +36,8 @@ export async function POST(request) {
       }, { status: 400 });
     }
 
-    if (!password || password.length < 6) {
-      return NextResponse.json({ success: false, error: 'Password must be at least 6 characters.' }, { status: 400 });
+    if (typeof password !== 'string' || password.length < 12 || password.length > 128) {
+      return NextResponse.json({ success: false, error: 'Password must be between 12 and 128 characters.' }, { status: 400 });
     }
 
     const cleanEmail = email.toLowerCase().trim();
@@ -64,7 +67,7 @@ export async function POST(request) {
     });
 
     // Create Initial Profile
-    await Profile.findOneAndUpdate(
+    const initialProfile = await Profile.findOneAndUpdate(
       { username: cleanUsername },
       {
         $setOnInsert: {
@@ -75,8 +78,11 @@ export async function POST(request) {
           avatar: newUser.avatar,
         },
       },
-      { upsert: true, new: true }
+      { upsert: true, new: true, setDefaultsOnInsert: true }
     );
+    newUser.profiles = [initialProfile._id];
+    newUser.activeProfileId = initialProfile._id;
+    await newUser.save();
 
     // Sign JWT
     const token = signToken({

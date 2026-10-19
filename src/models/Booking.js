@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 
 const BookingSchema = new mongoose.Schema({
+  slotKey: { type: String, default: undefined },
   creatorUsername: {
     type: String,
     required: true,
@@ -13,6 +14,7 @@ const BookingSchema = new mongoose.Schema({
     required: true,
     trim: true,
   },
+  publicSocialProof: { type: Boolean, default: false },
   clientEmail: {
     type: String,
     required: true,
@@ -66,7 +68,7 @@ const BookingSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['confirmed', 'cancelled', 'rescheduled'],
+    enum: ['confirmed', 'pending', 'cancelled', 'rescheduled'],
     default: 'confirmed',
     index: true,
   },
@@ -81,5 +83,6 @@ BookingSchema.index(
   { creatorUsername: 1, date: 1, timeSlot: 1, status: 1 },
   { unique: false }
 );
+BookingSchema.index({ slotKey: 1 }, { unique: true, sparse: true });
 
 export default mongoose.models.Booking || mongoose.model('Booking', BookingSchema);

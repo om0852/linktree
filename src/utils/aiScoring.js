@@ -1,23 +1,23 @@
 export const PERSONA_TAGLINES = {
   actor_actress: [
-    "🎭 Hollywood & Theatre Performer | Featured in HBO & Netflix Series | IMDb Verified",
-    "🎬 SAG-AFTRA Actor | Voiceover Artist & Stage Performer | Represented by CAA",
-    "✨ Film & Commercial Actress | Cannes Selectee | Represented globally"
+    "🎭 Film, television, and theatre performer",
+    "🎬 Actor and voiceover artist",
+    "✨ Film and commercial performer"
   ],
   influencer: [
-    "✨ Lifestyle, Tech & Fitness Creator | 2.5M+ Followers | Daily Vlogs & Tech Reviews",
+    "✨ Lifestyle, technology, and fitness creator",
     "🌴 Creating daily aesthetic moments, travel diaries & premium lifestyle guides",
-    "⚡ Fitness, mindset & lifestyle coaching | Helping 100K+ reach peak performance"
+    "⚡ Fitness, mindset, and lifestyle coaching"
   ],
   digital_marketer: [
-    "🚀 Growth Lead @ ScalingMedia | Helping E-Commerce Brands Scale past $10M ARR",
-    "📈 Performance Marketing Consultant | $45M+ in tracked client ad revenue",
+    "🚀 Growth strategy for ecommerce brands",
+    "📈 Performance marketing consultant",
     "💼 Fractional CMO | SEO, Paid Social & High-Conversion Funnel Architecture"
   ],
   musician: [
     "🎵 Electronic Music Producer & Live Performer | New Album 'Cosmic Echoes' Out Now!",
     "🎸 Indie Rock Songwriter & Multi-Instrumentalist | Currently Touring North America",
-    "🎹 Ambient Synth Explorer | 10M+ Spotify Streams | New Single Available Everywhere"
+    "🎹 Ambient synth composer and electronic producer"
   ]
 };
 
@@ -49,8 +49,8 @@ export const PERSONA_RECOMMENDATIONS = {
 };
 
 /**
- * Real-time ML CTR & Conversion Calculation Engine
- * Mirrors trained XGBoost regressor weights
+ * Heuristic profile completeness and engagement potential score.
+ * This is not a trained model and does not represent measured performance.
  */
 export function calculateCTRScore(profile) {
   let score = 42; // Baseline CTR foundation
@@ -72,7 +72,7 @@ export function calculateCTRScore(profile) {
   if (badgedLinks.length >= 1) {
     score += 12;
   } else {
-    recs.push('Add eye-catching badges (e.g. "NEW REEL", "TRENDING", "20% OFF") on top links (+12% CTR).');
+    recs.push('Add a clear badge to highlight a time-sensitive or important link.');
   }
 
   // 3. Bento 2.0 Visual Hierarchy
@@ -88,14 +88,14 @@ export function calculateCTRScore(profile) {
   if (profile.heroVideo && profile.heroVideo.trim()) {
     score += 14;
   } else {
-    recs.push('Embed a Hero Showreel / Video player directly inside the bio (+14% conversion boost).');
+    recs.push('Add a showreel or video so visitors can quickly understand your work.');
   }
 
   // 5. Lead Capture Newsletter (+10%)
   if (profile.widgets && profile.widgets.hasNewsletter) {
     score += 10;
   } else {
-    recs.push('Enable the Newsletter Lead Magnet to capture subscriber emails directly (+10% boost).');
+    recs.push('Enable newsletter signup if you want to collect subscriber emails.');
   }
 
   // 6. Direct Monetization / Tip Jar (+7%)

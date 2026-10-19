@@ -2,9 +2,12 @@ import { NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
 import { isComposioConfigured } from '@/lib/composio';
+import { requireAuth } from '@/lib/authorization';
 
-export async function GET() {
+export async function GET(request) {
   try {
+    const access = await requireAuth(request);
+    if (access.error) return access.error;
     const rawKey = process.env.COMPOSIO_API_KEY || '';
     const configured = Boolean(rawKey && rawKey.trim().length > 5);
 
@@ -28,8 +31,11 @@ export async function GET() {
 
 export async function POST(req) {
   try {
+    const access = await requireAuth(req);
+    if (access.error) return access.error;
+    if (access.user.role !== 'admin') return NextResponse.json({ error: 'Administrator access required.' }, { status: 403 });
     const { apiKey } = await req.json();
-    if (!apiKey || typeof apiKey !== 'string' || apiKey.trim().length < 5) {
+    if (!apiKey || typeof apiKey !== 'string' || apiKey.trim().length < 20 || /[\r\n]/.test(apiKey)) {
       return NextResponse.json({ error: 'Please provide a valid Composio API Key' }, { status: 400 });
     }
 

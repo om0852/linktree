@@ -157,8 +157,8 @@ export default function AtelierStudioPage() {
 
   // Phase 2: Unsaved changes bar & Undo/Redo history stack
   const [savedSnapshot, setSavedSnapshot] = useState(null);
-  const [history, setHistory] = useState([]);
-  const [historyIndex, setHistoryIndex] = useState(-1);
+  const [history, setHistory] = useState([DEFAULT_EMPTY_PROFILE]);
+  const [historyIndex, setHistoryIndex] = useState(0);
   const isUndoingRedoingRef = useRef(false);
 
   // Link addition & editing state
@@ -270,11 +270,6 @@ export default function AtelierStudioPage() {
       isUndoingRedoingRef.current = false;
       return;
     }
-    if (history.length === 0) {
-      setHistory([currentProfile]);
-      setHistoryIndex(0);
-      return;
-    }
     const currentStr = JSON.stringify(currentProfile);
     const headStr = JSON.stringify(history[historyIndex]);
     if (currentStr !== headStr) {
@@ -287,7 +282,7 @@ export default function AtelierStudioPage() {
       }, 300);
       return () => clearTimeout(timer);
     }
-  }, [currentProfile, historyIndex]);
+  }, [currentProfile, history, historyIndex]);
 
   // Undo / Redo handlers
   const handleUndo = () => {
@@ -609,7 +604,8 @@ export default function AtelierStudioPage() {
   // Phase 2: Theme Shuffle and Theme Preset handlers
   const handleThemeShuffle = () => {
     const otherPresets = THEME_PRESETS.filter(p => p.id !== currentProfile.theme);
-    const picked = otherPresets[Math.floor(Math.random() * otherPresets.length)] || THEME_PRESETS[0];
+    const currentIndex = THEME_PRESETS.findIndex((preset) => preset.id === currentProfile.theme);
+    const picked = otherPresets[(currentIndex + 1) % otherPresets.length] || THEME_PRESETS[0];
     handleApplyThemePreset(picked);
     setToastMessage({
       type: 'success',

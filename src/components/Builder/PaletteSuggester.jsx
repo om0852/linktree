@@ -11,11 +11,7 @@ export default function PaletteSuggester({ avatarUrl, currentTheme, onSelectThem
   const [appliedThemeId, setAppliedThemeId] = useState(null);
 
   useEffect(() => {
-    if (!avatarUrl) {
-      setExtractedColors([]);
-      setSuggestedThemes([]);
-      return;
-    }
+    if (!avatarUrl) return;
 
     let isMounted = true;
     const runExtraction = async () => {
