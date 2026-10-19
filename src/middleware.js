@@ -7,6 +7,7 @@ const PLATFORM_HOSTS = [
   '0.0.0.0',
   'linktree.work.gd',
   'creataurus.work.gd',
+  'linktree-sigma-eight.vercel.app',
   'tiny-url-self.vercel.app',
   'treeinbio.com',
 ];

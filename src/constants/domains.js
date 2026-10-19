@@ -11,6 +11,7 @@ export const RESERVED_PLATFORM_HOSTS = [
   '0.0.0.0',
   'linktree.work.gd',
   'creataurus.work.gd',
+  'linktree-sigma-eight.vercel.app',
   'treeinbio.com',
   'treeinbio.me',
   'treeinbio.vercel.app',
