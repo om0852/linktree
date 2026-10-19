@@ -28,7 +28,7 @@ const CustomDomainSchema = new mongoose.Schema({
   },
   target: {
     type: String,
-    default: 'creataurus.work.gd',
+    default: 'linktree.work.gd',
   },
   expectedIp: {
     type: String,

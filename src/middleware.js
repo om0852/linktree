@@ -5,6 +5,7 @@ const PLATFORM_HOSTS = [
   'localhost',
   '127.0.0.1',
   '0.0.0.0',
+  'linktree.work.gd',
   'creataurus.work.gd',
   'tiny-url-self.vercel.app',
   'treeinbio.com',
