@@ -1,0 +1,228 @@
+{
+  "commercial_platforms": [
+    {
+      "id": "linktree",
+      "name": "Linktree",
+      "category": "Classic Button Stack",
+      "tech_stack": ["React", "Node.js", "GraphQL", "AWS"],
+      "layout_types": ["Vertical Button Stack", "Grid Cards (Basic)", "Header Video"],
+      "monetization": ["Paypal", "Stripe", "Shopify Store", "Spring Merch", "Tip Jar"],
+      "key_features": ["Scheduled Links", "Gated Content", "Redirect Link", "Custom Themes", "Analytics Dashboard", "QR Generator"]
+    },
+    {
+      "id": "bento",
+      "name": "Bento.me",
+      "category": "Visual Bento Grid",
+      "tech_stack": ["Next.js", "TypeScript", "Tailwind CSS", "Vercel", "Framer Motion"],
+      "layout_types": ["Bento Box Grid", "Resizable Cards", "Interactive Widgets"],
+      "monetization": ["Custom Product Links", "Substack/Newsletter Embed"],
+      "key_features": ["Rich Media Cards", "Figma/GitHub/Twitter Live Embeds", "Minimalist Aesthetics", "Custom Drag Layout"]
+    },
+    {
+      "id": "beacons",
+      "name": "Beacons.ai",
+      "category": "AI Creator Suite",
+      "tech_stack": ["React", "Python/FastAPI", "TensorFlow", "Tailwind CSS"],
+      "layout_types": ["Modular Block Layout", "Video Hero Header", "Store Carousel"],
+      "monetization": ["Digital Store", "1:1 Booking", "Brand Sponsorship Pitch Deck", "Tips"],
+      "key_features": ["AI Bio Generator", "Auto Brand Pitch Deck", "Email Marketing Automation", "Live Follower Counter"]
+    },
+    {
+      "id": "stan_store",
+      "name": "Stan Store",
+      "category": "Native E-Commerce",
+      "tech_stack": ["React", "Node.js", "Stripe API", "PostgreSQL"],
+      "layout_types": ["Sales Funnel Stack", "Product Cards", "1-Click Checkout Modal"],
+      "monetization": ["Digital Downloads", "Recurring Subscriptions", "Calendar Bookings", "Courses"],
+      "key_features": ["Native Checkout", "Automated Email Delivery", "Upsell Popups", "Affiliate Tracking"]
+    },
+    {
+      "id": "carrd",
+      "name": "Carrd.co",
+      "category": "Micro Website Builder",
+      "tech_stack": ["Vanilla JS", "HTML5", "PHP", "Stripe API"],
+      "layout_types": ["Multi-section Single Page", "Responsive Canvas"],
+      "monetization": ["Stripe", "PayPal", "Mailchimp", "Custom Forms"],
+      "key_features": ["Full Freeform Canvas", "Custom Domains", "Custom HTML/CSS Embeds"]
+    },
+    {
+      "id": "taplink",
+      "name": "Taplink",
+      "category": "Messaging & E-commerce",
+      "tech_stack": ["Vue.js", "Node.js", "PostgreSQL"],
+      "layout_types": ["Messaging List", "Product Gallery"],
+      "monetization": ["Online Store", "WhatsApp Order Capture"],
+      "key_features": ["WhatsApp One-tap Chat", "Product Catalog"]
+    },
+    {
+      "id": "milkshake",
+      "name": "Milkshake App",
+      "category": "Story Cards",
+      "tech_stack": ["React Native", "Node.js"],
+      "layout_types": ["Horizontal Card Swipe", "Story Pages"],
+      "monetization": ["External Links"],
+      "key_features": ["Swipable Story Cards", "Mobile Builder"]
+    },
+    {
+      "id": "lnk_bio",
+      "name": "Lnk.Bio",
+      "category": "Grid & List Hybrid",
+      "tech_stack": ["PHP", "JavaScript", "MySQL"],
+      "layout_types": ["Instagram Grid Match", "Link List"],
+      "monetization": ["Donation Widgets"],
+      "key_features": ["IG Grid mirror", "Unlimited links"]
+    },
+    {
+      "id": "bio_link",
+      "name": "Bio.link",
+      "category": "Minimalist Fast",
+      "tech_stack": ["Next.js", "Tailwind CSS"],
+      "layout_types": ["Clean Stack", "Social Row"],
+      "monetization": ["Buy Me A Coffee"],
+      "key_features": ["Instant Load", "SEO Friendly"]
+    },
+    {
+      "id": "shorby",
+      "name": "Shorby",
+      "category": "Messenger & Retargeting",
+      "tech_stack": ["React", "Ruby on Rails"],
+      "layout_types": ["Messenger Blocks"],
+      "monetization": ["Lead Forms"],
+      "key_features": ["FB/Google Ad Retargeting Pixels"]
+    },
+    {
+      "id": "linkinbio_later",
+      "name": "Linkin.bio by Later",
+      "category": "Social Commerce Grid",
+      "tech_stack": ["React", "Ruby on Rails"],
+      "layout_types": ["Shoppable IG Grid"],
+      "monetization": ["Shopify Direct"],
+      "key_features": ["Multi-link IG post tagging"]
+    },
+    {
+      "id": "koji",
+      "name": "Koji",
+      "category": "Creator App Store",
+      "tech_stack": ["React", "WebAssembly"],
+      "layout_types": ["Interactive App Feed"],
+      "monetization": ["Paywalled Content", "Custom Video Requests"],
+      "key_features": ["In-bio Mini Apps", "Fan Interactivity"]
+    },
+    {
+      "id": "feedlink",
+      "name": "Feedlink",
+      "category": "Automated Newsletter Feed",
+      "tech_stack": ["Vue.js", "Node.js"],
+      "layout_types": ["Shoppable Feed"],
+      "monetization": ["Subscription Newsletter"],
+      "key_features": ["Auto RSS Digest"]
+    },
+    {
+      "id": "campsite",
+      "name": "Campsite.bio",
+      "category": "Advanced Analytics Stack",
+      "tech_stack": ["React", "Laravel"],
+      "layout_types": ["Stacked Buttons"],
+      "monetization": ["Lead Capture"],
+      "key_features": ["Sub-profiles", "Detailed Traffic Breakdown"]
+    },
+    {
+      "id": "seedprod",
+      "name": "SeedProd Bio",
+      "category": "WordPress Bio Plugin",
+      "tech_stack": ["PHP", "WordPress"],
+      "layout_types": ["WP Drag & Drop"],
+      "monetization": ["WooCommerce"],
+      "key_features": ["Native WP Hosting"]
+    },
+    {
+      "id": "contactinbio",
+      "name": "ContactInBio",
+      "category": "Form & Contact Focus",
+      "tech_stack": ["PHP", "Bootstrap"],
+      "layout_types": ["Form-heavy layout"],
+      "monetization": ["Smart Payment Buttons"],
+      "key_features": ["Contact Form Direct"]
+    },
+    {
+      "id": "sleekbio",
+      "name": "SleekBio by AppSumo",
+      "category": "AppSumo Special",
+      "tech_stack": ["Vue.js", "Python"],
+      "layout_types": ["Minimal Card Stack"],
+      "monetization": ["Product Promos"],
+      "key_features": ["Embedded Videos"]
+    },
+    {
+      "id": "biofm",
+      "name": "Bio.fm",
+      "category": "Content Aggregator Block",
+      "tech_stack": ["React", "Node.js"],
+      "layout_types": ["Media Block Grid"],
+      "monetization": ["Digital Sales"],
+      "key_features": ["Import content from Spotify & Twitter"]
+    },
+    {
+      "id": "tapbio",
+      "name": "Tap Bio",
+      "category": "Story Cards",
+      "tech_stack": ["React", "GraphQL"],
+      "layout_types": ["Full Page Cards"],
+      "monetization": ["Link Redirects"],
+      "key_features": ["Card swipe navigation"]
+    },
+    {
+      "id": "directme",
+      "name": "Direct.me",
+      "category": "Fan Experience Platform",
+      "tech_stack": ["React", "Node.js"],
+      "layout_types": ["Interactive Profile"],
+      "monetization": ["Video Shoutouts", "Digital Products"],
+      "key_features": ["Fan engagement tools"]
+    }
+  ],
+  "opensource_platforms": [
+    { "id": "biodrop", "name": "BioDrop (LinkFree)", "repo": "EddieHubCommunity/BioDrop", "tech_stack": ["Next.js", "React", "Tailwind CSS", "MongoDB"] },
+    { "id": "littlelink", "name": "LittleLink", "repo": "SethCottle/LittleLink", "tech_stack": ["HTML5", "Vanilla CSS", "SVG Icons"] },
+    { "id": "linkstack", "name": "LinkStack", "repo": "LinkStackOrg/linkstack", "tech_stack": ["PHP", "Laravel", "Tailwind", "MySQL"] },
+    { "id": "linkfolio", "name": "Linkfolio", "repo": "heristop/linkfolio", "tech_stack": ["Next.js", "TypeScript", "Tailwind CSS"] },
+    { "id": "singlelink", "name": "Singlelink", "repo": "ayushk234/Singlelink", "tech_stack": ["Node.js", "React", "PostgreSQL"] },
+    { "id": "lighthouse", "name": "Lighthouse Admin", "repo": "SethCottle/Lighthouse", "tech_stack": ["Laravel", "Vue.js"] },
+    { "id": "biolink_php", "name": "BioLink PHP", "repo": "php-linktree/biolink", "tech_stack": ["PHP", "MySQL"] },
+    { "id": "openbio", "name": "OpenBio", "repo": "openbio/openbio", "tech_stack": ["Vue.js", "Express.js"] },
+    { "id": "fastbio", "name": "FastBio", "repo": "fastbio/fastbio", "tech_stack": ["SvelteKit", "Tailwind"] },
+    { "id": "linkyee", "name": "Linkyee", "repo": "ZhgChgLi/linkyee", "tech_stack": ["Jekyll", "YAML"] }
+  ],
+  "persona_recommendation_matrix": {
+    "actor_actress": {
+      "preferred_layout": "Bento Grid + Video Hero",
+      "essential_widgets": ["Showreel YouTube Player", "Talent Agency Contact", "IMDb Links", "Press Kit Download", "Headshot Carousel"],
+      "recommended_theme": "Modern Dark Glassmorphism",
+      "cta_words": ["Watch Showreel", "Book Talent", "View Filmography", "Press Kit"]
+    },
+    "influencer": {
+      "preferred_layout": "Bento Grid + Social Row",
+      "essential_widgets": ["Latest TikTok/IG Embed", "Automated Media Kit Stats", "Brand Sponsorship Form", "Affiliate Links"],
+      "recommended_theme": "Neon Sunset Gradient",
+      "cta_words": ["Shop My Outfits", "Collab With Me", "Watch Latest Vlog", "Get 20% Off"]
+    },
+    "digital_marketer": {
+      "preferred_layout": "Conversion Sales Funnel Stack",
+      "essential_widgets": ["Email Lead Capture", "1:1 Booking Calendar", "Customer Testimonials", "Free E-Book Download"],
+      "recommended_theme": "Sleek Executive Minimal",
+      "cta_words": ["Download Free Guide", "Book Free Strategy Call", "Join 10k+ Subscribers"]
+    },
+    "musician": {
+      "preferred_layout": "Bento Grid + Audio Embed",
+      "essential_widgets": ["Spotify / Apple Music Player", "Concert Tour Ticket Links", "Official Music Video", "Merch Store"],
+      "recommended_theme": "Cyberpunk Dark Vibrance",
+      "cta_words": ["Stream New Single", "Get Tour Tickets", "Buy Merch", "Listen on Spotify"]
+    },
+    "agency": {
+      "preferred_layout": "Multi-card Bento",
+      "essential_widgets": ["Case Studies Grid", "Client Logos Showcase", "Audit Request Form"],
+      "recommended_theme": "Emerald Gold Luxury",
+      "cta_words": ["Request Free Audit", "View Our Work", "Get a Quote"]
+    }
+  }
+}

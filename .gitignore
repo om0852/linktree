@@ -39,3 +39,13 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# media & large recordings
+*.mp4
+*.mov
+*.avi
+*.mkv
+linktree demo.mp4
+
+# scratch
+scratch/

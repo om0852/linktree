@@ -1,0 +1,58 @@
+{
+  "dataset_analysis": {
+    "commercial_platforms_analyzed": 20,
+    "opensource_platforms_analyzed": 10,
+    "cloned_repositories_analyzed": {}
+  },
+  "sample_actor_persona_classification": {
+    "predicted_persona": "actor_actress",
+    "confidence_scores": {
+      "actor_actress": 10,
+      "influencer": 0,
+      "digital_marketer": 0,
+      "musician": 0,
+      "agency": 0
+    },
+    "recommendations": {
+      "preferred_layout": "Bento Grid + Video Hero",
+      "essential_widgets": [
+        "Showreel YouTube Player",
+        "Talent Agency Contact",
+        "IMDb Links",
+        "Press Kit Download",
+        "Headshot Carousel"
+      ],
+      "recommended_theme": "Modern Dark Glassmorphism",
+      "cta_words": [
+        "Watch Showreel",
+        "Book Talent",
+        "View Filmography",
+        "Press Kit"
+      ]
+    }
+  },
+  "sample_ctr_prediction": {
+    "predicted_ctr_score": "99%",
+    "rating": "EXCELLENT",
+    "optimization_insights": [
+      "+15% CTR: Bento grid layout increases visual engagement by 35%.",
+      "+12% Engagement: Video headers keep users on page 2.4x longer.",
+      "+8% Trust: 4+ social proof icons build brand authenticity.",
+      "+10% Lead Conversion: Newsletter/Booking widget captures immediate intent.",
+      "+5% Micro-interaction glow effects draw visual focus to primary CTA."
+    ]
+  },
+  "sample_ai_bio_generator": {
+    "suggested_taglines": [
+      "\ud83c\udfad Official Portfolio of Emily Vance | Actor & Performing Artist",
+      "\ud83c\udfac Emily Vance | Film, Television & Stage | Represented by Top Agencies",
+      "\ud83c\udf1f Watch Showreel & Book Talent | Emily Vance"
+    ],
+    "cta_recommendations": [
+      "Watch Showreel",
+      "Book Talent",
+      "View Filmography",
+      "Press Kit"
+    ]
+  }
+}

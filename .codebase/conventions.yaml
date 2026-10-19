@@ -1,0 +1,115 @@
+codebaseName: treeinbio
+version: 1.0.0
+lastUpdated: '2026-10-19T05:06:20.973Z'
+architecturalMap:
+  system_rules.md: unknown
+  AGENTS.md: unknown
+  CLAUDE.md: unknown
+  eslint.config.mjs: configuration
+  jsconfig.json: configuration
+  dialogue_transcript.json: service_business_logic
+  model_dialogue.py: data_model
+  model_report.json: data_model
+  nlp_trainer.py: service_business_logic
+  platform_dataset.json: service_business_logic
+  train_model.py: data_model
+  next.config.mjs: configuration
+  package-lock.json: configuration
+  package.json: configuration
+  postcss.config.mjs: configuration
+  README.md: unknown
+  apply_design_drilldown.mjs: unknown
+  apply_features.mjs: unknown
+  apply_page_features.mjs: unknown
+  apply_public_bio_features.mjs: unknown
+  check_style_lines.mjs: unknown
+  fix_syntax_in_page.mjs: unknown
+  update_full_design_and_content.mjs: unknown
+  page.jsx: ui_component
+  route.js: controller_route
+  layout.js: unknown
+  page.js: unknown
+  AtelierHeader.jsx: ui_component
+  AtelierSidebar.jsx: ui_component
+  WorkspaceSwitcher.jsx: ui_component
+  AuthModal.jsx: ui_component
+  EditorPanel.jsx: ui_component
+  PaletteSuggester.jsx: ui_component
+  AccessGateScreen.jsx: ui_component
+  CarouselSlider.jsx: ui_component
+  SocialIcons.jsx: ui_component
+  UnsavedChangesBar.jsx: ui_component
+  AddProductModal.jsx: ui_component
+  AIOptimizerModal.jsx: ui_component
+  AnalyticsModal.jsx: ui_component
+  BookingsManagerModal.jsx: ui_component
+  CustomDomainModal.jsx: ui_component
+  ExportImportModal.jsx: ui_component
+  LeadCaptureModal.jsx: ui_component
+  LeadMagnetGateModal.jsx: ui_component
+  LeadsManagerModal.jsx: ui_component
+  LinkMarketplaceModal.jsx: ui_component
+  QRCodeModal.jsx: ui_component
+  ScheduleMeetingModal.jsx: ui_component
+  ThumbnailPopover.jsx: ui_component
+  TipModal.jsx: ui_component
+  TitleFontModal.jsx: ui_component
+  ViewAsModal.jsx: ui_component
+  Navbar.jsx: ui_component
+  PhoneMockup.jsx: ui_component
+  CountdownBadge.jsx: ui_component
+  EmbedWidget.jsx: ui_component
+  PublicBioView.jsx: ui_component
+  SocialProofTicker.jsx: ui_component
+  StoryBubbleAvatar.jsx: ui_component
+  TrackingPixels.jsx: ui_component
+  Badge.jsx: ui_component
+  Button.jsx: ui_component
+  Card.jsx: ui_component
+  IconButton.jsx: ui_component
+  index.js: unknown
+  Input.jsx: ui_component
+  Label.jsx: ui_component
+  Select.jsx: ui_component
+  Switch.jsx: ui_component
+  TabButton.jsx: ui_component
+  app.js: unknown
+  connectors.js: unknown
+  domains.js: unknown
+  navigation.js: unknown
+  themes.js: unknown
+  middleware.js: unknown
+  aiScoring.js: utility_helper
+  embedDetector.js: utility_helper
+  paletteExtractor.js: utility_helper
+  bookingAndConnectors.test.mjs: test_spec
+  collections.test.mjs: test_spec
+  leadCapture.test.mjs: test_spec
+  linktree_full_features.test.mjs: test_spec
+  power_features.test.mjs: test_spec
+  preview_sync.test.mjs: test_spec
+  telemetry_engine.test.mjs: test_spec
+techDebtCount: 0
+rules:
+  structural:
+    constantsPlacement: top
+    exportStyle: named
+    typeAnnotationRequirement: false
+    namingConvention: camelCase variables, PascalCase classes/interfaces
+  git:
+    commitFormat: Freeform commit messages
+    branchNaming: 'active: master'
+    prTemplateSections:
+      - Summary
+      - Testing
+      - Checklist
+  documentation:
+    requireDocstrings: false
+    commentStyle: Use inline JSDoc comments for exported functions
+  customRules:
+    - id: no-explicit-any
+      description: Avoid using explicit any type casting when strict types are defined
+      severity: warning
+    - id: top-level-constants
+      description: Define configuration constants at top of file
+      severity: info

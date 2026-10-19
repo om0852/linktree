@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>treeinbio - Codebase Intelligence Dashboard</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --accent: #38bdf8;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --border: #334155;
+      --warning: #f59e0b;
+      --error: #ef4444;
+      --success: #10b981;
+    }
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+    }
+    .header {
+      padding: 24px 40px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #020617;
+    }
+    .header h1 {
+      margin: 0;
+      font-size: 24px;
+      color: var(--accent);
+    }
+    .badge {
+      background: #0369a1;
+      color: #e0f2fe;
+      padding: 4px 12px;
+      border-radius: 9999px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .container {
+      padding: 40px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      margin-bottom: 40px;
+    }
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+    .card h3 {
+      margin-top: 0;
+      color: var(--text-muted);
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .card .val {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .section-title {
+      font-size: 20px;
+      margin-bottom: 16px;
+      color: var(--accent);
+    }
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--card-bg);
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    .table th, .table td {
+      padding: 14px 20px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    .table th {
+      background: #0f172a;
+      color: var(--text-muted);
+      font-size: 13px;
+      text-transform: uppercase;
+    }
+    .tag {
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .tag-warning { background: rgba(245, 158, 11, 0.2); color: var(--warning); }
+    .tag-error { background: rgba(239, 68, 68, 0.2); color: var(--error); }
+    .tag-info { background: rgba(56, 189, 248, 0.2); color: var(--accent); }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div>
+      <h1>🚀 treeinbio</h1>
+      <span style="color: var(--text-muted); font-size: 14px;">Codebase Trainer Intelligence Dashboard</span>
+    </div>
+    <div class="badge">v1.0.0 • Model Loaded</div>
+  </div>
+
+  <div class="container">
+    <div class="grid">
+      <div class="card">
+        <h3>Constants Placement</h3>
+        <div class="val">TOP</div>
+      </div>
+      <div class="card">
+        <h3>Export Convention</h3>
+        <div class="val">NAMED</div>
+      </div>
+      <div class="card">
+        <h3>Strict Types Required</h3>
+        <div class="val" style="color: var(--warning)">
+          NO
+        </div>
+      </div>
+      <div class="card">
+        <h3>Mapped Symbols</h3>
+        <div class="val">383 Nodes</div>
+      </div>
+    </div>
+
+    <div class="section-title">⚠️ Code Quality & Performance Audit (55 issues)</div>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Severity</th>
+          <th>File Path</th>
+          <th>Issue Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        
+          <tr>
+            <td><span class="tag tag-info">INFO</span></td>
+            <td style="font-family: monospace;">ml_engine\platform_dataset.json</td>
+            <td>Average function length is high (229 lines per function). Consider refactoring.</td>
+          </tr>
+        
+          <tr>
+            <td><span class="tag tag-info">INFO</span></td>
+            <td style="font-family: monospace;">package-lock.json</td>
+            <td>Average function length is high (7638 lines per function). Consider refactoring.</td>
+          </tr>
+        
+          <tr>
+            <td><span class="tag tag-info">INFO</span></td>
+            <td style="font-family: monospace;">scratch\apply_design_drilldown.mjs</td>
+            <td>Average function length is high (781 lines per function). Consider refactoring.</td>
+          </tr>
+        
+          <tr>
+            <td><span class="tag tag-info">INFO</span></td>
+            <td style="font-family: monospace;">scratch\apply_page_features.mjs</td>
+            <td>Average function length is high (534 lines per function). Consider refactoring.</td>
+          </tr>
+        
+          <tr>
+            <td><span class="tag tag-info">INFO</span></td>
+            <td style="font-family: monospace;">scratch\fix_syntax_in_page.mjs</td>
+            <td>Average function length is high (103 lines per function). Consider refactoring.</td>
+          </tr>
+        
+          <tr>
+            <td><span class="tag tag-info">INFO</span></td>
+            <td style="font-family: monospace;">scratch\update_full_design_and_content.mjs</td>
+            <td>Average function length is high (339 lines per function). Consider refactoring.</td>
+          </tr>
+        
+          <tr>
+            <td><span class="tag tag-info">INFO</span></td>
+            <td style="font-family: monospace;">src\app\analytics\page.jsx</td>
+            <td>Average function length is high (320 lines per function). Consider refactoring.</td>
+          </tr>
+        
+          <tr>
+            <td><span class="tag tag-info">INFO</span></td>
+            <td style="font-family: monospace;">src\app\api\analytics\[username]\route.js</td>
+            <td>Average function length is high (121 lines per function). Consider refactoring.</td>
+          </tr>
+        
+          <tr>
+            <td><span class="tag tag-info">INFO</span></td>
+            <td style="font-family: monospace;">src\app\api\auth\register\route.js</td>
+            <td>Average function length is high (108 lines per function). Consider refactoring.</td>
+          </tr>
+        
+          <tr>
+            <td><span class="tag tag-info">INFO</span></td>
+            <td style="font-family: monospace;">src\app\api\click\[linkId]\route.js</td>
+            <td>Average function length is high (94 lines per function). Consider refactoring.</td>
+          </tr>
+        
+          <tr>
+            <td><span class="tag tag-info">INFO</span></td>
+            <td style="font-family: monospace;">src\app\api\integrations\toolkits\route.js</td>
+            <td>Average function length is high (85 lines per function). Consider refactoring.</td>
+          </tr>
+        
+          <tr>
+            <td><span class="tag tag-info">INFO</span></td>
+            <td style="font-family: monospace;">src\app\api\profile\route.js</td>
+            <td>Average function length is high (113 lines per function). Consider refactoring.</td>
+          </tr>
+        
+          <tr>
+            <td><span class="tag tag-info">INFO</span></td>
+            <td style="font-family: monospace;">src\app\api\track\view\route.js</td>
+            <td>Average function length is high (99 lines per function). Consider refactoring.</td>
+          </tr>
+        
+          <tr>
+            <td><span class="tag tag-info">INFO</span></td>
+            <td style="font-family: monospace;">src\app\api\v1\analytics\route.js</td>
+            <td>Average function length is high (393 lines per function). Consider refactoring.</td>
+          </tr>
+        
+          <tr>
+            <td><span class="tag tag-info">INFO</span></td>
+            <td style="font-family: monospace;">src\app\api\v1\internal\domain-check\route.js</td>
+            <td>Average function length is high (83 lines per function). Consider refactoring.</td>
+          </tr>
+        
+          <tr>
+            <td><span class="tag tag-info">INFO</span></td>
+            <td style="font-family: monospace;">src\app\api\v1\lead-magnet\unlock\route.js</td>
+            <td>Average function length is high (82 lines per function). Consider refactoring.</td>
+          </tr>
+        
+          <tr>
+            <td><span class="tag tag-info">INFO</span></td>
+            <td style="font-family: monospace;">src\app\api\v1\social-proof\[username]\route.js</td>
+            <td>Average function length is high (106 lines per function). Consider refactoring.</td>
+          </tr>
+        
+          <tr>
+            <td><span class="tag tag-info">INFO</span></td>
+            <td style="font-family: monospace;">src\app\api\v1\track\route.js</td>
+            <td>Average function length is high (138 lines per function). Consider refactoring.</td>
+          </tr>
+        
+          <tr>
+            <td><span class="tag tag-info">INFO</span></td>
+            <td style="font-family: monospace;">src\app\bookings\page.jsx</td>
+            <td>Average function length is high (104 lines per function). Consider refactoring.</td>
+          </tr>
+        
+          <tr>
+            <td><span class="tag tag-info">INFO</span></td>
+            <td style="font-family: monospace;">src\app\connectors\page.jsx</td>
+            <td>Average function length is high (295 lines per function). Consider refactoring.</td>
+          </tr>
+        
+          <tr>
+            <td><span class="tag tag-info">INFO</span></td>
+            <td style="font-family: monospace;">src\app\domains\page.jsx</td>
+            <td>Average function length is high (185 lines per function). Consider refactoring.</td>
+          </tr>
+        
+          <tr>
+            <td><span class="tag tag-info">INFO</span></td>
+            <td style="font-family: monospace;">src\app\leads\page.jsx</td>
+            <td>Average function length is high (122 lines per function). Consider refactoring.</td>
+          </tr>
+        
+          <tr>
+            <td><span class="tag tag-info">INFO</span></td>
+            <td style="font-family: monospace;">src\app\page.js</td>
+            <td>Average function length is high (123 lines per function). Consider refactoring.</td>
+          </tr>
+        
+          <tr>
+            <td><span class="tag tag-info">INFO</span></td>
+            <td style="font-family: monospace;">src\components\Atelier\AtelierHeader.jsx</td>
+            <td>Average function length is high (164 lines per function). Consider refactoring.</td>
+          </tr>
+        
+          <tr>
+            <td><span class="tag tag-info">INFO</span></td>
+            <td style="font-family: monospace;">src\components\Atelier\WorkspaceSwitcher.jsx</td>
+            <td>Average function length is high (158 lines per function). Consider refactoring.</td>
+          </tr>
+        
+          <tr>
+            <td><span class="tag tag-info">INFO</span></td>
+            <td style="font-family: monospace;">src\components\Auth\AuthModal.jsx</td>
+            <td>Average function length is high (233 lines per function). Consider refactoring.</td>
+          </tr>
+        
+          <tr>
+            <td><span class="tag tag-info">INFO</span></td>
+            <td style="font-family: monospace;">src\components\Builder\EditorPanel.jsx</td>
+            <td>Average function length is high (114 lines per function). Consider refactoring.</td>
+          </tr>
+        
+          <tr>
+            <td><span class="tag tag-info">INFO</span></td>
+            <td style="font-family: monospace;">src\components\Builder\PaletteSuggester.jsx</td>
+            <td>Average function length is high (112 lines per function). Consider refactoring.</td>
+          </tr>
+        
+          <tr>
+            <td><span class="tag tag-info">INFO</span></td>
+            <td style="font-family: monospace;">src\components\Common\UnsavedChangesBar.jsx</td>
+            <td>Average function length is high (98 lines per function). Consider refactoring.</td>
+          </tr>
+        
+          <tr>
+            <td><span class="tag tag-info">INFO</span></td>
+            <td style="font-family: monospace;">src\components\Modals\AddProductModal.jsx</td>
+            <td>Average function length is high (149 lines per function). Consider refactoring.</td>
+          </tr>
+        
+          <tr>
+            <td><span class="tag tag-info">INFO</span></td>
+            <td style="font-family: monospace;">src\components\Modals\AIOptimizerModal.jsx</td>
+            <td>Average function length is high (117 lines per function). Consider refactoring.</td>
+          </tr>
+        
+          <tr>
+            <td><span class="tag tag-info">INFO</span></td>
+            <td style="font-family: monospace;">src\components\Modals\BookingsManagerModal.jsx</td>
+            <td>Average function length is high (84 lines per function). Consider refactoring.</td>
+          </tr>
+        
+          <tr>
+            <td><span class="tag tag-info">INFO</span></td>
+            <td style="font-family: monospace;">src\components\Modals\CustomDomainModal.jsx</td>
+            <td>Average function length is high (170 lines per function). Consider refactoring.</td>
+          </tr>
+        
+          <tr>
+            <td><span class="tag tag-info">INFO</span></td>
+            <td style="font-family: monospace;">src\components\Modals\LeadCaptureModal.jsx</td>
+            <td>Average function length is high (140 lines per function). Consider refactoring.</td>
+          </tr>
+        
+          <tr>
+            <td><span class="tag tag-info">INFO</span></td>
+            <td style="font-family: monospace;">src\components\Modals\LeadMagnetGateModal.jsx</td>
+            <td>Average function length is high (126 lines per function). Consider refactoring.</td>
+          </tr>
+        
+          <tr>
+            <td><span class="tag tag-info">INFO</span></td>
+            <td style="font-family: monospace;">src\components\Modals\LeadsManagerModal.jsx</td>
+            <td>Average function length is high (116 lines per function). Consider refactoring.</td>
+          </tr>
+        
+          <tr>
+            <td><span class="tag tag-info">INFO</span></td>
+            <td style="font-family: monospace;">src\components\Modals\LinkMarketplaceModal.jsx</td>
+            <td>Average function length is high (169 lines per function). Consider refactoring.</td>
+          </tr>
+        
+          <tr>
+            <td><span class="tag tag-info">INFO</span></td>
+            <td style="font-family: monospace;">src\components\Modals\ScheduleMeetingModal.jsx</td>
+            <td>Average function length is high (108 lines per function). Consider refactoring.</td>
+          </tr>
+        
+          <tr>
+            <td><span class="tag tag-info">INFO</span></td>
+            <td style="font-family: monospace;">src\components\Modals\TipModal.jsx</td>
+            <td>Average function length is high (157 lines per function). Consider refactoring.</td>
+          </tr>
+        
+          <tr>
+            <td><span class="tag tag-info">INFO</span></td>
+            <td style="font-family: monospace;">src\components\Modals\TitleFontModal.jsx</td>
+            <td>Average function length is high (108 lines per function). Consider refactoring.</td>
+          </tr>
+        
+          <tr>
+            <td><span class="tag tag-info">INFO</span></td>
+            <td style="font-family: monospace;">src\components\Modals\ViewAsModal.jsx</td>
+            <td>Average function length is high (222 lines per function). Consider refactoring.</td>
+          </tr>
+        
+          <tr>
+            <td><span class="tag tag-info">INFO</span></td>
+            <td style="font-family: monospace;">src\components\Navbar.jsx</td>
+            <td>Average function length is high (180 lines per function). Consider refactoring.</td>
+          </tr>
+        
+          <tr>
+            <td><span class="tag tag-info">INFO</span></td>
+            <td style="font-family: monospace;">src\components\PublicBio\EmbedWidget.jsx</td>
+            <td>Average function length is high (95 lines per function). Consider refactoring.</td>
+          </tr>
+        
+          <tr>
+            <td><span class="tag tag-info">INFO</span></td>
+            <td style="font-family: monospace;">src\constants\app.js</td>
+            <td>Average function length is high (305 lines per function). Consider refactoring.</td>
+          </tr>
+        
+          <tr>
+            <td><span class="tag tag-info">INFO</span></td>
+            <td style="font-family: monospace;">src\constants\connectors.js</td>
+            <td>Average function length is high (367 lines per function). Consider refactoring.</td>
+          </tr>
+        
+          <tr>
+            <td><span class="tag tag-info">INFO</span></td>
+            <td style="font-family: monospace;">src\constants\themes.js</td>
+            <td>Average function length is high (82 lines per function). Consider refactoring.</td>
+          </tr>
+        
+          <tr>
+            <td><span class="tag tag-info">INFO</span></td>
+            <td style="font-family: monospace;">src\utils\aiScoring.js</td>
+            <td>Average function length is high (124 lines per function). Consider refactoring.</td>
+          </tr>
+        
+          <tr>
+            <td><span class="tag tag-info">INFO</span></td>
+            <td style="font-family: monospace;">tests\bookingAndConnectors.test.mjs</td>
+            <td>Average function length is high (191 lines per function). Consider refactoring.</td>
+          </tr>
+        
+          <tr>
+            <td><span class="tag tag-info">INFO</span></td>
+            <td style="font-family: monospace;">tests\collections.test.mjs</td>
+            <td>Average function length is high (277 lines per function). Consider refactoring.</td>
+          </tr>
+        
+          <tr>
+            <td><span class="tag tag-info">INFO</span></td>
+            <td style="font-family: monospace;">tests\leadCapture.test.mjs</td>
+            <td>Average function length is high (293 lines per function). Consider refactoring.</td>
+          </tr>
+        
+          <tr>
+            <td><span class="tag tag-info">INFO</span></td>
+            <td style="font-family: monospace;">tests\linktree_full_features.test.mjs</td>
+            <td>Average function length is high (240 lines per function). Consider refactoring.</td>
+          </tr>
+        
+          <tr>
+            <td><span class="tag tag-info">INFO</span></td>
+            <td style="font-family: monospace;">tests\power_features.test.mjs</td>
+            <td>Average function length is high (182 lines per function). Consider refactoring.</td>
+          </tr>
+        
+          <tr>
+            <td><span class="tag tag-info">INFO</span></td>
+            <td style="font-family: monospace;">tests\preview_sync.test.mjs</td>
+            <td>Average function length is high (201 lines per function). Consider refactoring.</td>
+          </tr>
+        
+          <tr>
+            <td><span class="tag tag-info">INFO</span></td>
+            <td style="font-family: monospace;">tests\telemetry_engine.test.mjs</td>
+            <td>Average function length is high (163 lines per function). Consider refactoring.</td>
+          </tr>
+        
+          <tr>
+            <td><span class="tag tag-error">ERROR</span></td>
+            <td style="font-family: monospace;">next.config.mjs</td>
+            <td>Circular import dependency detected between `next.config.mjs` and `next.config.mjs`.</td>
+          </tr>
+        
+      </tbody>
+    </table>
+  </div>
+</body>
+</html>
