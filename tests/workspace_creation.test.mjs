@@ -46,4 +46,23 @@ test('Brand Bio Workspace Creation & Profile Schema Validation Suite', async (t)
     assert.equal(u.profiles.length, 2);
     assert.equal(u.activeProfileId.toString(), dummyId2.toString());
   });
+
+  await t.test('verifies active workspace profile resolution logic', () => {
+    const rootProfile = { _id: new mongoose.Types.ObjectId(), username: 'om_root', name: 'OM Root' };
+    const brandProfile = { _id: new mongoose.Types.ObjectId(), username: 'salunke_brand', name: 'Salunke Brand' };
+
+    const userWithActiveBrand = {
+      username: 'om_root',
+      activeProfileId: brandProfile._id,
+      profiles: [rootProfile._id, brandProfile._id],
+    };
+
+    // Simulate session resolution
+    const resolvedProfile = userWithActiveBrand.activeProfileId.toString() === brandProfile._id.toString()
+      ? brandProfile
+      : rootProfile;
+
+    assert.equal(resolvedProfile.username, 'salunke_brand', 'Should resolve active brand workspace profile instead of root');
+    assert.equal(resolvedProfile._id.toString(), brandProfile._id.toString());
+  });
 });

@@ -1095,6 +1095,16 @@ export default function AtelierStudioPage() {
           onProfileSwitched={(newProfile) => {
             if (newProfile) {
               setCurrentProfile(newProfile);
+              setSavedSnapshot(JSON.stringify(newProfile));
+              setHistory([newProfile]);
+              setHistoryIndex(0);
+              setInlineEditingLinkId(null);
+              setEditingLinkId(null);
+              setIsAddingLink(false);
+              setEditingCollectionId(null);
+              setIsAddingCollection(false);
+              setActiveThumbnailLink(null);
+              setActiveLinkMenuId(null);
               setToastMessage({
                 type: 'success',
                 text: `Switched workspace to @${newProfile.username}`,

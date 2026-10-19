@@ -17,9 +17,9 @@ export async function POST(req) {
 
     let targetProfile = null;
     if (profileId) {
-      targetProfile = await Profile.findById(profileId);
+      targetProfile = await Profile.findById(profileId).lean();
     } else if (username) {
-      targetProfile = await Profile.findOne({ username: username.toLowerCase().trim() });
+      targetProfile = await Profile.findOne({ username: username.toLowerCase().trim() }).lean();
     }
 
     if (!targetProfile) {

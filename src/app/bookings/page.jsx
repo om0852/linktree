@@ -36,7 +36,7 @@ export default function BookingsPage() {
   const [cancellingId, setCancellingId] = useState(null);
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  const username = authUser?.username || currentProfile?.username || '';
+  const username = currentProfile?.username || authUser?.username || '';
 
   const fetchBookings = async () => {
     try {
@@ -152,6 +152,11 @@ export default function BookingsPage() {
           }}
           onLogout={handleLogout}
           onToggleMobile={() => setMobileOpen(!mobileOpen)}
+          onProfileSwitched={(newProfile) => {
+            if (newProfile) {
+              setCurrentProfile(newProfile);
+            }
+          }}
         />
 
         {/* Main Workspace */}

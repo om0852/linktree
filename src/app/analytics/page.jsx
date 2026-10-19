@@ -51,7 +51,7 @@ export default function AnalyticsPage() {
   const [mediaKitBusy, setMediaKitBusy] = useState(false);
   const [mediaKitMessage, setMediaKitMessage] = useState('');
 
-  const username = authUser?.username || currentProfile?.username || 'omm';
+  const username = currentProfile?.username || authUser?.username || 'omm';
 
   // Fetch live telemetry analytics from /api/v1/analytics
   const fetchAnalytics = useCallback(async (targetUsername, range) => {
@@ -80,7 +80,7 @@ export default function AnalyticsPage() {
 
         if (meData.authenticated && meData.user) {
           setAuthUser(meData.user);
-          target = meData.user.username;
+          target = meData.profile?.username || meData.user.username;
           if (meData.profile) {
             setCurrentProfile(meData.profile);
           }
@@ -243,6 +243,12 @@ export default function AnalyticsPage() {
           }}
           onLogout={handleLogout}
           onToggleMobile={() => setMobileOpen(!mobileOpen)}
+          onProfileSwitched={(newProfile) => {
+            if (newProfile) {
+              setCurrentProfile(newProfile);
+              fetchAnalytics(newProfile.username, timeRange);
+            }
+          }}
         />
 
         {/* Main Analytics Content */}

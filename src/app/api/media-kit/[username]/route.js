@@ -5,6 +5,7 @@ import AnalyticsEvent from '@/models/AnalyticsEvent';
 import Booking from '@/models/Booking';
 import Lead from '@/models/Lead';
 import Profile from '@/models/Profile';
+import Subscriber from '@/models/Subscriber';
 
 const json = (body, status = 200) => NextResponse.json(body, {
   status,
@@ -29,7 +30,7 @@ export async function GET(_request, { params }) {
       event_type: { $in: ['profile_view', 'view', 'link_click', 'click'] },
     };
 
-    const [eventGroups, linkGroups, leads, bookings] = await Promise.all([
+    const [eventGroups, linkGroups, leads, subscribers, bookings] = await Promise.all([
       AnalyticsEvent.aggregate([
         { $match: eventMatch },
         { $group: { _id: '$event_type', count: { $sum: 1 }, unique: { $sum: { $cond: ['$is_unique', 1, 0] } } } },
@@ -41,6 +42,7 @@ export async function GET(_request, { params }) {
         { $limit: 5 },
       ]),
       Lead.countDocuments({ creatorUsername: username, createdAt: { $gte: since } }),
+      Subscriber.countDocuments({ profileUsername: username, subscribedAt: { $gte: since } }),
       Booking.countDocuments({ creatorUsername: username, createdAt: { $gte: since }, status: { $ne: 'cancelled' } }),
     ]);
 
@@ -53,8 +55,10 @@ export async function GET(_request, { params }) {
       }
       return result;
     }, { views: 0, uniqueViews: 0, clicks: 0 });
-    const linksById = new Map((profile.links || []).map((link) => [String(link.id), link.title || 'Link']));
-    const conversions = leads + bookings;
+    const linksById = new Map((profile.links || [])
+      .filter((link) => link.active !== false && !link.disabled && !link.isArchived)
+      .map((link) => [String(link.id), link.title || 'Link']));
+    const conversions = leads + subscribers + bookings;
 
     return json({
       creator: { username: profile.username, name: profile.name || profile.title || profile.username, bio: profile.bio || '', avatar: profile.avatar || '' },
@@ -64,11 +68,14 @@ export async function GET(_request, { params }) {
         uniqueViews: values.uniqueViews,
         linkClicks: values.clicks,
         leads,
+        subscribers,
         bookings,
         conversions,
         clickThroughRate: values.views ? Number((values.clicks / values.views * 100).toFixed(1)) : 0,
       },
-      topLinks: linkGroups.map((item) => ({ title: linksById.get(String(item._id)) || 'Link', clicks: item.clicks })),
+      topLinks: linkGroups
+        .filter((item) => linksById.has(String(item._id)))
+        .map((item) => ({ title: linksById.get(String(item._id)), clicks: item.clicks })),
       generatedAt: new Date().toISOString(),
     });
   } catch (error) {

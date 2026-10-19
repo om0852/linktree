@@ -44,7 +44,7 @@ export default function DomainsPage() {
   const IP_TARGET = DOMAIN_TARGET_IP;
 
   const refreshDomains = async (targetUsername) => {
-    const un = targetUsername || authUser?.username;
+    const un = targetUsername || currentProfile?.username || authUser?.username;
     if (!un) {
       setDomains([]);
       setLoading(false);
@@ -74,7 +74,7 @@ export default function DomainsPage() {
           if (data.profile) {
             setCurrentProfile(data.profile);
           }
-          await refreshDomains(data.user.username);
+          await refreshDomains(data.profile?.username || data.user.username);
         } else {
           setLoading(false);
         }
@@ -244,6 +244,12 @@ export default function DomainsPage() {
           }}
           onLogout={handleLogout}
           onToggleMobile={() => setMobileOpen(!mobileOpen)}
+          onProfileSwitched={(newProfile) => {
+            if (newProfile) {
+              setCurrentProfile(newProfile);
+              refreshDomains(newProfile.username);
+            }
+          }}
         />
 
         {/* Main Domains Content Workspace */}

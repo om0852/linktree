@@ -72,7 +72,7 @@ export async function POST(req) {
     return NextResponse.json({
       success: true,
       message: `New brand workspace @${newProfile.username} created successfully!`,
-      profile: newProfile,
+      profile: newProfile.toObject ? newProfile.toObject() : newProfile,
     });
   } catch (error) {
     console.error('Create workspace error:', error);

@@ -59,7 +59,7 @@ export default function ConnectorsPage() {
   const [executingAction, setExecutingAction] = useState(false);
   const [executionResult, setExecutionResult] = useState(null);
 
-  const currentUserId = authUser?.username || currentProfile?.username || 'creator';
+  const currentUserId = currentProfile?.username || authUser?.username || 'creator';
 
   // Load auth session on mount
   useEffect(() => {
@@ -320,6 +320,11 @@ export default function ConnectorsPage() {
           }}
           onLogout={handleLogout}
           onToggleMobile={() => setMobileOpen(!mobileOpen)}
+          onProfileSwitched={(newProfile) => {
+            if (newProfile) {
+              setCurrentProfile(newProfile);
+            }
+          }}
         />
 
         {/* Status Notice Toast */}

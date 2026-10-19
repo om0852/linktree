@@ -44,7 +44,7 @@ export default function LeadsPage() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [savingAutoSync, setSavingAutoSync] = useState(false);
 
-  const username = authUser?.username || currentProfile?.username || '';
+  const username = currentProfile?.username || authUser?.username || '';
 
   const totalCount = leads.length;
   const syncedCount = leads.filter((l) => Boolean(l.syncedToGoogleContacts || l.syncStatus === 'synced')).length;
@@ -249,6 +249,11 @@ export default function LeadsPage() {
           }}
           onLogout={handleLogout}
           onToggleMobile={() => setMobileOpen(!mobileOpen)}
+          onProfileSwitched={(newProfile) => {
+            if (newProfile) {
+              setCurrentProfile(newProfile);
+            }
+          }}
         />
 
         {/* Main Workspace */}

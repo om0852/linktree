@@ -494,10 +494,13 @@ export const parseTailwindGradient = (str) => {
     if (matchHex) return matchHex[1];
     const namedColors = {
       'amber-500': '#f59e0b',
+      'amber-700': '#b45309',
       'amber-400': '#fbbf24',
       'rose-500': '#f43f5e',
       'rose-600': '#e11d48',
+      'rose-700': '#be123c',
       'purple-600': '#9333ea',
+      'purple-800': '#5b21b6',
       'purple-500': '#a855f7',
       'indigo-900': '#312e81',
       'indigo-600': '#4f46e5',

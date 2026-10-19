@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { revalidatePath } from 'next/cache';
 import connectToDatabase from '@/lib/mongodb';
 import Profile from '@/models/Profile';
+import User from '@/models/User';
 import { getAuthUser } from '@/lib/auth';
 import { INITIAL_USER_PROFILE } from '@/constants/app';
 
@@ -16,7 +17,21 @@ export async function GET(request) {
 
     if (!targetUsername) {
       const authUser = await getAuthUser(request);
-      if (authUser && authUser.username) {
+      if (authUser) {
+        const targetUserId = authUser.id || authUser.userId || authUser._id;
+        let user = targetUserId 
+          ? await User.findById(targetUserId).lean() 
+          : null;
+        if (!user && authUser.username) {
+          user = await User.findOne({ username: authUser.username.toLowerCase() }).lean();
+        }
+
+        if (user?.activeProfileId) {
+          const activeProf = await Profile.findById(user.activeProfileId).lean();
+          if (activeProf) {
+            return NextResponse.json({ success: true, profile: activeProf });
+          }
+        }
         targetUsername = authUser.username;
       }
     }
@@ -55,8 +70,23 @@ export async function POST(request) {
       return NextResponse.json({ success: false, error: 'Authentication required. Please sign in.' }, { status: 401 });
     }
 
-    if (authUser && authUser.username !== normalizedUsername && authUser.role !== 'admin') {
-      return NextResponse.json({ success: false, error: 'You are not authorized to modify this profile.' }, { status: 403 });
+    if (authUser && authUser.role !== 'admin') {
+      const targetUserId = authUser.id || authUser.userId || authUser._id;
+      let user = targetUserId 
+        ? await User.findById(targetUserId).lean() 
+        : null;
+      if (!user && authUser.username) {
+        user = await User.findOne({ username: authUser.username.toLowerCase() }).lean();
+      }
+
+      const profileDoc = await Profile.findOne({ username: normalizedUsername }).select('_id').lean();
+      const userProfileIds = (user?.profiles || []).map(id => id.toString());
+      const isOwner = authUser.username === normalizedUsername || 
+        (profileDoc && userProfileIds.includes(profileDoc._id.toString()));
+
+      if (!isOwner) {
+        return NextResponse.json({ success: false, error: 'You are not authorized to modify this profile.' }, { status: 403 });
+      }
     }
 
     // Clean links structure preserving power attributes

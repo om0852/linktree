@@ -51,7 +51,7 @@ function minContrast(foreground, backgrounds) {
   return color ? Math.min(...backgrounds.map((background) => contrastRatio(color, background))) : 0;
 }
 
-function resolveReadableColor(candidate, backgrounds, fallback) {
+function resolveReadableColor(candidate, backgrounds) {
   if (minContrast(candidate, backgrounds) >= 4.5) return candidate;
   const black = '#111827';
   const white = '#ffffff';
@@ -68,8 +68,8 @@ export function getReadableThemeColors(preset, wallpaper, customColors = {}) {
     || (preset?.text?.includes('emerald-400') ? '#34d399' : null)
     || (preset?.text?.includes('stone-900') ? '#1c1917' : null);
   const safeDefault = isDark ? '#f8fafc' : '#1f2937';
-  const title = resolveReadableColor(customColors.title || customColors.titleColor || presetText || safeDefault, backgrounds, safeDefault);
-  const body = resolveReadableColor(customColors.pageText || customColors.pageTextColor || (isDark ? '#e2e8f0' : '#475569'), backgrounds, safeDefault);
-  const muted = resolveReadableColor(isDark ? '#cbd5e1' : '#64748b', backgrounds, safeDefault);
+  const title = resolveReadableColor(customColors.title || customColors.titleColor || presetText || safeDefault, backgrounds);
+  const body = resolveReadableColor(customColors.pageText || customColors.pageTextColor || (isDark ? '#e2e8f0' : '#475569'), backgrounds);
+  const muted = resolveReadableColor(isDark ? '#cbd5e1' : '#64748b', backgrounds);
   return { isDark, title, body, muted };
 }

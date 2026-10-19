@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
+import Image from 'next/image';
 import { ArrowUpRight, BarChart3, CalendarDays, Download, Eye, MousePointer2, Users, CalendarCheck } from 'lucide-react';
 
 const number = (value) => Number(value || 0).toLocaleString();
@@ -32,6 +33,7 @@ export default function PerformanceMediaKitPage() {
     { label: 'Profile views', value: metrics.profileViews, detail: `${number(metrics.uniqueViews)} unique`, icon: Eye },
     { label: 'Link clicks', value: metrics.linkClicks, detail: `${metrics.clickThroughRate}% click-through rate`, icon: MousePointer2 },
     { label: 'Leads', value: metrics.leads, detail: 'Contact inquiries received', icon: Users },
+    { label: 'Subscribers', value: metrics.subscribers, detail: 'Newsletter and lead magnet signups', icon: Users },
     { label: 'Bookings', value: metrics.bookings, detail: 'Non-cancelled bookings', icon: CalendarCheck },
   ];
 
@@ -41,7 +43,7 @@ export default function PerformanceMediaKitPage() {
         <header className="bg-[#0f241d] px-6 py-8 text-white sm:px-10 sm:py-10 print:bg-white print:text-slate-900">
           <div className="flex flex-wrap items-start justify-between gap-5">
             <div className="flex min-w-0 items-center gap-4">
-              {creator.avatar ? <img src={creator.avatar} alt="" className="h-16 w-16 rounded-2xl object-cover" /> : <div className="grid h-16 w-16 place-items-center rounded-2xl bg-white/10 text-xl font-bold">{creator.name.slice(0, 1).toUpperCase()}</div>}
+              {creator.avatar ? <Image src={creator.avatar} alt="" width={64} height={64} unoptimized className="h-16 w-16 rounded-2xl object-cover" /> : <div className="grid h-16 w-16 place-items-center rounded-2xl bg-white/10 text-xl font-bold">{creator.name.slice(0, 1).toUpperCase()}</div>}
               <div className="min-w-0"><p className="text-sm font-semibold uppercase tracking-[0.18em] text-emerald-200 print:text-emerald-800">TreeInBio Performance Report</p><h1 className="mt-1 truncate text-2xl font-bold sm:text-3xl">{creator.name}</h1><p className="mt-1 text-sm text-white/70 print:text-slate-600">treeinbio.com/{creator.username}</p></div>
             </div>
             <button onClick={() => window.print()} className="inline-flex items-center gap-2 rounded-xl border border-white/20 px-4 py-2 text-sm font-semibold hover:bg-white/10 print:hidden"><Download size={16} /> Save as PDF</button>
@@ -56,7 +58,7 @@ export default function PerformanceMediaKitPage() {
           </div>
 
           <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div className="rounded-2xl border border-emerald-900/10 bg-emerald-50/60 p-5"><div className="flex items-center gap-2 text-sm font-semibold text-emerald-950"><BarChart3 size={17} /> Total conversions</div><div className="mt-2 text-3xl font-bold text-emerald-950">{number(metrics.conversions)}</div><p className="mt-1 text-sm text-emerald-900/70">Leads and bookings recorded in this period</p></div>
+            <div className="rounded-2xl border border-emerald-900/10 bg-emerald-50/60 p-5"><div className="flex items-center gap-2 text-sm font-semibold text-emerald-950"><BarChart3 size={17} /> Total conversions</div><div className="mt-2 text-3xl font-bold text-emerald-950">{number(metrics.conversions)}</div><p className="mt-1 text-sm text-emerald-900/70">Leads, signups, and bookings recorded in this period</p></div>
             <div className="rounded-2xl border border-slate-200 p-5"><div className="flex items-center gap-2 text-sm font-semibold"><ArrowUpRight size={17} /> Top links</div>{topLinks.length ? <ol className="mt-3 space-y-2">{topLinks.map((link, index) => <li key={`${link.title}-${index}`} className="flex justify-between gap-4 text-sm"><span className="truncate text-slate-600">{index + 1}. {link.title}</span><span className="shrink-0 font-semibold">{number(link.clicks)}</span></li>)}</ol> : <p className="mt-3 text-sm text-slate-500">No link clicks recorded in this period.</p>}</div>
           </div>
           <footer className="mt-8 border-t border-slate-100 pt-4 text-xs text-slate-400">Generated {new Date(report.generatedAt).toLocaleDateString()} · Aggregated TreeInBio analytics</footer>

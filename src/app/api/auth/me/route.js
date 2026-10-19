@@ -12,13 +12,28 @@ export async function GET(request) {
     }
 
     await connectToDatabase();
-    const user = await User.findOne({ username: authPayload.username.toLowerCase() }).select('-passwordHash').lean();
+    const targetUserId = authPayload.id || authPayload.userId || authPayload._id;
+    let user = targetUserId 
+      ? await User.findById(targetUserId).select('-passwordHash').lean() 
+      : null;
+
+    if (!user) {
+      user = await User.findOne({ username: authPayload.username.toLowerCase() }).select('-passwordHash').lean();
+    }
 
     if (!user) {
       return NextResponse.json({ authenticated: false, user: null, profile: null });
     }
 
-    const profile = await Profile.findOne({ username: user.username }).lean();
+    // Retrieve active workspace profile if activeProfileId is configured
+    let profile = null;
+    if (user.activeProfileId) {
+      profile = await Profile.findById(user.activeProfileId).lean();
+    }
+    // Fallback to primary account profile
+    if (!profile) {
+      profile = await Profile.findOne({ username: user.username.toLowerCase() }).lean();
+    }
 
     return NextResponse.json({
       authenticated: true,
@@ -29,6 +44,8 @@ export async function GET(request) {
         name: user.name,
         avatar: user.avatar,
         role: user.role,
+        activeProfileId: user.activeProfileId?.toString() || profile?._id?.toString() || null,
+        activeUsername: profile?.username || user.username,
       },
       profile: profile || null,
     });
