@@ -55,6 +55,12 @@ export async function POST(req) {
       title: title || 'Creator & Brand',
       bio: `Welcome to the official @${cleanUsername} TreeInBio page.`,
       niche,
+      designSettings: {
+        ...(INITIAL_USER_PROFILE.designSettings || {}),
+        buttonRoundness: 'pill',
+        buttonShadow: 'soft',
+        customColors: {},
+      },
     });
 
     // Add to user profiles and set as active

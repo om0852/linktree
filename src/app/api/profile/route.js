@@ -252,6 +252,10 @@ export async function POST(request) {
       }),
     };
 
+    if (typeof body.performanceMediaKitEnabled === 'boolean') {
+      updateData.performanceMediaKitEnabled = body.performanceMediaKitEnabled;
+    }
+
     const savedProfile = await Profile.findOneAndUpdate(
       { username: normalizedUsername },
       { $set: updateData },

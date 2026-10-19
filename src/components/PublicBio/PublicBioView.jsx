@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { getReadableThemeColors } from '@/lib/theme-contrast';
 import Link from 'next/link';
 import { 
   InstagramIcon, 
@@ -341,57 +342,12 @@ export default function PublicBioView({ profile, onBackToEditor, onIncrementClic
     const ds = profile?.designSettings;
     const customColors = ds?.customColors || {};
 
-    // 1. Determine if theme is dark
-    const isDark = Boolean(
-      preset?.id === 'dark-glass' ||
-      preset?.id === 'emerald-gold' ||
-      preset?.id === 'neon' ||
-      preset?.id === 'agate' ||
-      preset?.id === 'astrid' ||
-      preset?.id === 'mineral' ||
-      preset?.id === 'rise' ||
-      preset?.id === 'twilight' ||
-      preset?.id === 'olivia-guts' ||
-      preset?.id === 'billie-blohsh' ||
-      preset?.id === 'travis-cactus' ||
-      preset?.id === 'dua-future' ||
-      preset?.text?.includes('white') ||
-      preset?.text?.includes('#f6edd9') ||
-      preset?.text?.includes('#EDF2F4') ||
-      preset?.text?.includes('#E2CFEA') ||
-      preset?.text?.includes('#F0F5F9') ||
-      preset?.text?.includes('#FFEAA7') ||
-      preset?.text?.includes('#E0EAFC') ||
-      preset?.text?.includes('#25f43a') ||
-      preset?.text?.includes('#F3C5FF') ||
-      preset?.text?.includes('#E8DCC4')
-    );
-
-    // 2. Dynamic Title and Bio text colors
-    let titleColor = customColors.titleColor;
-    let bioColor = customColors.pageTextColor;
-
-    if (!titleColor) {
-      if (preset?.text?.startsWith('text-[#') && preset.text.endsWith(']')) {
-        titleColor = preset.text.slice(6, -1);
-      } else if (preset?.text?.includes('white')) {
-        titleColor = '#FFFFFF';
-      } else if (isDark) {
-        titleColor = '#F0F5F9';
-      } else {
-        titleColor = '#28352F';
-      }
-    }
-
-    if (!bioColor) {
-      if (isDark) {
-        bioColor = 'rgba(255, 255, 255, 0.78)';
-      } else {
-        bioColor = '#5C6B64';
-      }
-    }
-
-    const mutedColor = isDark ? 'rgba(255, 255, 255, 0.55)' : '#7A8B83';
+    // Resolve contrast from the actual background so preview and public pages agree.
+    const readableColors = getReadableThemeColors(preset, ds?.wallpaper, customColors);
+    const { isDark } = readableColors;
+    const titleColor = readableColors.title;
+    const bioColor = readableColors.body;
+    const mutedColor = readableColors.muted;
 
     // 3. Card Background & Border Style
     const cardStyle = {};

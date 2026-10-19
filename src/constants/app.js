@@ -15,6 +15,7 @@ export const DEFAULT_APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localh
 
 export const INITIAL_USER_PROFILE = {
   username: '',
+  performanceMediaKitEnabled: false,
   name: 'New Creator',
   title: 'Digital Creator & Professional',
   titleLogo: {
@@ -146,9 +147,9 @@ export const THEME_PRESETS = [
   { id: 'atelier', name: 'Atelier (Default)', bg: 'bg-[#FFFEFA]', cardBg: 'bg-[#F5F3ED]', text: 'text-[#28352F]', border: 'border-[#CAD8CE]', accent: '#52796F', primary: '#52796F', tag: 'Editorial' },
   { id: 'emerald-gold', name: 'Emerald & Gold', bg: 'bg-[#0f241d]', cardBg: 'bg-[#153228]', text: 'text-[#f6edd9]', border: 'border-[#cbb279]/40', accent: '#cbb279', primary: '#0f241d', tag: 'Luxury' },
   { id: 'dark-glass', name: 'Dark Glassmorphism', bg: 'bg-[#090d16]', cardBg: 'bg-white/10', text: 'text-white', border: 'border-white/20', accent: '#38bdf8', primary: '#38bdf8', tag: 'Futuristic' },
-  { id: 'sunset', name: 'Sunset Gradient', bg: 'bg-gradient-to-br from-amber-500 via-rose-500 to-purple-600', cardBg: 'bg-white/20', text: 'text-white', border: 'border-white/30', accent: '#f59e0b', primary: '#f59e0b', tag: 'Vibrant' },
+  { id: 'sunset', name: 'Sunset Gradient', bg: 'bg-gradient-to-br from-amber-700 via-rose-700 to-purple-800', cardBg: 'bg-white/20', text: 'text-white', border: 'border-white/30', accent: '#f59e0b', primary: '#f59e0b', tag: 'Vibrant' },
   { id: 'minimal-light', name: 'Minimal Light', bg: 'bg-white', cardBg: 'bg-stone-50', text: 'text-stone-900', border: 'border-stone-200', accent: '#1c1917', primary: '#1c1917', tag: 'Clean' },
-  { id: 'neon', name: 'Cyber Neon', bg: 'bg-slate-950', cardBg: 'bg-slate-900/90', text: 'text-emerald-400', border: 'border-emerald-500/50', accent: '#10b981', primary: '#10b981', tag: 'Cyber' },
+  { id: 'neon', name: 'Cyber Neon', bg: 'bg-slate-950', cardBg: 'bg-slate-900/90', text: 'text-[#6EE7B7]', border: 'border-emerald-500/50', accent: '#10b981', primary: '#10b981', tag: 'Cyber' },
   { id: 'agate', name: 'Agate Stone', bg: 'bg-[#2B2D42]', cardBg: 'bg-[#8D99AE]/20', text: 'text-[#EDF2F4]', border: 'border-[#8D99AE]/40', accent: '#EF233C', primary: '#2B2D42', tag: 'Modern' },
   { id: 'air', name: 'Air Sky', bg: 'bg-[#EBF4F6]', cardBg: 'bg-[#FFFFFF]', text: 'text-[#088395]', border: 'border-[#4E8EA2]/30', accent: '#0A4D68', primary: '#088395', tag: 'Breezy' },
   { id: 'astrid', name: 'Astrid Purple', bg: 'bg-[#1D1128]', cardBg: 'bg-[#371E4A]', text: 'text-[#E2CFEA]', border: 'border-[#805090]/40', accent: '#A06CD5', primary: '#1D1128', tag: 'Mystic' },
@@ -176,9 +177,9 @@ export const AVATAR_SHAPES = [
 export const CURATED_THEMES = [
   { id: 'ariana-cloud', name: 'Ariana Cloud', creator: 'Ariana Grande', bg: 'bg-gradient-to-b from-[#f3e7e9] via-[#e3eeff] to-[#e3eeff]', cardBg: 'bg-white/80 backdrop-blur-md', text: 'text-[#4A4E69]', border: 'border-[#C9ADA7]/40', accent: '#9A8C98', primary: '#9A8C98', tag: 'Pop Icon' },
   { id: 'olivia-guts', name: 'Olivia Guts', creator: 'Olivia Rodrigo', bg: 'bg-[#2B0938]', cardBg: 'bg-[#431259]', text: 'text-[#F3C5FF]', border: 'border-[#9B5DE5]/50', accent: '#E056FD', primary: '#9B5DE5', tag: 'Alt Pop' },
-  { id: 'billie-blohsh', name: 'Billie Neon', creator: 'Billie Eilish', bg: 'bg-[#0b0c10]', cardBg: 'bg-[#1f2833]', text: 'text-[#25f43a]', border: 'border-[#25f43a]/50', accent: '#25f43a', primary: '#25f43a', tag: 'Hyper Dark' },
+  { id: 'billie-blohsh', name: 'Billie Neon', creator: 'Billie Eilish', bg: 'bg-[#0b0c10]', cardBg: 'bg-[#1f2833]', text: 'text-[#86efac]', border: 'border-[#25f43a]/50', accent: '#25f43a', primary: '#25f43a', tag: 'Hyper Dark' },
   { id: 'travis-cactus', name: 'Cactus Earth', creator: 'Travis Scott', bg: 'bg-[#3A332B]', cardBg: 'bg-[#52493F]', text: 'text-[#E8DCC4]', border: 'border-[#8C7A6B]/50', accent: '#D4A373', primary: '#D4A373', tag: 'Hypebeast' },
-  { id: 'dua-future', name: 'Nostalgia Disco', creator: 'Dua Lipa', bg: 'bg-gradient-to-tr from-[#FF007F] via-[#7928CA] to-[#00DFD8]', cardBg: 'bg-black/40 backdrop-blur-lg', text: 'text-white', border: 'border-white/30', accent: '#00DFD8', primary: '#FF007F', tag: 'Nu-Disco' },
+  { id: 'dua-future', name: 'Nostalgia Disco', creator: 'Dua Lipa', bg: 'bg-gradient-to-tr from-[#BE185D] via-[#581C87] to-[#0E7490]', cardBg: 'bg-black/40 backdrop-blur-lg', text: 'text-white', border: 'border-white/30', accent: '#00DFD8', primary: '#FF007F', tag: 'Nu-Disco' },
   { id: 'steve-lacy', name: 'Gemini Lo-Fi', creator: 'Steve Lacy', bg: 'bg-[#FFB703]', cardBg: 'bg-[#FB8500]/20', text: 'text-[#023047]', border: 'border-[#023047]/30', accent: '#219EBC', primary: '#023047', tag: 'Lo-Fi' },
 ];
 

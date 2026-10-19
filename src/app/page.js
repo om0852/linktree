@@ -18,6 +18,7 @@ import TitleFontModal from '../components/Modals/TitleFontModal';
 import AddProductModal from '../components/Modals/AddProductModal';
 import UnsavedChangesBar from '../components/Common/UnsavedChangesBar';
 import PhoneMockup from '../components/Preview/PhoneMockup';
+import { getReadableThemeColors } from '@/lib/theme-contrast';
 import { 
   DEFAULT_EMPTY_PROFILE, 
   THEME_PRESETS, 
@@ -619,22 +620,15 @@ export default function AtelierStudioPage() {
 
   const handleApplyThemePreset = (preset) => {
     const isGradient = preset.bg?.includes('gradient');
-    const isDark = Boolean(
-      preset.text?.includes('white') ||
-      preset.text?.includes('#f6edd9') ||
-      preset.text?.includes('#EDF2F4') ||
-      preset.text?.includes('#E2CFEA') ||
-      preset.text?.includes('#F0F5F9') ||
-      preset.text?.includes('#FFEAA7') ||
-      preset.text?.includes('#E0EAFC') ||
-      preset.text?.includes('#25f43a') ||
-      preset.text?.includes('#F3C5FF') ||
-      preset.text?.includes('#E8DCC4')
-    );
-
     const wallpaperVal = preset.bg?.startsWith('bg-[#') 
       ? preset.bg.slice(4, -1) 
       : (preset.bg?.startsWith('bg-') ? preset.bg : '#FFFEFA');
+    const wallpaper = {
+      type: isGradient ? 'gradient' : 'fill',
+      value: isGradient ? '' : wallpaperVal,
+      gradient: isGradient ? preset.bg.replace(/^bg-/, '') : '',
+    };
+    const readableColors = getReadableThemeColors(preset, wallpaper);
 
     setCurrentProfile(prev => ({
       ...prev,
@@ -645,11 +639,7 @@ export default function AtelierStudioPage() {
       avatarShape: preset.avatarShape || prev.avatarShape || 'circle',
       designSettings: {
         ...(prev.designSettings || {}),
-        wallpaper: {
-          type: isGradient ? 'gradient' : 'fill',
-          value: isGradient ? '' : wallpaperVal,
-          gradient: isGradient ? preset.bg.replace(/^bg-/, '') : '',
-        },
+        wallpaper,
         buttonColor: preset.primary || '#52796F',
         buttonTextColor: '#FFFFFF',
         buttonStyle: preset.cardBg?.includes('/10') || preset.cardBg?.includes('/20') || preset.id === 'dark-glass' 
@@ -658,8 +648,8 @@ export default function AtelierStudioPage() {
         buttonRoundness: prev.designSettings?.buttonRoundness || 'rounded',
         customColors: {
           ...(prev.designSettings?.customColors || {}),
-          titleColor: isDark ? '#FFFFFF' : '#28352F',
-          pageTextColor: isDark ? 'rgba(255, 255, 255, 0.78)' : '#5C6B64',
+          title: readableColors.title,
+          pageText: readableColors.body,
         },
       },
     }));

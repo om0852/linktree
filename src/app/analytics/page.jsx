@@ -32,7 +32,8 @@ import {
   Search,
   Activity,
   Calendar,
-  Lock
+  Lock,
+  Copy
 } from 'lucide-react';
 
 export default function AnalyticsPage() {
@@ -47,6 +48,8 @@ export default function AnalyticsPage() {
   const [analyticsData, setAnalyticsData] = useState(null);
   const [hoveredTimelinePoint, setHoveredTimelinePoint] = useState(null);
   const [streamFilter, setStreamFilter] = useState('');
+  const [mediaKitBusy, setMediaKitBusy] = useState(false);
+  const [mediaKitMessage, setMediaKitMessage] = useState('');
 
   const username = authUser?.username || currentProfile?.username || 'omm';
 
@@ -115,6 +118,55 @@ export default function AnalyticsPage() {
     setTimeRange(newRange);
     if (username) {
       fetchAnalytics(username, newRange);
+    }
+  };
+
+  const handleMediaKitAction = async () => {
+    setMediaKitBusy(true);
+    setMediaKitMessage('');
+    try {
+      const enabled = Boolean(currentProfile?.performanceMediaKitEnabled);
+      if (!enabled) {
+        const response = await fetch(`/api/media-kit/${encodeURIComponent(username)}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ enabled: true }),
+        });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error || 'Could not enable the media kit.');
+        setCurrentProfile((profile) => ({ ...profile, performanceMediaKitEnabled: true }));
+      }
+      const url = `${window.location.origin}/media-kit/${encodeURIComponent(username)}`;
+      try {
+        await navigator.clipboard.writeText(url);
+        setMediaKitMessage(enabled ? 'Media kit link copied.' : 'Media kit enabled and link copied.');
+      } catch {
+        setMediaKitMessage('Media kit is ready. Use the link below to share it.');
+      }
+    } catch (error) {
+      setMediaKitMessage(error.message || 'Could not update the media kit.');
+    } finally {
+      setMediaKitBusy(false);
+    }
+  };
+
+  const handleDisableMediaKit = async () => {
+    setMediaKitBusy(true);
+    setMediaKitMessage('');
+    try {
+      const response = await fetch(`/api/media-kit/${encodeURIComponent(username)}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ enabled: false }),
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || 'Could not disable the media kit.');
+      setCurrentProfile((profile) => ({ ...profile, performanceMediaKitEnabled: false }));
+      setMediaKitMessage('Public media kit disabled.');
+    } catch (error) {
+      setMediaKitMessage(error.message || 'Could not update the media kit.');
+    } finally {
+      setMediaKitBusy(false);
     }
   };
 
@@ -260,6 +312,16 @@ export default function AnalyticsPage() {
                 <span>Export CSV</span>
               </a>
 
+              <button
+                onClick={handleMediaKitAction}
+                disabled={mediaKitBusy || !authUser}
+                title={!authUser ? 'Sign in to publish a media kit' : 'Copy shareable performance media kit link'}
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 min-h-[38px] bg-white hover:bg-slate-50 text-slate-700 border border-[#CAD8CE] text-xs sm:text-sm font-semibold rounded-lg shadow-xs transition disabled:opacity-50"
+              >
+                <Copy className="w-4 h-4 text-slate-500" />
+                <span>{mediaKitBusy ? 'Saving…' : currentProfile?.performanceMediaKitEnabled ? 'Copy Media Kit' : 'Publish Media Kit'}</span>
+              </button>
+
               {/* View Live Bio */}
               <a
                 href={`/${username}`}
@@ -272,6 +334,12 @@ export default function AnalyticsPage() {
               </a>
             </div>
           </div>
+
+          {mediaKitMessage && <div className="-mt-2 rounded-lg border border-[#CAD8CE] bg-white px-4 py-2 text-sm text-slate-600">
+            {mediaKitMessage}
+            {currentProfile?.performanceMediaKitEnabled && <a className="ml-2 font-semibold text-[#2D6A4F] underline" href={`/media-kit/${encodeURIComponent(username)}`} target="_blank" rel="noreferrer">Open report</a>}
+            {currentProfile?.performanceMediaKitEnabled && <button onClick={handleDisableMediaKit} disabled={mediaKitBusy} className="ml-3 font-semibold text-rose-700 underline disabled:opacity-50">Disable sharing</button>}
+          </div>}
 
           {/* Primary KPI Summary Cards Strip (4 columns) */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
