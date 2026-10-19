@@ -1,13 +1,16 @@
 import { NextResponse } from 'next/server';
 import { getComposioClient, isComposioConfigured } from '@/lib/composio';
-import { requireAuth } from '@/lib/authorization';
+import { requireAuth, requireProfileOwner } from '@/lib/authorization';
 
 export async function GET(req) {
   try {
-    const access = await requireAuth(req);
+    const { searchParams } = new URL(req.url);
+    const requestedUser = searchParams.get('userId') || searchParams.get('username');
+    const access = requestedUser
+      ? await requireProfileOwner(req, requestedUser)
+      : await requireAuth(req);
     if (access.error) return access.error;
-    const authUser = access.user;
-    const userId = authUser.username;
+    const userId = (requestedUser || access.user.username).toLowerCase().trim();
 
     if (!isComposioConfigured()) {
       return NextResponse.json({
@@ -41,10 +44,13 @@ export async function GET(req) {
 
 export async function DELETE(req) {
   try {
-    const access = await requireAuth(req);
-    if (access.error) return access.error;
     const body = await req.json();
-    const { accountId } = body;
+    const { accountId, userId: requestedUser } = body;
+    const access = requestedUser
+      ? await requireProfileOwner(req, requestedUser)
+      : await requireAuth(req);
+    if (access.error) return access.error;
+    const userId = (requestedUser || access.user.username).toLowerCase().trim();
 
     if (!accountId) {
       return NextResponse.json({ error: 'accountId is required' }, { status: 400 });
@@ -55,7 +61,7 @@ export async function DELETE(req) {
     }
 
     const client = getComposioClient();
-    const accounts = await client.connectedAccounts.list({ userIds: [access.user.username] });
+    const accounts = await client.connectedAccounts.list({ userIds: [userId] });
     if (!(accounts.items || []).some((account) => String(account.id || account.nanoid) === String(accountId))) {
       return NextResponse.json({ error: 'Connected account not found for this user.' }, { status: 404 });
     }

@@ -227,4 +227,18 @@ describe('Bookings API & Double-Booking Prevention End-to-End Suite', () => {
     assert.equal(data.success, true);
     assert.equal(data.booking.status, 'cancelled');
   });
+
+  describe('Connectors Workspace Isolation Suite', () => {
+    test('GET /api/connectors/accounts - Scopes query to requested workspace and rejects unauthorized profiles', async () => {
+      const unauth = await fetch(`${BASE_URL}/api/connectors/accounts?userId=emilyvance`);
+      assert.equal(unauth.status, 401);
+
+      const auth = await fetch(`${BASE_URL}/api/connectors/accounts?userId=emilyvance`, {
+        headers: getAuthHeaders(),
+      });
+      assert.equal(auth.status, 200);
+      const data = await auth.json();
+      assert.equal(data.userId, 'emilyvance');
+    });
+  });
 });

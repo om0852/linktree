@@ -1,0 +1,29 @@
+{
+  "microserviceName": "treeinbio",
+  "exposedRoutes": [],
+  "consumedRoutes": [
+    "/api/auth/me",
+    "/api/profile",
+    "/api/auth/logout",
+    "/api/connectors/connect",
+    "/api/connectors/accounts",
+    "/api/connectors/execute",
+    "/api/v1/domains",
+    "/api/v1/domains/verify",
+    "/api/leads/sync",
+    "/api/profile/workspaces",
+    "/api/profile/switch",
+    "/api/profile/create-workspace",
+    "/api/auth/login",
+    "/api/auth/register",
+    "/api/profile/access",
+    "/api/scrape-product",
+    "/api/leads",
+    "/api/v1/lead-magnet/unlock",
+    "/api/bookings",
+    "/api/tip",
+    "/api/newsletter",
+    "/api/v1/track",
+    "http://localhost:3000/api/scrape-product"
+  ]
+}

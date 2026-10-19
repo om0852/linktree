@@ -1,14 +1,16 @@
 import { NextResponse } from 'next/server';
 import { getComposioClient, isComposioConfigured, createAuthorizationLink } from '@/lib/composio';
-import { requireAuth } from '@/lib/authorization';
+import { requireAuth, requireProfileOwner } from '@/lib/authorization';
 
 export async function POST(req) {
   try {
-    const access = await requireAuth(req);
-    if (access.error) return access.error;
     const body = await req.json();
-    const { toolkitSlug } = body;
-    const userId = access.user.username;
+    const { toolkitSlug, userId: requestedUser } = body;
+    const access = requestedUser
+      ? await requireProfileOwner(req, requestedUser)
+      : await requireAuth(req);
+    if (access.error) return access.error;
+    const userId = (requestedUser || access.user.username).toLowerCase().trim();
 
     if (!toolkitSlug) {
       return NextResponse.json({ error: 'toolkitSlug is required' }, { status: 400 });

@@ -206,7 +206,7 @@ export default function ConnectorsPage() {
       const res = await fetch('/api/connectors/accounts', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ accountId })
+        body: JSON.stringify({ accountId, userId: currentUserId })
       });
       const data = await res.json();
 
@@ -337,6 +337,8 @@ export default function ConnectorsPage() {
           onProfileSwitched={(newProfile) => {
             if (newProfile) {
               setCurrentProfile(newProfile);
+              setConnectedAccounts([]);
+              setLoadingAccounts(true);
             }
           }}
         />
