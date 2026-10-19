@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { 
   Building2, 
   ChevronDown, 
@@ -17,6 +18,7 @@ export default function WorkspaceSwitcher({
   currentUsername, 
   onProfileSwitched 
 }) {
+  const [mounted, setMounted] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [workspaces, setWorkspaces] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -27,6 +29,10 @@ export default function WorkspaceSwitcher({
   const [createError, setCreateError] = useState('');
   const [creating, setCreating] = useState(false);
   const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Fetch workspaces on mount
   const loadWorkspaces = async () => {
@@ -221,15 +227,18 @@ export default function WorkspaceSwitcher({
       )}
 
       {/* Create New Workspace Modal */}
-      {showCreateModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
+      {showCreateModal && mounted && createPortal(
+        <div 
+          className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn"
+          onClick={() => setShowCreateModal(false)}
+        >
           <div 
-            className="relative w-full max-w-sm rounded-2xl bg-white border border-[#CAD8CE] shadow-2xl p-6 text-slate-800"
+            className="relative w-full max-w-sm max-h-[90vh] overflow-y-auto rounded-2xl bg-white border border-[#CAD8CE] shadow-2xl p-6 text-slate-800 my-auto"
             onClick={(e) => e.stopPropagation()}
           >
             <button
               onClick={() => setShowCreateModal(false)}
-              className="absolute top-4 right-4 p-1.5 text-slate-400 hover:text-slate-600 rounded-lg"
+              className="absolute top-4 right-4 p-1.5 text-slate-400 hover:text-slate-600 rounded-lg cursor-pointer"
             >
               <X size={16} />
             </button>
@@ -271,7 +280,7 @@ export default function WorkspaceSwitcher({
                   />
                 </div>
                 <p className="text-[10px] text-slate-400 mt-1">
-                  Public URL will be: treeinbio.com/@{newUsername || 'brand'}
+                  Public URL: {typeof window !== 'undefined' ? window.location.host : 'linktree.work.gd'}/@{newUsername || 'brand'}
                 </p>
               </div>
 
@@ -292,14 +301,14 @@ export default function WorkspaceSwitcher({
                 <button
                   type="button"
                   onClick={() => setShowCreateModal(false)}
-                  className="flex-1 py-2 text-xs text-slate-500 hover:text-slate-800"
+                  className="flex-1 py-2 text-xs text-slate-500 hover:text-slate-800 cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={creating || !newUsername.trim()}
-                  className="flex-1 py-2 px-3 rounded-xl bg-[#2D6A4F] hover:bg-[#1B4332] text-white font-semibold text-xs flex items-center justify-center gap-1.5 shadow-xs disabled:opacity-50 transition-colors"
+                  className="flex-1 py-2 px-3 rounded-xl bg-[#2D6A4F] hover:bg-[#1B4332] text-white font-semibold text-xs flex items-center justify-center gap-1.5 shadow-xs disabled:opacity-50 transition-colors cursor-pointer"
                 >
                   {creating ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />}
                   <span>Create Brand</span>
@@ -307,7 +316,8 @@ export default function WorkspaceSwitcher({
               </div>
             </form>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
