@@ -50,3 +50,6 @@ linktree-rse/*.har
 
 # scratch
 scratch/
+
+# local MCP client config (holds a personal API key)
+.mcp.json
