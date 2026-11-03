@@ -75,6 +75,28 @@ Create a key on the **AI Assistants** page, then:
   { "mcpServers": { "treeinbio": { "command": "npx", "args": ["-y", "mcp-remote", "https://<your-domain>/api/mcp", "--header", "Authorization:Bearer <key>"] } } }
   ```
 
+## v1.1: tools for working on a page end to end
+
+- `check_page` reviews a page and lists issues with the tool that fixes each.
+- Shop: `list_products`, `add_product`, `update_product`, `remove_product`,
+  `set_shop_visible`. Stickers: `list_stickers`, `remove_stickers` (placing
+  stickers stays in the Studio). Card colour: `update_design colors.card`.
+  Booking availability: `update_widgets schedule_meeting` (days, hours, slot
+  length, time zone). Leads: `update_lead_status`.
+- Every page edit accepts `dry_run` (preview the changes, save nothing) and
+  `if_unchanged_since` (refuse if the page changed after the assistant read
+  it). Saves also refuse to overwrite a page that changed while the tool ran.
+- `apply_changes` makes up to 15 edits as one save with one undo; every item
+  is validated first and nothing is saved if one is invalid.
+
+## What assistants can never do
+
+There are no tools, and no tool arguments, for: the account (email,
+password, username), API keys, access gates / passcodes, tracking pixels,
+creating or deleting workspaces, deleting custom domains, or bulk-deleting
+leads. Page edits only change the fields they name; everything else is
+copied from the saved page.
+
 ## Security
 
 - **Personal keys only.** `/api/mcp` accepts per-user API keys, never browser
@@ -101,6 +123,13 @@ Create a key on the **AI Assistants** page, then:
   afterwards. Viewing and undoing need a signed-in session, not a key.
 - **Errors.** Unexpected server errors are logged and reported to the
   assistant without internal details.
+- **Deletion budget.** At most 25 deletions/removals (links, products,
+  stickers, cancelled bookings) per key per day, even if an assistant is
+  told to do more.
+- **Safe values only.** Links must be https/mailto/tel, images https (no
+  `data:` or `javascript:`), colours 6-digit hex, gradients CSS gradients only,
+  fonts/themes/icons from fixed lists, and pages are capped at 60 links,
+  40 products and 12 social handles.
 
 ## Next steps (not built yet)
 

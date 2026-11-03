@@ -288,3 +288,28 @@ export async function DELETE(request) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 }
+
+// PATCH /api/leads?id=... { status } — mark a lead new / contacted / closed / archived.
+export async function PATCH(request) {
+  try {
+    await connectToDatabase();
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
+    if (!id || !/^[a-f\d]{24}$/i.test(id)) {
+      return NextResponse.json({ success: false, error: 'A valid lead ID is required.' }, { status: 400 });
+    }
+    const { status } = await request.json();
+    if (!['new', 'contacted', 'closed', 'archived'].includes(status)) {
+      return NextResponse.json({ success: false, error: 'Status must be new, contacted, closed or archived.' }, { status: 400 });
+    }
+    const lead = await Lead.findById(id).select('creatorUsername').lean();
+    if (!lead) return NextResponse.json({ success: false, error: 'Lead not found.' }, { status: 404 });
+    const access = await requireProfileOwner(request, lead.creatorUsername);
+    if (access.error) return access.error;
+    const updated = await Lead.findOneAndUpdate({ _id: id, creatorUsername: lead.creatorUsername }, { $set: { status } }, { new: true }).select('status').lean();
+    return NextResponse.json({ success: true, lead: updated });
+  } catch (error) {
+    console.error('Leads PATCH error:', error);
+    return NextResponse.json({ success: false, error: 'Could not update the lead.' }, { status: 500 });
+  }
+}

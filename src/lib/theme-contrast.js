@@ -79,7 +79,10 @@ function pageSamples(preset, wallpaper) {
 
 // Card colour as it is actually seen: translucent cards blended over the page,
 // and over another card (the laptop split layout nests cards in a card).
-function cardSamples(preset, backgrounds) {
+function cardSamples(preset, backgrounds, customCard) {
+  // A custom card colour (customColors.card) is a solid surface.
+  const custom = parseColor(customCard);
+  if (custom) return [custom];
   const surface = parseSurface(preset?.cardBg);
   if (!surface) return [];
   const once = backgrounds.map((background) => mix(background, surface.rgb, surface.alpha));
@@ -119,7 +122,8 @@ export function getReadableThemeColors(preset, wallpaper, customColors = {}) {
   // Text must read on the page and on the theme's cards. A custom wallpaper
   // can make that impossible (black page, cream cards): then text follows the
   // page and the cards switch to a glass surface over it (cardsFollowPage).
-  let surfaces = [...backgrounds, ...cardSamples(preset, backgrounds)];
+  const customCard = parseColor(customColors.card) ? toHex(parseColor(customColors.card)) : null;
+  let surfaces = [...backgrounds, ...cardSamples(preset, backgrounds, customCard)];
   let cardsFollowPage = false;
   if (minContrast(pickReadable(titleCandidates, surfaces), surfaces) < AA) {
     surfaces = backgrounds;
@@ -133,7 +137,7 @@ export function getReadableThemeColors(preset, wallpaper, customColors = {}) {
   const muted = pickReadable([tint(0.32), tint(0.24), tint(0.12), title], surfaces);
   // Accent colour used for text and icons (stats, prices); falls back to the title.
   const accent = pickReadable([preset?.accent, title], surfaces);
-  return { isDark, title, body, muted, accent, cardsFollowPage };
+  return { isDark, title, body, muted, accent, cardsFollowPage, customCard: cardsFollowPage ? null : customCard };
 }
 
 /** Text colour for a filled button; keeps the requested colour when it is readable. */
@@ -159,7 +163,7 @@ export function getGlassButtonColors(preset, wallpaper, readable) {
     return { background: 'rgba(255, 255, 255, 0.7)', color: readable?.title || '#333333', border: '1px solid rgba(255, 255, 255, 0.85)' };
   }
   const backgrounds = pageSamples(preset, wallpaper);
-  const surfaces = readable.cardsFollowPage ? backgrounds : [...backgrounds, ...cardSamples(preset, backgrounds)];
+  const surfaces = readable.cardsFollowPage ? backgrounds : [...backgrounds, ...cardSamples(preset, backgrounds, readable.customCard)];
   const white = parseColor(LIGHT_TEXT);
   const frosted = surfaces.map((surface) => mix(surface, white, 0.12));
   if (Math.min(...frosted.map((surface) => contrastRatio(white, surface))) >= AA) {
@@ -174,6 +178,7 @@ export function getGlassButtonColors(preset, wallpaper, readable) {
  */
 export function getThemeCardColor(preset, readable) {
   if (readable?.cardsFollowPage) return readable.isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 255, 255, 0.7)';
+  if (readable?.customCard) return readable.customCard;
   const surface = parseSurface(preset?.cardBg);
   if (!surface) return null;
   const [r, g, b] = surface.rgb.map((channel) => Math.round(channel * 255));
