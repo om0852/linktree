@@ -248,6 +248,12 @@
   .chip { @apply inline-flex h-[23px] items-center rounded-pill bg-surface-2 px-[10px] text-[10px] text-ink-700; }
 }
 
+/* Creatosaurus .customScrollBar; .thin-scroll is the same thing. */
+.customScrollBar::-webkit-scrollbar { width: 6px; height: 6px; background: transparent; }
+.customScrollBar::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.15); border-radius: 105px; }
+.customScrollBar::-webkit-scrollbar-thumb:hover { background: rgba(0, 0, 0, 0.4); }
+.customScrollBar::-webkit-scrollbar-track { background: transparent; }
+.customScrollBar { scrollbar-width: thin; scrollbar-color: rgba(0, 0, 0, 0.15) transparent; }
 .thin-scroll::-webkit-scrollbar { width: 6px; height: 6px; background: transparent; }
 .thin-scroll::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.15); border-radius: 105px; }
 .thin-scroll::-webkit-scrollbar-thumb:hover { background: rgba(0, 0, 0, 0.4); }

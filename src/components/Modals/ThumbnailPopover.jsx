@@ -30,7 +30,7 @@ import {
   Film,
   Loader2,
   ExternalLink,
-} from 'lucide-react';
+} from '@/components/icons';
 
 const ICON_LIBRARY = [
   { id: 'globe', label: 'Globe', icon: Globe },

@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Sparkles, Zap, CheckCircle2, AlertCircle, X, Wand2 } from 'lucide-react';
+import { Sparkles, Zap, CheckCircle2, AlertCircle, X, Wand2 } from '@/components/icons';
 import { PERSONA_TAGLINES } from '../../utils/aiScoring';
 
 export default function AIOptimizerModal({ 

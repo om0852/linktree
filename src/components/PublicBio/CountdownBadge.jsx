@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Clock, Zap } from 'lucide-react';
+import { Clock, Zap } from '@/components/icons';
 
 export default function CountdownBadge({ expiresAt, startsAt }) {
   const [timeLeft, setTimeLeft] = useState(null);

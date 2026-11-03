@@ -3,57 +3,49 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { X } from 'lucide-react';
 
 import { SIDEBAR_NAV_ITEMS } from '@/constants/navigation';
+import WorkspaceSwitcher from './WorkspaceSwitcher';
 
-export default function AtelierSidebar({ mobileOpen, onToggleMobile }) {
+/** Global navigation card (Creatosaurus LeftBar.jsx). */
+export default function AtelierSidebar({ mobileOpen, onToggleMobile, authUser, currentUsername, onProfileSwitched }) {
   const pathname = usePathname();
 
-  const isItemActive = (item) => {
-    if (item.matchExact) {
-      return pathname === '/';
-    }
-    return pathname.startsWith(item.href);
-  };
+  const isItemActive = (item) => (item.matchExact ? pathname === '/' : pathname.startsWith(item.href));
+  const close = () => mobileOpen && onToggleMobile && onToggleMobile();
 
   return (
     <>
-      {/* Mobile backdrop */}
-      {mobileOpen && (
-        <div
-          onClick={onToggleMobile}
-          className="fixed inset-0 z-40 bg-black/40 backdrop-blur-[2px] lg:hidden"
-        />
-      )}
+      {mobileOpen && <div onClick={onToggleMobile} className="fixed inset-0 z-40 bg-black/40 backdrop-blur-[2px] lg:hidden" />}
 
-      {/* Single floating navigation card (design system §4.1) */}
       <aside
-        className={`fixed left-[10px] top-[10px] z-50 flex h-[calc(100vh-20px)] w-[260px] flex-col rounded-lg bg-white py-[15px] transition-transform duration-200 ${
-          mobileOpen ? 'translate-x-0' : '-translate-x-[calc(100%+20px)] lg:translate-x-0'
-        }`}
+        style={{ height: 'calc(100vh - 20px)' }}
+        className={`fixed left-[10px] top-[10px] z-50 w-[260px] min-w-[260px] rounded-[10px] bg-white py-[15px] transition-transform duration-200 ${mobileOpen ? 'translate-x-0' : '-translate-x-[calc(100%_+_20px)] lg:translate-x-0'}`}
       >
-        {/* Brand row */}
-        <div className="mx-[13px] flex h-[24px] items-center justify-between">
-          <Link href="/" className="flex items-center gap-[8px]">
-            <span className="grid size-[20px] place-items-center rounded-sm bg-brand-500 text-[11px] font-semibold text-white">
-              T
-            </span>
-            <span className="text-[16px] font-semibold text-ink-900">TreeInBio</span>
+        {/* Logo row */}
+        <div className="flex items-center justify-between">
+          <Link href="/" onClick={close} className="ml-[9px] flex h-[24px] items-center">
+            <svg className="h-[20px] w-auto" width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M10 2.5V17.5M10 7L6 3.5M10 7L14 3.5M10 12L5 8M10 12L15 8" stroke="black" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            <span className="ml-[7px] text-[16px] font-semibold">TreeInBio</span>
           </Link>
           {onToggleMobile && (
-            <button
-              onClick={onToggleMobile}
-              aria-label="Close navigation"
-              className="grid size-[30px] place-items-center rounded-full text-ink-500 hover:bg-surface-2 hover:text-ink-600 lg:hidden"
-            >
-              <X className="size-[16px]" strokeWidth={1.5} />
+            <button type="button" onClick={onToggleMobile} aria-label="Close navigation" className="group mr-[13px] lg:hidden">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <path className="group-hover:stroke-[#404040]" d="M8 3L4 7L8 11M12 3L8 7L12 11" stroke="#CACACC" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
             </button>
           )}
         </div>
 
-        {/* Navigation */}
-        <nav className="thin-scroll mr-[3px] mt-[15px] flex-1 overflow-y-auto pl-[13px] pr-[4px]">
+        {authUser && <WorkspaceSwitcher currentUsername={currentUsername} onProfileSwitched={onProfileSwitched} />}
+
+        {/* Nav */}
+        <nav
+          className="customScrollBar mr-[3px] mt-[15px] overflow-y-auto pl-[13px] pr-[4px] text-[14px]"
+          style={{ height: authUser ? 'calc(100vh - 162px)' : 'calc(100vh - 118px)' }}
+        >
           {SIDEBAR_NAV_ITEMS.map((item) => {
             const active = isItemActive(item);
             const Icon = item.icon;
@@ -61,25 +53,15 @@ export default function AtelierSidebar({ mobileOpen, onToggleMobile }) {
               <Link
                 key={item.href}
                 href={item.href}
-                title={item.sub}
-                onClick={() => onToggleMobile && onToggleMobile(false)}
-                className={`nav-item mb-[10px] ${active ? 'nav-item-active font-medium' : ''}`}
+                onClick={close}
+                className={`mb-[10px] flex h-[34px] min-h-[34px] w-full items-center rounded-[5px] border-[0.5px] px-[7px] hover:bg-[#F8F8F9] ${active ? 'border-[#dcdcdc] bg-[#F8F8F9]' : 'border-transparent'}`}
               >
-                <Icon
-                  className={`size-[20px] shrink-0 ${active ? 'text-brand-500' : 'text-ink-900'}`}
-                  strokeWidth={1.5}
-                />
-                <span className="truncate">{item.label}</span>
+                <Icon className="min-w-[20px]" size={20} strokeWidth={1.5} color="black" />
+                <span className="ml-[10px] truncate">{item.label}</span>
               </Link>
             );
           })}
         </nav>
-
-        {/* Footer */}
-        <div className="mx-[13px] mt-auto border-t-[0.5px] border-line px-[7px] pt-[10px]">
-          <p className="text-[12px] text-ink-700">TreeInBio Studio</p>
-          <p className="text-[10px] text-ink-500">v1.0</p>
-        </div>
       </aside>
     </>
   );

@@ -12,7 +12,7 @@ import {
   AlertCircle,
   Sparkles,
   ShieldCheck
-} from 'lucide-react';
+} from '@/components/icons';
 import { PLATFORM_NAME } from '@/constants/app';
 
 export default function AuthModal({ isOpen = true, onClose, onSuccess, initialMode = 'login', mode: propMode }) {

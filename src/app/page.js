@@ -2,7 +2,6 @@
 
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import AtelierSidebar from '../components/Atelier/AtelierSidebar';
 import AtelierHeader from '../components/Atelier/AtelierHeader';
 import LeadCaptureModal from '../components/Modals/LeadCaptureModal';
 import ScheduleMeetingModal from '../components/Modals/ScheduleMeetingModal';
@@ -101,7 +100,7 @@ import {
   ChevronLeft,
   Paintbrush,
   Smile
-} from 'lucide-react';
+} from '@/components/icons';
 import PaletteSuggester from '../components/Builder/PaletteSuggester';
 import { detectEmbed } from '../utils/embedDetector';
 
@@ -1067,16 +1066,16 @@ export default function AtelierStudioPage() {
       )}
 
       {/* Atelier Left Navigation Sidebar */}
-      <AtelierSidebar
-        mobileOpen={mobileSidebarOpen}
-        onToggleMobile={() => setMobileSidebarOpen(!mobileSidebarOpen)}
-        onOpenConfig={() => setShowAIOptimizer(true)}
-      />
 
       {/* Main Content Workspace Container */}
-      <div className="lg:pl-[280px] min-h-screen bg-canvas flex flex-col">
+      <div className="lg:pl-[280px] h-screen overflow-hidden bg-canvas flex flex-col">
         {/* TreeInBio Top Header */}
+
+        {/* Main Studio Viewport */}
+        <main style={{ height: 'calc(100vh - 20px)' }} className="mt-[10px] mx-[10px] lg:ml-0 min-w-0 rounded-[10px] bg-white p-[15px] flex flex-col overflow-hidden">
         <AtelierHeader
+          title="Studio"
+          mobileOpen={mobileSidebarOpen}
           currentProfile={currentProfile}
           onSaveProfile={handleSaveProfile}
           isSaving={isSaving}
@@ -1109,9 +1108,7 @@ export default function AtelierStudioPage() {
             }
           }}
         />
-
-        {/* Main Studio Viewport */}
-        <main className="flex-1 mt-[74px] mx-[10px] mb-[10px] lg:ml-0 min-w-0 rounded-lg bg-white p-[15px] flex flex-col gap-[15px]">
+        <div className="customScrollBar mt-[15px] min-h-0 flex-1 overflow-y-auto pr-[6px] -mr-[9px] flex flex-col gap-[15px]">
           {/* Top Bio Optimization Insights Banner */}
           {!rankerDismissed && (
             <div className="bg-surface-2 border-[0.5px] border-line/80 rounded-2xl p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 relative overflow-hidden">
@@ -4414,6 +4411,7 @@ export default function AtelierStudioPage() {
               </div>
             </div>
           </div>
+        </div>
         </main>
       </div>
 

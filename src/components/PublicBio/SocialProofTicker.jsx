@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Sparkles, Calendar, TrendingUp, X } from 'lucide-react';
+import { Sparkles, Calendar, TrendingUp, X } from '@/components/icons';
 
 export default function SocialProofTicker({ username, enabled = true, initialIntervalMs = 8000 }) {
   const [events, setEvents] = useState([]);

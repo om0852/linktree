@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import AtelierSidebar from '../../components/Atelier/AtelierSidebar';
 import AtelierHeader from '../../components/Atelier/AtelierHeader';
+import { Toolbar, PillTab, SearchPill, RoundIconButton, InfoChip } from '@/components/ui';
 import AuthModal from '../../components/Auth/AuthModal';
 import { AVAILABLE_CONNECTORS, CONNECTOR_CATEGORIES } from '@/constants/connectors';
 import { DEFAULT_EMPTY_PROFILE } from '@/constants/app';
@@ -25,7 +25,7 @@ import {
   ArrowRight,
   Sliders,
   CheckCircle
-} from 'lucide-react';
+} from '@/components/icons';
 
 export default function ConnectorsPage() {
   const [currentProfile, setCurrentProfile] = useState(DEFAULT_EMPTY_PROFILE);
@@ -317,15 +317,15 @@ export default function ConnectorsPage() {
 
   return (
     <div className="min-h-screen bg-canvas text-ink-700 antialiased font-sans">
-      {/* Atelier Sidebar */}
-      <AtelierSidebar 
-        mobileOpen={mobileOpen} 
-        onToggleMobile={() => setMobileOpen(!mobileOpen)} 
-      />
 
-      <div className="lg:pl-[280px] flex flex-col min-h-screen">
-        {/* Atelier Header */}
-        <AtelierHeader 
+      <div className="lg:pl-[280px] h-screen overflow-hidden flex flex-col">
+
+
+        {/* Main Content Viewport */}
+        <main style={{ height: 'calc(100vh - 20px)' }} className="mt-[10px] mx-[10px] lg:ml-0 min-w-0 rounded-[10px] bg-white p-[15px] flex flex-col overflow-hidden">
+        <AtelierHeader
+          title="Connectors"
+          mobileOpen={mobileOpen} 
           currentProfile={currentProfile}
           authUser={authUser}
           onOpenAuthModal={(mode) => {
@@ -342,246 +342,106 @@ export default function ConnectorsPage() {
             }
           }}
         />
-
-        {/* Status Notice Toast */}
-        {statusNotice && (
-          <div className="sticky top-0 z-40 max-w-4xl mx-auto w-full px-5 pt-3">
-            <div className={`p-3 rounded-lg border text-sm flex items-center justify-between gap-3 transition-all ${
-              statusNotice.type === 'success' 
-                ? 'bg-brand-50 border-brand-200 text-brand-800' 
-                : statusNotice.type === 'error'
-                ? 'bg-rose-50 border-rose-200 text-rose-800'
-                : 'bg-indigo-50 border-indigo-200 text-indigo-800'
+        <div className="customScrollBar mt-[15px] min-h-0 flex-1 overflow-y-auto pr-[6px] -mr-[9px] flex flex-col gap-[15px]">
+          {statusNotice && (
+            <div className={`flex items-center justify-between gap-[8px] rounded-[5px] border-[0.5px] px-[12px] py-[8px] text-[11px] ${
+              statusNotice.type === 'error'
+                ? 'border-[#FFC2CA] bg-[#FFEDEF] text-[#FF4359]'
+                : 'border-[#DCDCDC] bg-[#F8F8F9] text-[#333333]'
             }`}>
-              <div className="flex items-center gap-2">
-                {statusNotice.type === 'success' && <CheckCircle2 className="w-4 h-4 text-brand-600 shrink-0" />}
-                {statusNotice.type === 'error' && <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />}
-                {statusNotice.type === 'info' && <Zap className="w-4 h-4 text-indigo-600 shrink-0" />}
-                <span className="font-medium">{statusNotice.text}</span>
-              </div>
-              <button 
-                onClick={() => setStatusNotice(null)}
-                className="text-ink-400 hover:text-ink-700 transition"
-              >
-                <X className="w-4 h-4" />
+              <span>{statusNotice.text}</span>
+              <button type="button" onClick={() => setStatusNotice(null)} aria-label="Dismiss" className="shrink-0 text-[#808080] hover:text-black">
+                <X size={14} />
               </button>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* Main Content Viewport */}
-        <main className="flex-1 mt-[74px] mx-[10px] mb-[10px] lg:ml-0 min-w-0 rounded-lg bg-white p-[15px] flex flex-col gap-[15px]">
-          {/* Top Banner */}
-          <div className="bg-surface-2 border-[0.5px] border-line/80 rounded-xl p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 relative overflow-hidden">
-            <div className="flex items-start sm:items-center gap-3.5 relative z-10">
-              <div className="w-10 h-10 rounded-lg bg-white border-[0.5px] border-line flex items-center justify-center text-brand-700 shrink-0">
-                <Zap className="w-5 h-5 text-brand-700" />
-              </div>
-              <div>
-                <div className="flex items-center gap-2 flex-wrap">
-                  <h1 className="text-[16px] font-sans font-semibold text-ink-900">
-                    Creator Connectors &amp; Cloud Workspaces
-                  </h1>
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-brand-700/10 text-brand-700 border border-brand-700/20">
-                    <ShieldCheck className="w-3.5 h-3.5" /> Composio OAuth Engine
-                  </span>
-                </div>
-                <p className="text-xs sm:text-sm text-[#406856] mt-0.5 leading-normal">
-                  Connect verified third-party tools to automate booking availability, capture contacts, sync media, and run live actions.
-                </p>
-              </div>
-            </div>
+          <Toolbar
+            left={CONNECTOR_CATEGORIES.map((cat) => (
+              <PillTab key={cat} active={selectedCategory === cat} onClick={() => setSelectedCategory(cat)}>
+                {cat}
+              </PillTab>
+            ))}
+            right={
+              <>
+                <SearchPill value={search} onChange={setSearch} placeholder="Search connectors" />
+                <RoundIconButton icon={RefreshCw} title="Refresh" onClick={fetchAccounts} disabled={loadingAccounts} iconClassName={loadingAccounts ? 'animate-spin' : ''} />
+              </>
+            }
+          />
 
-            <div className="flex items-center gap-2 relative z-10 shrink-0">
-              <button 
-                onClick={fetchAccounts}
-                disabled={loadingAccounts}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border-[0.5px] border-line bg-white hover:bg-surface-1 text-ink-700 text-xs font-medium transition"
-              >
-                <RefreshCw className={`w-3.5 h-3.5 ${loadingAccounts ? 'animate-spin' : ''}`} />
-                <span>Refresh Accounts</span>
-              </button>
-            </div>
+          <div className="flex items-center gap-[6px]">
+            <InfoChip>Connected ({connectedAccounts.length}/{AVAILABLE_CONNECTORS.length})</InfoChip>
           </div>
 
-          {/* Metric Overview Strip */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-            <div className="bg-white border-[0.5px] border-line/60 rounded-xl p-3.5 sm:p-4 ">
-              <div className="text-[11px] font-semibold tracking-wider text-ink-400 uppercase">Available Connectors</div>
-              <div className="text-xl sm:text-2xl font-semibold font-sans text-ink-700 mt-1">{AVAILABLE_CONNECTORS.length}</div>
-              <div className="text-[11px] text-ink-500 mt-0.5">Production integrations</div>
+          <div>
+            <div className="grid grid-cols-7 border-b-[0.5px] border-[#C4C4C466] text-[12px] font-medium">
+              <div className="flex items-center justify-center border-r-[0.5px] border-[#C4C4C466] px-[12px] py-[12px]">Sr. No.</div>
+              <div className="col-span-3 flex items-center border-r-[0.5px] border-[#C4C4C466] px-[12px] py-[12px]">Connector</div>
+              <div className="flex items-center justify-center border-r-[0.5px] border-[#C4C4C466] px-[12px] py-[12px]">Status</div>
+              <div className="flex items-center justify-center border-r-[0.5px] border-[#C4C4C466] px-[12px] py-[12px]">Action</div>
+              <div className="flex items-center justify-center px-[12px] py-[12px]">Remove</div>
             </div>
 
-            <div className="bg-white border-[0.5px] border-line/60 rounded-xl p-3.5 sm:p-4 ">
-              <div className="text-[11px] font-semibold tracking-wider text-ink-400 uppercase">Active Connected Accounts</div>
-              <div className="text-xl sm:text-2xl font-semibold font-sans text-brand-700 mt-1 flex items-center gap-2">
-                <span>{connectedAccounts.length}</span>
-                {connectedAccounts.length > 0 && (
-                  <span className="w-2 h-2 rounded-full bg-brand-500 animate-pulse"></span>
-                )}
-              </div>
-              <div className="text-[11px] text-ink-500 mt-0.5">Composio authenticated</div>
-            </div>
+            {filteredConnectors.length === 0 && (
+              <p className="mt-[15px] text-center text-[12px]">No results found. Please adjust your search or filter criteria.</p>
+            )}
 
-            <div className="bg-white border-[0.5px] border-line/60 rounded-xl p-3.5 sm:p-4 ">
-              <div className="text-[11px] font-semibold tracking-wider text-ink-400 uppercase">Engine Status</div>
-              <div className="text-xl sm:text-2xl font-semibold font-sans text-brand-600 mt-1 flex items-center gap-1.5">
-                <CheckCircle2 className="w-5 h-5 text-brand-500" /> Live
-              </div>
-              <div className="text-[11px] text-ink-500 mt-0.5">Composio SDK Ready</div>
-            </div>
-
-            <div className="bg-white border-[0.5px] border-line/60 rounded-xl p-3.5 sm:p-4 ">
-              <div className="text-[11px] font-semibold tracking-wider text-ink-400 uppercase">Security &amp; Permissions</div>
-              <div className="text-xl sm:text-2xl font-semibold font-sans text-ink-700 mt-1">Granular</div>
-              <div className="text-[11px] text-ink-500 mt-0.5">Token isolated per creator</div>
-            </div>
-          </div>
-
-          {/* Search & Category Filter Toolbar */}
-          <div className="bg-white border-[0.5px] border-line/60 rounded-xl p-3 sm:p-4 flex flex-col md:flex-row md:items-center justify-between gap-3">
-            {/* Category Chips */}
-            <div className="flex items-center gap-2 overflow-x-auto pb-1 md:pb-0 scrollbar-none">
-              {CONNECTOR_CATEGORIES.map(cat => (
-                <button
-                  key={cat}
-                  onClick={() => setSelectedCategory(cat)}
-                  className={`px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold whitespace-nowrap min-h-[38px] transition-colors cursor-pointer ${
-                    selectedCategory === cat
-                      ? 'bg-brand-700 text-white '
-                      : 'bg-surface-2 hover:bg-line text-ink-600'
-                  }`}
-                >
-                  {cat}
-                </button>
-              ))}
-            </div>
-
-            {/* Search Input */}
-            <div className="relative min-w-[260px]">
-              <Search className="w-4 h-4 text-ink-400 absolute left-3 top-1/2 -translate-y-1/2" />
-              <input
-                type="text"
-                placeholder="Search connectors or operations..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-9 pr-3.5 py-2 min-h-[38px] text-xs sm:text-sm bg-surface-1 border border-line rounded-lg focus:outline-none focus:ring-1 focus:ring-brand-700 focus:border-brand-700 transition"
-              />
-            </div>
-          </div>
-
-          {/* Connectors Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredConnectors.map((connector) => {
+            {filteredConnectors.map((connector, index) => {
               const matchedAccount = getConnectedAccount(connector.toolkitSlug);
               const isConnected = Boolean(matchedAccount);
               const isConnecting = connectingSlug === connector.toolkitSlug;
               const isDisconnecting = disconnectingId === matchedAccount?.id;
 
               return (
-                <div 
+                <div
                   key={connector.id}
-                  className={`bg-white border rounded-xl p-4 flex flex-col justify-between transition-all relative ${
-                    isConnected ? 'border-brand-200 ring-1 ring-brand-100' : 'border-line/60 hover:border-ink-300'
-                  }`}
+                  className={`group grid grid-cols-7 hover:bg-[#F8F8F9] ${index === filteredConnectors.length - 1 ? '' : 'border-b-[0.5px] border-[#C4C4C466]'}`}
                 >
-                  <div>
-                    {/* Header */}
-                    <div className="flex items-start justify-between gap-3 mb-2.5">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-lg bg-surface-1 border border-line p-2 flex items-center justify-center shrink-0">
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img 
-                            src={connector.iconUrl} 
-                            alt={connector.name}
-                            className="w-6 h-6 object-contain"
-                            onError={(e) => {
-                              e.currentTarget.style.display = 'none';
-                            }}
-                          />
-                        </div>
-                        <div>
-                          <div className="flex items-center gap-1.5">
-                            <h2 className="text-[16px] font-sans font-semibold text-ink-700">
-                              {connector.name}
-                            </h2>
-                            <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-surface-2 text-ink-600">
-                              {connector.badge}
-                            </span>
-                          </div>
-                          <span className="text-[11px] text-ink-400">{connector.category}</span>
-                        </div>
-                      </div>
-
-                      {/* Connection Status Badge */}
-                      <div>
-                        {isConnected ? (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-brand-50 text-brand-700 border border-brand-200">
-                            <CheckCircle2 className="w-3 h-3 text-brand-600" /> Connected
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium bg-surface-2 text-ink-500">
-                            Not Linked
-                          </span>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Description */}
-                    <p className="text-xs text-ink-600 leading-relaxed mb-3">
-                      {connector.description}
-                    </p>
-
-                    {/* Bio Integration Callout */}
-                    <div className="bg-[#FAF9F5] border-[0.5px] border-line/50 rounded-lg p-2.5 mb-3 text-[11px] text-brand-700 flex items-start gap-1.5">
-                      <Sparkles className="w-3.5 h-3.5 shrink-0 text-brand-700 mt-0.5" />
-                      <span>{connector.bioIntegration}</span>
-                    </div>
-
-                    {/* Connected Account Metadata */}
-                    {isConnected && (
-                      <div className="mb-3 pt-2 border-t border-line text-[11px] text-ink-500 flex items-center justify-between">
-                        <span>Account ID: <code className="font-mono text-[10px] bg-surface-2 px-1 py-0.5 rounded text-ink-700">{matchedAccount.id}</code></span>
-                        <span className="text-brand-600 font-medium">Status: {matchedAccount.status}</span>
-                      </div>
+                  <div className="flex items-center justify-center border-r-[0.5px] border-[#C4C4C466] px-[12px] py-[8px] text-[12px]">{index + 1}</div>
+                  <div className="col-span-3 flex min-w-0 items-center gap-[10px] border-r-[0.5px] border-[#C4C4C466] px-[12px] py-[8px]" title={`${connector.description} ${connector.bioIntegration || ''}`.trim()}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={connector.iconUrl}
+                      alt=""
+                      className="h-[25px] w-[25px] shrink-0 object-contain"
+                      onError={(e) => { e.currentTarget.style.visibility = 'hidden'; }}
+                    />
+                    <span className="min-w-0">
+                      <span className="block truncate text-[14px]">{connector.name}</span>
+                      <span className="block truncate text-[10px] text-[#808080]">{connector.category}</span>
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-center border-r-[0.5px] border-[#C4C4C466] px-[12px] py-[8px] text-[12px]">
+                    {isConnected ? 'Active' : <span className="text-[#808080]">Not connected</span>}
+                  </div>
+                  <div className="flex items-center justify-center border-r-[0.5px] border-[#C4C4C466] px-[12px] py-[8px]">
+                    {isConnected ? (
+                      <button type="button" onClick={() => openOperationsModal(connector, matchedAccount)} className="text-[12px] text-[#16A34A] hover:underline">
+                        Operations
+                      </button>
+                    ) : (
+                      <button type="button" onClick={() => handleConnect(connector)} disabled={isConnecting} className="text-[12px] text-[#16A34A] hover:underline disabled:opacity-50">
+                        {isConnecting ? 'Connecting...' : 'Connect'}
+                      </button>
                     )}
                   </div>
-
-                  {/* Action Buttons */}
-                  <div className="pt-2 border-t border-line flex items-center gap-2">
-                    {isConnected ? (
-                      <>
-                        <button
-                          onClick={() => openOperationsModal(connector, matchedAccount)}
-                          className="flex-1 inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 min-h-[40px] bg-brand-700 hover:bg-brand-800 text-white text-xs sm:text-sm font-semibold rounded-lg transition cursor-pointer"
-                        >
-                          <Play className="w-3.5 h-3.5 fill-current" />
-                          <span>Perform Operations</span>
-                        </button>
-                        <button
-                          onClick={() => handleDisconnect(matchedAccount.id, connector.name)}
-                          disabled={isDisconnecting}
-                          className="p-2.5 min-h-[40px] min-w-[40px] flex items-center justify-center bg-surface-2 hover:bg-rose-50 hover:text-rose-600 text-ink-500 text-xs font-medium rounded-lg transition cursor-pointer"
-                          title="Disconnect Account"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </>
-                    ) : (
-                      <button
-                        onClick={() => handleConnect(connector)}
-                        disabled={isConnecting}
-                        className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 min-h-[40px] bg-ink-900 hover:bg-ink-700 text-white text-xs sm:text-sm font-semibold rounded-lg transition disabled:opacity-50 cursor-pointer"
-                      >
-                        <Zap className={`w-4 h-4 text-brand-400 ${isConnecting ? 'animate-bounce' : ''}`} />
-                        <span>{isConnecting ? 'Authorizing in popup...' : 'Connect with 1-Click OAuth'}</span>
-                      </button>
+                  <div className="flex items-center justify-center px-[12px] py-[8px]">
+                    {isConnected && (
+                      <RoundIconButton
+                        icon={Trash2}
+                        tone="danger"
+                        title="Disconnect"
+                        onClick={() => handleDisconnect(matchedAccount.id, connector.name)}
+                        disabled={isDisconnecting}
+                      />
                     )}
                   </div>
                 </div>
               );
             })}
           </div>
+        </div>
         </main>
       </div>
 

@@ -14,7 +14,7 @@ import {
   Globe, 
   Users, 
   CalendarCheck2 
-} from 'lucide-react';
+} from '@/components/icons';
 import Link from 'next/link';
 
 export default function Navbar({ 

@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Loader2 } from 'lucide-react';
+import { Loader2 } from '@/components/icons';
 
 const VARIANT_MAP = {
   primary: 'bg-brand-500 hover:bg-brand-600 active:bg-brand-700 text-white border-[0.5px] border-transparent',

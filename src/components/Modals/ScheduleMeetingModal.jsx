@@ -18,7 +18,7 @@ import {
   Copy,
   Check,
   CalendarCheck
-} from 'lucide-react';
+} from '@/components/icons';
 
 const DAYS_OF_WEEK = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 

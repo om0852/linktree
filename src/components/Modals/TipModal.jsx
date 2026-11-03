@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Heart, X, Check, Coffee, DollarSign } from 'lucide-react';
+import { Heart, X, Check, Coffee, DollarSign } from '@/components/icons';
 
 export default function TipModal({ profile, onClose }) {
   const [selectedAmount, setSelectedAmount] = useState(5);

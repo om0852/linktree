@@ -14,7 +14,7 @@ import {
   ExternalLink,
   Smartphone,
   Mail
-} from 'lucide-react';
+} from '@/components/icons';
 
 export default function LeadMagnetGateModal({ 
   isOpen, 

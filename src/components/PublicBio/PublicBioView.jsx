@@ -49,7 +49,7 @@ import {
   Folder,
   ChevronDown,
   ChevronRight
-} from 'lucide-react';
+} from '@/components/icons';
 import TipModal from '../Modals/TipModal';
 import QRCodeModal from '../Modals/QRCodeModal';
 import LeadCaptureModal from '../Modals/LeadCaptureModal';

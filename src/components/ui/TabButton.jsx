@@ -22,7 +22,7 @@ export default function TabButton({
       onClick={onClick}
       className={`inline-flex items-center justify-center font-sans border-[0.5px] transition-colors duration-150 cursor-pointer select-none shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400/40 ${sizeClasses} ${
         active
-          ? 'bg-brand-50 border-brand-500 text-brand-800 font-medium'
+          ? 'bg-[#F8F8F9BF] border-[#000] text-black'
           : 'bg-white border-line text-ink-700 hover:bg-surface-2'
       } ${className}`}
       {...props}

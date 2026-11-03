@@ -10,7 +10,7 @@ import {
   ArrowRight,
   Sparkles,
   EyeOff
-} from 'lucide-react';
+} from '@/components/icons';
 
 export default function AccessGateScreen({ accessGate, profileTitle, onUnlock, username }) {
   const [enteredPasscode, setEnteredPasscode] = useState('');

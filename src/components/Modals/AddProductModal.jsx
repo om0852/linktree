@@ -11,7 +11,7 @@ import {
   Loader2,
   Check,
   Package,
-} from 'lucide-react';
+} from '@/components/icons';
 
 export default function AddProductModal({
   isOpen,

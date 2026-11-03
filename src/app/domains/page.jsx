@@ -1,29 +1,12 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import AtelierSidebar from '../../components/Atelier/AtelierSidebar';
 import AtelierHeader from '../../components/Atelier/AtelierHeader';
 import AuthModal from '../../components/Auth/AuthModal';
 import { DOMAIN_TARGET_CNAME, DOMAIN_TARGET_IP, domainVerificationRecordName } from '@/constants/domains';
 import { DEFAULT_EMPTY_PROFILE } from '@/constants/app';
-import {
-  Globe,
-  CheckCircle2,
-  AlertCircle,
-  Copy,
-  Check,
-  RefreshCw,
-  Trash2,
-  ExternalLink,
-  ShieldCheck,
-  Server,
-  ArrowRight,
-  Info,
-  Loader2,
-  Sparkles,
-  Lock,
-  Zap,
-} from 'lucide-react';
+import { InfoChip, RoundIconButton, SkeletonRows, Tooltip, table } from '@/components/ui';
+import { RefreshCw, Trash2, Copy, Check, Info, X } from '@/components/icons';
 
 export default function DomainsPage() {
   const [currentProfile, setCurrentProfile] = useState(DEFAULT_EMPTY_PROFILE);
@@ -229,13 +212,14 @@ export default function DomainsPage() {
 
   return (
     <div className="min-h-screen bg-canvas text-ink-700">
-      <AtelierSidebar 
-        mobileOpen={mobileOpen} 
-        onToggleMobile={() => setMobileOpen(!mobileOpen)} 
-      />
 
-      <div className="lg:pl-[280px] flex flex-col min-h-screen">
+      <div className="lg:pl-[280px] h-screen overflow-hidden flex flex-col">
+
+        {/* Main Domains Content Workspace */}
+        <main style={{ height: 'calc(100vh - 20px)' }} className="mt-[10px] mx-[10px] lg:ml-0 min-w-0 rounded-[10px] bg-white p-[15px] flex flex-col overflow-hidden">
         <AtelierHeader
+          title="Custom Domains"
+          mobileOpen={mobileOpen}
           currentProfile={currentProfile}
           authUser={authUser}
           onOpenAuth={(mode) => {
@@ -251,295 +235,140 @@ export default function DomainsPage() {
             }
           }}
         />
-
-        {/* Main Domains Content Workspace */}
-        <main className="flex-1 mt-[74px] mx-[10px] mb-[10px] lg:ml-0 min-w-0 rounded-lg bg-white p-[15px] flex flex-col gap-[15px]">
-          {/* Top Header Banner */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b-[0.5px] border-line/80">
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-semibold text-brand-500 uppercase tracking-wider font-mono">
-                  Custom Branding
-                </span>
-                <span className="px-2 py-0.5 bg-brand-100/70 text-ink-700 font-mono text-xs font-semibold rounded">
-                  Free Automatic SSL
-                </span>
-              </div>
-              <h1 className="text-[16px] font-sans font-semibold text-ink-700 mt-1">
-                Custom Domains &amp; Branded URLs
-              </h1>
-              <p className="text-xs text-ink-500 mt-0.5 leading-normal">
-                Point any custom apex domain or subdomain to your TreeInBio profile with instant, automated SSL certificates.
-              </p>
-            </div>
-
-            <div className="flex items-center gap-2 self-start sm:self-auto">
-              <div className="flex items-center gap-1.5 bg-surface-2 border-[0.5px] border-line px-3 py-1.5 rounded-lg ">
-                <ShieldCheck className="w-4 h-4 text-brand-500" />
-                <span className="text-xs font-mono font-medium text-ink-700">Automatic HTTPS</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Action Feedback Banner */}
+        <div className="customScrollBar mt-[15px] min-h-0 flex-1 overflow-y-auto pr-[6px] -mr-[9px] flex flex-col gap-[15px]">
           {actionFeedback && (
-            <div
-              className={`p-3 rounded-lg text-xs flex items-center justify-between ${
-                actionFeedback.type === 'success'
-                  ? 'bg-brand-50 text-brand-800 border border-brand-200'
-                  : actionFeedback.type === 'warning'
-                  ? 'bg-amber-50 text-amber-800 border border-amber-200'
-                  : 'bg-rose-50 text-rose-800 border border-rose-200'
-              }`}
-            >
-              <div className="flex items-center gap-2">
-                {actionFeedback.type === 'success' && <CheckCircle2 className="w-4 h-4 text-brand-600 shrink-0" />}
-                {actionFeedback.type === 'warning' && <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />}
-                {actionFeedback.type === 'error' && <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />}
-                <span className="font-medium">{actionFeedback.text}</span>
-              </div>
-              <button
-                onClick={() => setActionFeedback(null)}
-                className="text-xs font-mono underline hover:no-underline ml-3"
-              >
-                Dismiss
+            <div className={`flex items-center justify-between gap-[8px] rounded-[5px] border-[0.5px] px-[12px] py-[8px] text-[11px] ${
+              actionFeedback.type === 'error'
+                ? 'border-[#FFC2CA] bg-[#FFEDEF] text-[#FF4359]'
+                : actionFeedback.type === 'warning'
+                ? 'border-[#FFE082] bg-[#FFF8E1] text-[#92400E]'
+                : 'border-[#DCDCDC] bg-[#F8F8F9] text-[#333333]'
+            }`}>
+              <span>{actionFeedback.text}</span>
+              <button type="button" onClick={() => setActionFeedback(null)} aria-label="Dismiss" className="shrink-0 text-[#808080] hover:text-black">
+                <X size={14} />
               </button>
             </div>
           )}
 
-          {/* Add Domain Card */}
-          <div className="bg-surface-2 border-[0.5px] border-line/80 rounded-xl p-4 sm:p-5 flex flex-col gap-3.5">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-white border-[0.5px] border-line flex items-center justify-center text-brand-500 ">
-                <Globe className="w-5 h-5" />
-              </div>
-              <div>
-                <h3 className="text-[14px] font-sans font-semibold text-ink-700">
-                  Connect a Branded Custom Domain
-                </h3>
-                <p className="text-xs text-ink-500 mt-0.5">
-                  Enter your domain name (e.g., <span className="font-mono text-brand-500">links.yourbrand.com</span> or <span className="font-mono text-brand-500">yourname.com</span>)
-                </p>
-              </div>
-            </div>
+          <form onSubmit={handleAddDomain} className="flex items-center gap-[10px]">
+            <input
+              type="text"
+              required
+              placeholder="Enter a domain, e.g. links.yourbrand.com"
+              value={newHostname}
+              onChange={(e) => setNewHostname(e.target.value)}
+              className="h-[34px] w-full rounded-[50px] border-[0.5px] border-[#DCDCDC] bg-[#FAFAFA] px-[15px] text-[12px] font-light outline-none placeholder:text-[#808080] focus:border-[#404040]"
+            />
+            <button
+              type="submit"
+              disabled={addingDomain}
+              className="h-[34px] shrink-0 rounded-[5px] bg-[#16A34A] px-[15px] text-[12px] font-medium text-white hover:bg-[#15803D] disabled:opacity-50"
+            >
+              {addingDomain ? 'Adding...' : 'Add Domain'}
+            </button>
+          </form>
 
-            <form onSubmit={handleAddDomain} className="flex flex-col sm:flex-row gap-2.5 pt-1">
-              <div className="relative flex-1">
-                <input
-                  type="text"
-                  required
-                  placeholder="links.yourdomain.com or yourbrand.com"
-                  value={newHostname}
-                  onChange={(e) => setNewHostname(e.target.value)}
-                  className="w-full px-4 py-2.5 min-h-[42px] bg-white border-[0.5px] border-line rounded-lg text-sm text-ink-700 font-mono focus:outline-none focus:border-brand-500 "
-                />
-              </div>
-              <button
-                type="submit"
-                disabled={addingDomain}
-                className="px-5 py-2.5 min-h-[42px] bg-brand-500 hover:bg-brand-600 text-white text-xs sm:text-sm font-semibold rounded-lg flex items-center justify-center gap-2 transition-all cursor-pointer shrink-0 disabled:opacity-50"
-              >
-                {addingDomain ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    <span>Connecting...</span>
-                  </>
-                ) : (
-                  <>
-                    <Zap className="w-4 h-4" />
-                    <span>Add Custom Domain</span>
-                  </>
-                )}
-              </button>
-            </form>
+          <div className="flex items-center justify-between">
+            <InfoChip>Domains ({domains.length})</InfoChip>
+            <RoundIconButton icon={RefreshCw} title="Refresh" onClick={() => refreshDomains()} iconClassName={loading ? 'animate-spin' : ''} />
           </div>
 
-          {/* DNS Configuration Instructions */}
-          <div className="bg-white border-[0.5px] border-line/80 rounded-xl p-4 sm:p-5 flex flex-col gap-3.5">
-            <div className="flex items-center justify-between pb-2 border-b-[0.5px] border-line">
-              <div className="flex items-center gap-2">
-                <Server className="w-4 h-4 text-brand-500" />
-                <h3 className="text-[14px] font-sans font-semibold text-ink-700">
-                  DNS Configuration Records
-                </h3>
-              </div>
-              <span className="text-xs font-mono text-ink-500">
-                Configure at your domain registrar (GoDaddy, Cloudflare, Namecheap)
-              </span>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 pt-1">
-              {/* CNAME Record */}
-              <div className="p-4 bg-surface-2 border-[0.5px] border-line rounded-xl flex flex-col justify-between gap-3">
-                <div>
-                  <div className="flex items-center justify-between">
-                    <span className="px-2 py-0.5 bg-brand-100 text-ink-700 text-xs font-mono font-semibold rounded">
-                      OPTION 1: SUBDOMAIN (Recommended)
-                    </span>
-                    <span className="text-xs font-mono text-brand-500 font-semibold">TYPE: CNAME</span>
-                  </div>
-                  <p className="text-xs sm:text-sm text-ink-700 mt-2 font-medium">
-                    For subdomains such as <span className="font-mono text-brand-500">links.yourbrand.com</span> or <span className="font-mono text-brand-500">bio.yourdomain.com</span>:
-                  </p>
-                </div>
-
-                <div className="p-3 bg-white border-[0.5px] border-line rounded-lg font-mono text-xs flex items-center justify-between">
-                  <div className="truncate">
-                    <span className="text-ink-500 text-xs block">CNAME TARGET:</span>
-                    <span className="font-semibold text-ink-700 truncate">{CNAME_TARGET}</span>
-                  </div>
-                  <button
-                    onClick={() => handleCopy(CNAME_TARGET, 'cname')}
-                    className="p-1.5 hover:bg-surface-2 text-brand-500 rounded-lg transition-colors ml-2 cursor-pointer"
-                    title="Copy CNAME"
-                  >
-                    {copiedKey === 'cname' ? <Check className="w-4 h-4 text-brand-600" /> : <Copy className="w-4 h-4" />}
-                  </button>
-                </div>
-              </div>
-
-              {/* A Record */}
-              <div className="p-4 bg-surface-2 border-[0.5px] border-line rounded-xl flex flex-col justify-between gap-3">
-                <div>
-                  <div className="flex items-center justify-between">
-                    <span className="px-2 py-0.5 bg-brand-100 text-ink-700 text-xs font-mono font-semibold rounded">
-                      OPTION 2: ROOT DOMAIN
-                    </span>
-                    <span className="text-xs font-mono text-brand-500 font-semibold">TYPE: A RECORD</span>
-                  </div>
-                  <p className="text-xs sm:text-sm text-ink-700 mt-2 font-medium">
-                    For root / apex domains such as <span className="font-mono text-brand-500">yourbrand.com</span>:
-                  </p>
-                </div>
-
-                <div className="p-3 bg-white border-[0.5px] border-line rounded-lg font-mono text-xs flex items-center justify-between">
-                  <div className="truncate">
-                    <span className="text-ink-500 text-xs block">A RECORD IP:</span>
-                    <span className="font-semibold text-ink-700 truncate">{IP_TARGET}</span>
-                  </div>
-                  <button
-                    onClick={() => handleCopy(IP_TARGET, 'ip')}
-                    className="p-1.5 hover:bg-surface-2 text-brand-500 rounded-lg transition-colors ml-2 cursor-pointer"
-                    title="Copy IP"
-                  >
-                    {copiedKey === 'ip' ? <Check className="w-4 h-4 text-brand-600" /> : <Copy className="w-4 h-4" />}
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Connected Domains Table */}
-          <div className="bg-white border-[0.5px] border-line/80 rounded-xl p-4 sm:p-5 flex flex-col gap-3.5">
-            <div className="flex items-center justify-between pb-2 border-b-[0.5px] border-line">
-              <div className="flex items-center gap-2">
-                <Globe className="w-4 h-4 text-brand-500" />
-                <h3 className="text-[14px] font-sans font-semibold text-ink-700">
-                  Your Connected Domains ({domains.length})
-                </h3>
-              </div>
-              <button
-                onClick={() => refreshDomains()}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono text-brand-500 hover:text-ink-700 hover:bg-surface-2 rounded-lg transition-colors cursor-pointer"
-              >
-                <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
-                <span>Refresh</span>
-              </button>
+          <div>
+            <div className="grid grid-cols-7 border-b-[0.5px] border-[#C4C4C466] text-[12px] font-medium">
+              <div className="flex items-center justify-center border-r-[0.5px] border-[#C4C4C466] px-[12px] py-[12px]">Sr. No.</div>
+              <div className="col-span-3 flex items-center border-r-[0.5px] border-[#C4C4C466] px-[12px] py-[12px]">Domain</div>
+              <div className="flex items-center justify-center border-r-[0.5px] border-[#C4C4C466] px-[12px] py-[12px]">Status</div>
+              <div className="flex items-center justify-center border-r-[0.5px] border-[#C4C4C466] px-[12px] py-[12px]">DNS</div>
+              <div className="flex items-center justify-center px-[12px] py-[12px]">Remove</div>
             </div>
 
             {loading ? (
-              <div className="p-8 text-center text-xs sm:text-sm text-ink-500 flex items-center justify-center gap-2">
-                <Loader2 className="w-4 h-4 animate-spin text-brand-500" />
-                <span>Checking domain status...</span>
-              </div>
+              <SkeletonRows rows={3} />
             ) : domains.length === 0 ? (
-              <div className="p-8 text-center text-xs sm:text-sm text-ink-500 border border-dashed border-line rounded-xl flex flex-col items-center gap-2">
-                <Globe className="w-8 h-8 text-line" />
-                <p>No custom domains connected yet.</p>
-                <p className="text-xs">Add your first branded domain above to get started.</p>
-              </div>
+              <p className="mt-[15px] text-center text-[12px]">Add a domain above to use your own address for your bio.</p>
             ) : (
-              <div className="space-y-3">
-                {domains.map((d) => (
-                  <div
-                    key={d._id || d.hostname}
-                    className="p-3.5 sm:p-4 bg-surface-2 border-[0.5px] border-line rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:border-brand-500 transition-all"
-                  >
-                    <div className="flex items-center gap-3 min-w-0">
-                      <div className="w-9 h-9 rounded-lg bg-white border-[0.5px] border-line flex items-center justify-center text-brand-500 shrink-0">
-                        <Lock className="w-4 h-4" />
-                      </div>
-                      <div className="truncate">
-                        <div className="flex items-center gap-2">
-                          <span className="font-mono font-semibold text-xs text-ink-700 truncate">
-                            {d.hostname}
-                          </span>
-                          <span
-                            className={`px-1.5 py-0.2 rounded text-[0.62rem] font-mono font-semibold uppercase ${
-                              d.verified || d.status === 'active'
-                                ? 'bg-brand-100 text-brand-800'
-                                : 'bg-amber-100 text-amber-800'
-                            }`}
-                          >
-                            {d.verified || d.status === 'active' ? 'Active & SSL Verified' : 'DNS Pending'}
-                          </span>
-                        </div>
-                        <span className="text-[0.65rem] text-ink-500 font-mono block">
-                          Routes to: @{d.username} • Target: {d.target || CNAME_TARGET}
-                        </span>
-                        {!d.verified && d.verificationToken && (
-                          <span className="text-[0.65rem] text-ink-500 font-mono block break-all">
-                            TXT {domainVerificationRecordName(d.hostname)} = {d.verificationToken}
-                          </span>
-                        )}
-                      </div>
+              domains.map((d, index) => {
+                const active = d.verified || d.status === 'active';
+                return (
+                  <div key={d._id || d.hostname} className={`group grid grid-cols-7 hover:bg-[#F8F8F9] ${index === domains.length - 1 ? '' : 'border-b-[0.5px] border-[#C4C4C466]'}`}>
+                    <div className="flex items-center justify-center border-r-[0.5px] border-[#C4C4C466] px-[12px] py-[8px] text-[12px]">{index + 1}</div>
+                    <div className="col-span-3 flex min-w-0 flex-col justify-center border-r-[0.5px] border-[#C4C4C466] px-[12px] py-[8px]">
+                      <a href={`https://${d.hostname}`} target="_blank" rel="noopener noreferrer" className="truncate text-[14px] hover:underline" title={`Open ${d.hostname}`}>
+                        {d.hostname}
+                      </a>
+                      <span className="truncate text-[10px] text-[#808080]">@{d.username}</span>
                     </div>
-
-                    <div className="flex items-center gap-2 shrink-0">
-                      {/* Verify Button */}
+                    <div className="flex items-center justify-center border-r-[0.5px] border-[#C4C4C466] px-[12px] py-[8px] text-[12px]">
+                      {active ? 'Active' : <span className="text-[#92400E]">Pending</span>}
+                    </div>
+                    <div className="flex items-center justify-center border-r-[0.5px] border-[#C4C4C466] px-[12px] py-[8px]">
                       <button
+                        type="button"
                         onClick={() => handleVerify(d._id, d.hostname)}
                         disabled={verifyingId === d._id}
-                        className="px-2.5 py-1 rounded bg-white hover:bg-surface-2 text-ink-700 border-[0.5px] border-line text-xs font-semibold flex items-center gap-1 cursor-pointer transition-all disabled:opacity-50"
+                        className="text-[12px] text-[#16A34A] hover:underline disabled:opacity-50"
                       >
-                        {verifyingId === d._id ? (
-                          <>
-                            <Loader2 className="w-3 h-3 animate-spin text-brand-500" />
-                            <span>Checking...</span>
-                          </>
-                        ) : (
-                          <>
-                            <RefreshCw className="w-3 h-3 text-brand-500" />
-                            <span>Check DNS</span>
-                          </>
-                        )}
-                      </button>
-
-                      {/* Open Link */}
-                      <a
-                        href={`https://${d.hostname}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="p-1 text-ink-500 hover:text-ink-700 transition-colors rounded"
-                        title="Open Domain"
-                      >
-                        <ExternalLink className="w-3.5 h-3.5" />
-                      </a>
-
-                      {/* Delete */}
-                      <button
-                        onClick={() => handleDelete(d._id, d.hostname)}
-                        className="p-1 text-ink-500 hover:text-rose-600 transition-colors rounded cursor-pointer"
-                        title="Delete Domain"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
+                        {verifyingId === d._id ? 'Checking...' : 'Check'}
                       </button>
                     </div>
+                    <div className="flex items-center justify-center px-[12px] py-[8px]">
+                      <RoundIconButton icon={Trash2} tone="danger" title="Remove domain" onClick={() => handleDelete(d._id, d.hostname)} />
+                    </div>
+                    {!active && d.verificationToken && (
+                      <div className="col-span-7 border-t-[0.5px] border-[#F0F0F0] px-[12px] py-[8px] text-[11px] text-[#808080]">
+                        Add TXT record <span className="text-[#333333]">{domainVerificationRecordName(d.hostname)}</span> with value{' '}
+                        <button type="button" onClick={() => handleCopy(d.verificationToken, `txt_${d._id}`)} className="text-[#333333] hover:underline" title="Copy value">
+                          {d.verificationToken}
+                        </button>
+                        {copiedKey === `txt_${d._id}` && <span className="ml-[6px] text-[#16A34A]">Copied</span>}
+                      </div>
+                    )}
                   </div>
-                ))}
-              </div>
+                );
+              })
             )}
           </div>
+
+          <div className="rounded-[10px] border-[0.5px] border-[#dcdcdc] p-[15px]">
+            <div className="flex items-center">
+              <span className="text-[14px] font-semibold">DNS Records</span>
+              <Tooltip content="Add one of these records at your domain registrar, then press Check. Subdomains use CNAME; root domains use the A record." width={220}>
+                <Info className="ml-[6px] cursor-pointer text-[#aaa] hover:text-black" size={15} strokeWidth={1.5} />
+              </Tooltip>
+            </div>
+            <div className="mt-[10px] overflow-x-auto">
+              <table className={table.table}>
+                <thead className={table.head}>
+                  <tr>
+                    <th className={table.th}>Type</th>
+                    <th className={table.th}>Used for</th>
+                    <th className={table.th}>Value</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[
+                    { key: 'cname', type: 'CNAME', use: 'Subdomain (links.yourbrand.com)', value: CNAME_TARGET },
+                    { key: 'ip', type: 'A', use: 'Root domain (yourbrand.com)', value: IP_TARGET },
+                  ].map((record) => (
+                    <tr key={record.key} className={table.row}>
+                      <td className={table.td}>{record.type}</td>
+                      <td className={table.td}>{record.use}</td>
+                      <td className={table.td}>
+                        <span className="flex items-center gap-[6px]">
+                          <span>{record.value}</span>
+                          <button type="button" onClick={() => handleCopy(record.value, record.key)} title="Copy" aria-label={`Copy ${record.type} value`} className="text-[#808080] hover:text-[#333333]">
+                            {copiedKey === record.key ? <Check size={14} color="#16A34A" /> : <Copy size={14} />}
+                          </button>
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
         </main>
       </div>
 

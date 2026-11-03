@@ -11,7 +11,7 @@ import {
   RotateCcw,
   Sparkles,
   Info
-} from 'lucide-react';
+} from '@/components/icons';
 
 export const SIMULATION_LOCATIONS = [
   { id: 'global', name: 'Global (Auto Detect)', flag: '🌍', currency: 'USD ($)', region: 'Worldwide' },

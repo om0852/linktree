@@ -14,7 +14,7 @@ import {
   Eye,
   Film,
   Lock
-} from 'lucide-react';
+} from '@/components/icons';
 import { InstagramIcon, YoutubeIcon } from './SocialIcons';
 
 export default function CarouselSlider({

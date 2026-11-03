@@ -8,7 +8,7 @@ import {
   X, 
   Loader2, 
   AlertCircle 
-} from 'lucide-react';
+} from '@/components/icons';
 
 export default function UnsavedChangesBar({
   hasChanges = false,

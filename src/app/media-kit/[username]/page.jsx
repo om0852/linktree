@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Image from 'next/image';
-import { ArrowUpRight, BarChart3, CalendarDays, Download, Eye, MousePointer2, Users, CalendarCheck } from 'lucide-react';
+import { ArrowUpRight, BarChart3, CalendarDays, Download, Eye, MousePointer2, Users, CalendarCheck } from '@/components/icons';
 
 const number = (value) => Number(value || 0).toLocaleString();
 

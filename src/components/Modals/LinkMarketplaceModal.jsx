@@ -21,7 +21,7 @@ import {
   Award,
   Zap,
   Tag
-} from 'lucide-react';
+} from '@/components/icons';
 import { 
   InstagramIcon, 
   YoutubeIcon, 

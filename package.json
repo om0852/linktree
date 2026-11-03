@@ -16,7 +16,6 @@
     "canvas-confetti": "^1.9.4",
     "isbot": "^5.2.2",
     "jsonwebtoken": "^9.0.3",
-    "lucide-react": "^1.48.0",
     "mongoose": "^9.10.2",
     "next": "^16.4.4",
     "qrcode": "^1.5.4",

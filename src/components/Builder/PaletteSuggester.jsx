@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Sparkles, Palette, Check, RefreshCw, Layers } from 'lucide-react';
+import { Sparkles, Palette, Check, RefreshCw, Layers } from '@/components/icons';
 import { extractPaletteFromImage, generateSuggestedThemes } from '@/utils/paletteExtractor';
 
 export default function PaletteSuggester({ avatarUrl, currentTheme, onSelectTheme }) {

@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import QRCode from 'qrcode';
-import { QrCode, X, Download, Copy, Check } from 'lucide-react';
+import { QrCode, X, Download, Copy, Check } from '@/components/icons';
 
 export default function QRCodeModal({ profile, onClose }) {
   const [qrUrl, setQrUrl] = useState('');

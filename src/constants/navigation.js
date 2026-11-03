@@ -6,37 +6,37 @@ import {
   Share2, 
   Zap, 
   Globe 
-} from 'lucide-react';
+} from '@/components/icons';
 
 export const SIDEBAR_NAV_ITEMS = [
   {
     href: '/',
-    label: 'Studio & Links',
+    label: 'Studio',
     sub: 'Visual Bio Builder',
     icon: LayoutGrid,
     matchExact: true,
   },
   {
     href: '/leads',
-    label: 'Lead Capture',
+    label: 'Leads',
     sub: 'Contacts & CRM',
     icon: UserCheck,
   },
   {
     href: '/bookings',
-    label: 'Bookings & Meetings',
+    label: 'Bookings',
     sub: '1:1 Consultations',
     icon: Calendar,
   },
   {
     href: '/analytics',
-    label: 'Analytics & Traffic',
+    label: 'Analytics',
     sub: 'Real-time Visitor Stats',
     icon: BarChart3,
   },
   {
     href: '/connectors',
-    label: 'Connectors Hub',
+    label: 'Connectors',
     sub: 'Google Drive, Calendar & Socials',
     icon: Share2,
   },

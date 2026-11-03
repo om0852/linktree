@@ -17,7 +17,7 @@ import {
   RefreshCw,
   CalendarCheck2,
   CheckCircle2
-} from 'lucide-react';
+} from '@/components/icons';
 
 export default function BookingsManagerModal({ profile, onClose }) {
   const [bookings, setBookings] = useState([]);

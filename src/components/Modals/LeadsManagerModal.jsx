@@ -19,7 +19,7 @@ import {
   Sparkles,
   Copy,
   Check
-} from 'lucide-react';
+} from '@/components/icons';
 
 export default function LeadsManagerModal({ profile, onClose }) {
   const [leads, setLeads] = useState([]);

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { X, Search, Check, Sparkles, Type } from 'lucide-react';
+import { X, Search, Check, Sparkles, Type } from '@/components/icons';
 import { GOOGLE_FONTS_LIST } from '@/constants/app';
 
 export default function TitleFontModal({

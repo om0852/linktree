@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Play, Pause, ChevronDown, ChevronUp, Music, Video } from 'lucide-react';
+import { Play, Pause, ChevronDown, ChevronUp, Music, Video } from '@/components/icons';
 
 export default function EmbedWidget({ embed, title = '' }) {
   const [expanded, setExpanded] = useState(true);

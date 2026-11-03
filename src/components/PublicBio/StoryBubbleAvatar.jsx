@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Play, Pause, Volume2, VolumeX, X, Sparkles } from 'lucide-react';
+import { Play, Pause, Volume2, VolumeX, X, Sparkles } from '@/components/icons';
 
 export default function StoryBubbleAvatar({ 
   avatarUrl, 

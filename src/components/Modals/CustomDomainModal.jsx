@@ -18,7 +18,7 @@ import {
   Loader2,
   Sparkles,
   Lock,
-} from 'lucide-react';
+} from '@/components/icons';
 import { DOMAIN_TARGET_CNAME, DOMAIN_TARGET_IP, domainVerificationRecordName } from '@/constants/domains';
 
 export default function CustomDomainModal({ profile, onClose }) {

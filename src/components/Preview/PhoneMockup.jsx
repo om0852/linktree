@@ -56,7 +56,7 @@ import {
   Move,
   X,
   Layers,
-} from 'lucide-react';
+} from '@/components/icons';
 import LeadCaptureModal from '../Modals/LeadCaptureModal';
 import ScheduleMeetingModal from '../Modals/ScheduleMeetingModal';
 import ViewAsModal from '../Modals/ViewAsModal';

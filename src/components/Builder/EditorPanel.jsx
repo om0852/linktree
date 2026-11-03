@@ -25,7 +25,7 @@ import {
   Calendar,
   Clock,
   CalendarCheck2
-} from 'lucide-react';
+} from '@/components/icons';
 import { PERSONA_TAGLINES } from '../../utils/aiScoring';
 
 const AVAILABLE_ICONS = [

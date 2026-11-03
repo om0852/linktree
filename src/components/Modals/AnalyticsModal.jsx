@@ -14,7 +14,7 @@ import {
   Mail,
   Heart,
   Loader2
-} from 'lucide-react';
+} from '@/components/icons';
 
 export default function AnalyticsModal({ profile, onClose }) {
   const [loading, setLoading] = useState(true);

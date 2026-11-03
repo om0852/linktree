@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { FileCode, X, Copy, Check, Upload, Download, AlertTriangle } from 'lucide-react';
+import { FileCode, X, Copy, Check, Upload, Download, AlertTriangle } from '@/components/icons';
 
 export default function ExportImportModal({ profile, onImportProfile, onClose }) {
   const [copied, setCopied] = useState(false);

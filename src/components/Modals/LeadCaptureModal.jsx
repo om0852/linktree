@@ -15,7 +15,7 @@ import {
   Loader2, 
   Sparkles,
   Lock
-} from 'lucide-react';
+} from '@/components/icons';
 
 const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$/;
 const PHONE_REGEX = /^(\+?[0-9\s\-().]{7,20})$/;
