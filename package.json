@@ -10,7 +10,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test:unit": "node --test tests/collections.test.mjs tests/preview_sync.test.mjs tests/security_helpers.test.mjs tests/telemetry_engine.test.mjs tests/workspace_creation.test.mjs tests/sticker_positioning.test.mjs tests/theme_design.test.mjs tests/meet_link.test.mjs tests/templates.test.mjs tests/wallpaper_photo.test.mjs",
+    "test:unit": "node --test tests/collections.test.mjs tests/preview_sync.test.mjs tests/security_helpers.test.mjs tests/telemetry_engine.test.mjs tests/workspace_creation.test.mjs tests/sticker_positioning.test.mjs tests/theme_design.test.mjs tests/meet_link.test.mjs tests/templates.test.mjs tests/wallpaper_photo.test.mjs tests/ip_address.test.mjs",
     "test:cli": "node --test tests/cli_and_mcp.test.mjs",
     "test:integration": "node --test tests/api_access_control.test.mjs tests/bookingAndConnectors.test.mjs tests/leadCapture.test.mjs tests/linktree_full_features.test.mjs tests/power_features.test.mjs",
     "test:e2e": "node tests/e2e/run.mjs",

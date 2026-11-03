@@ -5,18 +5,7 @@ import https from 'node:https';
 import { isIP } from 'node:net';
 import { requireAuth } from '@/lib/authorization';
 import { consumeRateLimit } from '@/lib/rateLimit';
-
-function isPrivateAddress(address) {
-  const ip = address.toLowerCase().split('%')[0];
-  if (ip === '::1' || ip === '::' || ip.startsWith('fc') || ip.startsWith('fd') || /^fe[89ab]/.test(ip)) return true;
-  if (ip.startsWith('::ffff:')) return isPrivateAddress(ip.slice(7));
-  const parts = ip.split('.').map(Number);
-  if (parts.length !== 4 || parts.some((part) => !Number.isInteger(part) || part < 0 || part > 255)) return true;
-  return parts[0] === 0 || parts[0] === 10 || parts[0] === 127 ||
-    (parts[0] === 169 && parts[1] === 254) || (parts[0] === 172 && parts[1] >= 16 && parts[1] <= 31) ||
-    (parts[0] === 192 && parts[1] === 168) || (parts[0] === 100 && parts[1] >= 64 && parts[1] <= 127) ||
-    (parts[0] === 198 && (parts[1] === 18 || parts[1] === 19)) || (parts[0] === 192 && parts[1] === 0 && parts[2] === 0) || parts[0] >= 224;
-}
+import { isPrivateAddress } from '@/lib/ipAddress';
 
 /**
  * GET the page from the already-validated address. Connecting by that address
@@ -80,7 +69,9 @@ async function scrapeUrl(url) {
   let currency = '$';
 
   try {
-    const res = await fetchPinned(urlObj, resolved[0], {
+    // Every address was checked above; prefer IPv4, which every network can reach.
+    const target = resolved.find(({ family }) => family === 4) || resolved[0];
+    const res = await fetchPinned(urlObj, target, {
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
