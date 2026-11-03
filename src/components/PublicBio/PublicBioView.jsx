@@ -14,14 +14,9 @@ import {
 } from '../Common/SocialIcons';
 import { 
   ArrowLeft, 
-  Share2, 
   QrCode, 
-  Smartphone, 
   Tablet,
   Laptop,
-  Maximize2,
-  ZoomIn,
-  ZoomOut,
   CheckCircle2, 
   MapPin, 
   ExternalLink, 
@@ -44,8 +39,6 @@ import {
   Ticket,
   Globe,
   PhoneCall,
-  Columns,
-  LayoutGrid,
   Lock,
   Folder,
   ChevronDown,
@@ -80,55 +73,22 @@ const ICON_MAP = {
 export default function PublicBioView({ profile: initialProfile, onBackToEditor, onIncrementClick }) {
   const [unlockedProfile, setUnlockedProfile] = useState(null);
   const profile = unlockedProfile || initialProfile;
-  // Start with responsive default based on client screen size, with clean switching to 'tablet' and 'mobile'
+  // Layout follows the visitor's screen: phone, tablet or laptop and larger.
+  // Breakpoints match the Studio preview (768px / 1024px).
   const [deviceMode, setDeviceMode] = useState('mobile');
 
   React.useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const detectMode = () => {
-        const w = window.innerWidth;
-        // On standalone live profile (/omm), always default to the centered bio stream (matching preview)
-        // while allowing manual switching via the top bar for testing tablet/laptop.
-        if (onBackToEditor) {
-          if (w >= 1024) setDeviceMode('laptop');
-          else if (w >= 640) setDeviceMode('tablet');
-          else setDeviceMode('mobile');
-        } else {
-          setDeviceMode('mobile');
-        }
-      };
-      detectMode();
-      if (!onBackToEditor) {
-        window.addEventListener('resize', detectMode);
-        return () => window.removeEventListener('resize', detectMode);
-      }
-    }
-  }, [onBackToEditor]);
+    const detectMode = () => {
+      const w = window.innerWidth;
+      setDeviceMode(w >= 1024 ? 'laptop' : w >= 768 ? 'tablet' : 'mobile');
+    };
+    detectMode();
+    window.addEventListener('resize', detectMode);
+    return () => window.removeEventListener('resize', detectMode);
+  }, []);
 
-  // On large screens, creators can choose between a 2-Column Split Bento or a Focused Centered layout
-  const [desktopLayout, setDesktopLayout] = useState('centered'); // 'centered' matches preview exactly
-  const [zoomScale, setZoomScale] = useState(1);
-
-  const ZOOM_PRESETS = [0.4, 0.5, 0.65, 0.75, 0.85, 1, 1.15, 1.25, 1.5];
-
-  const handleZoomIn = () => {
-    setZoomScale((prev) => {
-      const next = ZOOM_PRESETS.find((z) => z > prev + 0.04);
-      return next !== undefined ? next : Math.min(1.75, Number((prev + 0.1).toFixed(2)));
-    });
-  };
-
-  const handleZoomOut = () => {
-    setZoomScale((prev) => {
-      const reversed = [...ZOOM_PRESETS].reverse();
-      const next = reversed.find((z) => z < prev - 0.04);
-      return next !== undefined ? next : Math.max(0.3, Number((prev - 0.1).toFixed(2)));
-    });
-  };
-
-  const handleZoomReset = () => {
-    setZoomScale(1);
-  };
+  // Laptops show the centred column, matching the Studio's default preview.
+  const desktopLayout = 'centered';
   const [activeBioTab, setActiveBioTab] = useState('links');
   const [newsletterEmail, setNewsletterEmail] = useState('');
   const [newsletterSuccess, setNewsletterSuccess] = useState(false);
@@ -136,7 +96,6 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
   const [showQrModal, setShowQrModal] = useState(false);
   const [showLeadModal, setShowLeadModal] = useState(false);
   const [showScheduleModal, setShowScheduleModal] = useState(false);
-  const [copiedLink, setCopiedLink] = useState(false);
   const [activeLeadMagnetLink, setActiveLeadMagnetLink] = useState(null);
   const [collapsedCollections, setCollapsedCollections] = useState({});
   const [isGateUnlocked, setIsGateUnlocked] = useState(false);
@@ -254,13 +213,6 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
     } catch (err) {
       console.error('Newsletter error:', err);
     }
-  };
-
-  const handleCopyLink = () => {
-    const url = typeof window !== 'undefined' ? window.location.href : '';
-    navigator.clipboard.writeText(url);
-    setCopiedLink(true);
-    setTimeout(() => setCopiedLink(false), 2500);
   };
 
   const getActiveThemePreset = () => {
@@ -1446,8 +1398,6 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
      RESPONSIVE CONTAINER WRAPPERS (Mobile, Tablet, Laptop, Full)
      ======================================================== */
 
-  // Determine if wide 2-column layout should be active
-  const isWideLayout = (deviceMode === 'laptop' || deviceMode === 'fluid') && desktopLayout === 'split';
 
   return (
     <div 
@@ -1475,155 +1425,25 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
         initialIntervalMs={profile.socialProof?.intervalMs} 
       />
 
-      {/* Top Floating Admin & Device Switcher Bar */}
-      <div className="w-full max-w-6xl px-3 sm:px-4 py-2 flex flex-wrap items-center justify-between gap-2.5 sticky top-0 z-50 backdrop-blur-xl bg-white/95 border-b border-line/80 shadow-xs">
-        {onBackToEditor ? (
-          <button
-            onClick={onBackToEditor}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-sm bg-brand-500 hover:bg-brand-600 text-white text-xs font-semibold transition-all cursor-pointer shadow-xs shrink-0"
-          >
-            <ArrowLeft className="w-3.5 h-3.5" /> Back to Editor
-          </button>
-        ) : (
-          <Link
-            href="/"
-            className="flex items-center gap-2 text-xs font-bold text-ink-700 hover:text-brand-500 transition-colors shrink-0"
-          >
-            <span className="w-6 h-6 rounded bg-surface-2 border border-line flex items-center justify-center text-xs">🌲</span>
-            <span className="font-sans font-bold text-sm tracking-tight hidden sm:inline">TreeInBio</span>
-          </Link>
-        )}
-
-        {/* Center: 4 Device Type Modes + Interactive Zoom Controls */}
-        <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
-          {/* Multi-Device Switcher (Mobile, Tablet, Laptop, Fluid) */}
-          <div className="flex items-center gap-1 bg-surface-2 p-0.5 rounded border border-line">
-            <button
-              type="button"
-              onClick={() => setDeviceMode('mobile')}
-              className={`px-2.5 py-1 rounded text-xs font-medium flex items-center gap-1.5 transition-all cursor-pointer ${
-                deviceMode === 'mobile' ? 'bg-white text-ink-700 shadow-xs font-bold border border-line/60' : 'text-ink-500 hover:text-ink-700'
-              }`}
-              title="Mobile View (410px phone chassis)"
-            >
-              <Smartphone className="w-3.5 h-3.5" />
-              <span>Mobile</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setDeviceMode('tablet')}
-              className={`px-2.5 py-1 rounded text-xs font-medium flex items-center gap-1.5 transition-all cursor-pointer ${
-                deviceMode === 'tablet' ? 'bg-white text-ink-700 shadow-xs font-bold border border-line/60' : 'text-ink-500 hover:text-ink-700'
-              }`}
-              title="Tablet View (768px iPad layout)"
-            >
-              <Tablet className="w-3.5 h-3.5" />
-              <span>Tablet</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setDeviceMode('laptop')}
-              className={`px-2.5 py-1 rounded text-xs font-medium flex items-center gap-1.5 transition-all cursor-pointer ${
-                deviceMode === 'laptop' ? 'bg-white text-ink-700 shadow-xs font-bold border border-line/60' : 'text-ink-500 hover:text-ink-700'
-              }`}
-              title="Laptop Desktop View (1024px MacBook split bento)"
-            >
-              <Laptop className="w-3.5 h-3.5" />
-              <span>Laptop</span>
-            </button>
-          </div>
-
-          {/* Interactive Zoom Controls: Zoom Out [-], Scale %, Zoom In [+] */}
-          <div className="flex items-center gap-1 bg-surface-2 p-0.5 rounded border border-line">
-            <button
-              type="button"
-              onClick={handleZoomOut}
-              className="p-1 hover:bg-white text-ink-700 rounded text-xs transition-colors cursor-pointer disabled:opacity-30"
-              title="Zoom Out"
-              disabled={zoomScale <= 0.3}
-            >
-              <ZoomOut className="w-3.5 h-3.5" />
-            </button>
-
-            <button
-              type="button"
-              onClick={handleZoomReset}
-              className="px-1.5 py-0.5 text-[11px] font-mono font-bold text-ink-700 hover:text-brand-500 transition-colors"
-              title="Click to reset zoom to 100%"
-            >
-              {Math.round(zoomScale * 100)}%
-            </button>
-
-            <button
-              type="button"
-              onClick={handleZoomIn}
-              className="p-1 hover:bg-white text-ink-700 rounded text-xs transition-colors cursor-pointer disabled:opacity-30"
-              title="Zoom In"
-              disabled={zoomScale >= 1.75}
-            >
-              <ZoomIn className="w-3.5 h-3.5" />
-            </button>
-          </div>
-        </div>
-
-        {/* Right Action Buttons */}
-        <div className="flex items-center gap-1.5 shrink-0">
-          {/* Desktop Layout Toggle (Visible on wide screens) */}
-          {(deviceMode === 'laptop' || deviceMode === 'fluid') && (
-            <div className="hidden lg:flex items-center gap-1 bg-surface-2 p-0.5 rounded border border-line mr-1">
-              <button
-                type="button"
-                onClick={() => setDesktopLayout('split')}
-                className={`px-2 py-0.5 rounded text-[11px] font-medium flex items-center gap-1 transition-all cursor-pointer ${
-                  desktopLayout === 'split' ? 'bg-white text-ink-700 font-bold shadow-xs border border-line/60' : 'text-ink-500 hover:text-ink-700'
-                }`}
-                title="2-Column Split Bento View"
-              >
-                <Columns className="w-3 h-3" />
-                <span className="hidden xl:inline">Split</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setDesktopLayout('centered')}
-                className={`px-2 py-0.5 rounded text-[11px] font-medium flex items-center gap-1 transition-all cursor-pointer ${
-                  desktopLayout === 'centered' ? 'bg-white text-ink-700 font-bold shadow-xs border border-line/60' : 'text-ink-500 hover:text-ink-700'
-                }`}
-                title="Focused Centered Stream View"
-              >
-                <LayoutGrid className="w-3 h-3" />
-                <span className="hidden xl:inline">Centered</span>
-              </button>
-            </div>
-          )}
-
-          {!onBackToEditor && (
-            <Link
-              href="/"
-              className="hidden sm:inline-flex items-center gap-1 px-3 py-1 rounded-sm bg-white hover:bg-surface-2 text-ink-700 border border-line text-xs font-semibold transition-all shadow-xs"
-            >
-              Build Your Bio
-            </Link>
-          )}
-          <button
-            type="button"
-            onClick={() => setShowQrModal(true)}
-            className="p-1.5 rounded-sm bg-white hover:bg-surface-2 text-ink-700 border border-line transition-all cursor-pointer shadow-xs"
-            title="Show QR Code"
-          >
-            <QrCode className="w-3.5 h-3.5 text-brand-500" />
-          </button>
-          <button
-            type="button"
-            onClick={handleCopyLink}
-            className="flex items-center gap-1 px-3 py-1 rounded-sm bg-brand-500 hover:bg-brand-600 text-white text-xs font-semibold transition-all cursor-pointer shadow-xs"
-          >
-            <Share2 className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">{copiedLink ? 'Copied!' : 'Share'}</span>
-          </button>
-        </div>
-      </div>
+      {/* Floating actions: back to the editor (Studio preview) and share */}
+      {onBackToEditor && (
+        <button
+          type="button"
+          onClick={onBackToEditor}
+          className="fixed left-[16px] top-[16px] z-50 flex h-[36px] items-center gap-[6px] rounded-[50px] bg-black px-[14px] text-[12px] font-medium text-white shadow-[0_6px_20px_rgba(0,0,0,0.18)] hover:bg-[#1A1A1A]"
+        >
+          <ArrowLeft className="h-[14px] w-[14px]" /> Back to editor
+        </button>
+      )}
+      <button
+        type="button"
+        onClick={() => setShowQrModal(true)}
+        aria-label="Share this page"
+        title="Share"
+        className="fixed right-[16px] top-[16px] z-50 flex h-[40px] w-[40px] items-center justify-center rounded-full border-[0.5px] border-white/60 bg-white/85 text-[#1A1A1A] shadow-[0_6px_20px_rgba(0,0,0,0.15)] backdrop-blur-md transition-transform hover:scale-105"
+      >
+        <QrCode className="h-[18px] w-[18px]" />
+      </button>
 
       {/* Main Bio Container: Adapts Dynamically to Active Device Mode & Zoom Scale */}
       <main className="w-full flex-1 flex flex-col items-center justify-start overflow-x-auto py-6 sm:py-8 px-2 sm:px-4">
@@ -1642,10 +1462,8 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
           </div>
         ) : (
           <div 
-            className="flex flex-col items-center justify-start transition-transform duration-200"
+            className="flex flex-col items-center justify-start"
             style={{
-              transform: `scale(${zoomScale})`,
-              transformOrigin: 'top center',
               width: deviceMode === 'mobile' ? '410px' : deviceMode === 'tablet' ? '768px' : '1024px',
               maxWidth: '100%',
             }}
