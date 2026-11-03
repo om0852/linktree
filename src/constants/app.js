@@ -339,6 +339,7 @@ export const getStickerDeviceProps = (stk, targetMode = 'mobile', desktopLayout 
       flipX: Boolean(override.flipX ?? override.flipHorizontal ?? stk.flipX ?? stk.flipHorizontal),
       coordinateMode: override.coordinateMode ?? stk.coordinateMode ?? 'height-percent',
       anchorType: override.anchorType ?? anchorType,
+      refWidth: override.refWidth ?? stk.refWidth,
     };
   }
 
@@ -360,6 +361,7 @@ export const getStickerDeviceProps = (stk, targetMode = 'mobile', desktopLayout 
       flipX: baseFlip,
       coordinateMode,
       anchorType,
+      refWidth: mobileOverride?.refWidth ?? stk.refWidth,
     };
   }
 
@@ -447,29 +449,44 @@ export const getStickerDeviceProps = (stk, targetMode = 'mobile', desktopLayout 
   return { x: baseX, y: baseY, scale: baseScale, rotate: baseRotate, flipX: baseFlip, coordinateMode, anchorType };
 };
 
-// Sticker artwork is authored at the editor's unscaled canvas size, then grows
-// with the rendered device canvas in the public profile.
-const STICKER_REFERENCE_WIDTHS = { mobile: 308, tablet: 596, laptop: 828, fluid: 904 };
+const CENTERED_ANCHORS = new Set(['HEADER', 'PROFILE_HEADER']);
 
-export const getStickerCanvasPositionStyle = (props) => ({
-  left: `${props?.x ?? 50}%`,
-  top: props?.coordinateMode === 'pixel-offset'
-    ? `${props?.y ?? 0}px`
-    : `${props?.y ?? 50}%`,
-});
-
-export const getStickerGraphicSizeStyle = (targetMode = 'mobile', graphic = 'emoji') => {
-  const referenceWidth = STICKER_REFERENCE_WIDTHS[targetMode] || STICKER_REFERENCE_WIDTHS.mobile;
-  const width = graphic === 'image' ? 40 : 30;
-  const cssWidth = `${Number(((width / referenceWidth) * 100).toFixed(4))}cqw`;
-
-  return graphic === 'image'
-    ? { width: cssWidth, height: cssWidth }
-    : {
-        fontSize: cssWidth,
-        lineHeight: `${Number(((36 / referenceWidth) * 100).toFixed(4))}cqw`,
-      };
+/**
+ * Where a sticker sits inside its anchor element.
+ *
+ * x is a percentage of the anchor's width, y a percentage of its height or a
+ * pixel offset from its top (`coordinateMode: 'pixel-offset'`).
+ *
+ * Header content (avatar, name, socials) is centred and sized in px, so a
+ * percentage drifts away from it on screens wider or narrower than the editor.
+ * When the anchor width at placement time is known (`refWidth`), a header
+ * sticker keeps its pixel distance from the centre instead. Content stickers
+ * stay proportional to the width, like the full-width links they sit on.
+ */
+export const getStickerCanvasPositionStyle = (props) => {
+  const x = props?.x ?? 50;
+  const refWidth = Number(props?.refWidth);
+  const left = CENTERED_ANCHORS.has(props?.anchorType) && props?.coordinateMode === 'pixel-offset' && refWidth > 0
+    ? `calc(50% + ${Number((((x - 50) / 100) * refWidth).toFixed(3))}px)`
+    : `${x}%`;
+  return {
+    left,
+    top: props?.coordinateMode === 'pixel-offset'
+      ? `${props?.y ?? 0}px`
+      : `${props?.y ?? 50}%`,
+  };
 };
+
+/**
+ * Sticker artwork size in px, matching the editor canvas. It used to grow
+ * with the page width (cqw) while the avatar and text stay fixed, which moved
+ * stickers relative to the content on wider phones and laptops.
+ */
+export const getStickerGraphicSizeStyle = (_targetMode = 'mobile', graphic = 'emoji') => (
+  graphic === 'image'
+    ? { width: '40px', height: '40px' }
+    : { fontSize: '30px', lineHeight: '36px' }
+);
 
 export const parseTailwindGradient = (str) => {
   if (!str) return '';

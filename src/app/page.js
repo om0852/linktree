@@ -3722,36 +3722,46 @@ export default function AtelierStudioPage() {
                                   e.dataTransfer.effectAllowed = 'copy';
                                 }}
                                 onClick={() => {
-                                  const startX = 20 + Math.floor(Math.random() * 60);
-                                  const startY = 20 + Math.floor(Math.random() * 60);
-                                  const startRotate = Math.floor(Math.random() * 20) - 10;
-                                  const baseSticker = {
-                                    id: `stk_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
-                                    emoji: stk.emoji,
-                                    src: '',
-                                    name: stk.name,
-                                    x: startX,
-                                    y: startY,
-                                    scale: 1,
-                                    rotate: startRotate,
-                                    flipX: false,
-                                    flipHorizontal: false,
-                                  };
-                                  const newSticker = {
-                                    ...baseSticker,
-                                    devices: {
-                                      mobile: { x: startX, y: startY, scale: 1, rotate: startRotate, flipX: false },
-                                      tablet: getStickerDeviceProps(baseSticker, 'tablet'),
-                                      laptop: getStickerDeviceProps(baseSticker, 'laptop', 'split'),
-                                    },
-                                  };
-                                  setCurrentProfile((prev) => ({
-                                    ...prev,
-                                    designSettings: {
-                                      ...(prev.designSettings || {}),
-                                      stickers: [...(prev.designSettings?.stickers || []), newSticker],
-                                    },
-                                  }));
+                                  // Place it beside the avatar in the profile header (the same
+                                  // anchor a drag-and-drop there uses), staggering each new one
+                                  // so they do not stack. Drag it from there to fine-tune.
+                                  const header = document.querySelector('.phone-viewport [data-anchor-section="PROFILE_HEADER"], [data-anchor-section="PROFILE_HEADER"]');
+                                  const refWidth = header?.offsetWidth || 308;
+                                  const stickerId = `stk_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
+                                  setCurrentProfile((prev) => {
+                                    const existing = prev.designSettings?.stickers || [];
+                                    const count = existing.length;
+                                    const placement = {
+                                      x: 78 - (count % 3) * 28,
+                                      y: 28 + (Math.floor(count / 3) % 3) * 34,
+                                      scale: 1,
+                                      rotate: ((count * 7) % 20) - 10,
+                                      flipX: false,
+                                      anchorType: 'PROFILE_HEADER',
+                                      coordinateMode: 'pixel-offset',
+                                      refWidth,
+                                    };
+                                    const newSticker = {
+                                      id: stickerId,
+                                      emoji: stk.emoji,
+                                      src: '',
+                                      name: stk.name,
+                                      ...placement,
+                                      flipHorizontal: false,
+                                      devices: {
+                                        mobile: { ...placement },
+                                        tablet: { ...placement },
+                                        laptop: { ...placement },
+                                      },
+                                    };
+                                    return {
+                                      ...prev,
+                                      designSettings: {
+                                        ...(prev.designSettings || {}),
+                                        stickers: [...existing, newSticker],
+                                      },
+                                    };
+                                  });
                                 }}
                                 className="text-[16px] p-2.5 rounded-[10px] bg-white border-[0.5px] border-line hover:border-brand-500 hover:scale-110 transition-all flex items-center justify-center cursor-grab active:cursor-grabbing shadow-2xs select-none"
                                 title={`Drag or click to place ${stk.name}`}

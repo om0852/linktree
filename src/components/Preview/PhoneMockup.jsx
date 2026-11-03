@@ -141,6 +141,7 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
         y: Number(Math.max(0, yInCanvas - headerTop).toFixed(3)),
         anchorType: 'PROFILE_HEADER',
         coordinateMode: 'pixel-offset',
+        refWidth: headerWidth,
       };
 
       return {
@@ -592,13 +593,14 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
       const anchorType = isProfileHeaderDrop ? 'PROFILE_HEADER' : 'CONTENT';
 
       const relativeX = clientX - targetRect.left;
-      const xPct = Math.max(5, Math.min(95, Math.round((relativeX / targetRect.width) * 100)));
+      const xPct = Math.max(2, Math.min(98, Number(((relativeX / targetRect.width) * 100).toFixed(2))));
 
+      // Offsets are stored in the canvas's own px (the preview may be zoomed),
+      // measured from the top of the anchor, so they match the published page.
       const relativeY = clientY - targetRect.top;
-      const coordinateMode = isProfileHeaderDrop ? 'pixel-offset' : 'height-percent';
-      const y = coordinateMode === 'pixel-offset'
-        ? Number((relativeY * targetEl.offsetHeight / targetRect.height).toFixed(3))
-        : Math.max(2, Math.min(98, Math.round((relativeY / targetRect.height) * 100)));
+      const coordinateMode = 'pixel-offset';
+      const y = Number((relativeY * targetEl.offsetHeight / targetRect.height).toFixed(2));
+      const refWidth = targetEl.offsetWidth;
 
       const stickerSequence = ++stickerSequenceRef.current;
       const baseSticker = {
@@ -610,6 +612,7 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
         x: xPct,
         y,
         coordinateMode,
+        refWidth,
         scale: 1,
         rotate: ((stickerSequence * 7) % 20) - 10,
         flipX: false,
@@ -618,9 +621,9 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
       const newSticker = {
         ...baseSticker,
         devices: {
-          mobile: { x: xPct, y, scale: 1, rotate: baseSticker.rotate, flipX: false, anchorType, coordinateMode },
-          tablet: { x: xPct, y, scale: 1, rotate: baseSticker.rotate, flipX: false, anchorType, coordinateMode },
-          laptop: { x: xPct, y, scale: 1, rotate: baseSticker.rotate, flipX: false, anchorType, coordinateMode },
+          mobile: { x: xPct, y, scale: 1, rotate: baseSticker.rotate, flipX: false, anchorType, coordinateMode, refWidth },
+          tablet: { x: xPct, y, scale: 1, rotate: baseSticker.rotate, flipX: false, anchorType, coordinateMode, refWidth },
+          laptop: { x: xPct, y, scale: 1, rotate: baseSticker.rotate, flipX: false, anchorType, coordinateMode, refWidth },
           [deviceMode]: {
             x: xPct,
             y,
@@ -629,6 +632,7 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
             flipX: false,
             anchorType,
             coordinateMode,
+            refWidth,
           },
         },
       };
@@ -698,54 +702,27 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
     onUpdateStickers(updated);
   };
 
-  const handleStickerMouseDown = (e, stickerId, targetCanvasRef) => {
-    if (e.target.tagName === 'BUTTON' || e.target.closest('button')) {
-      return;
-    }
-    e.stopPropagation();
-    setSelectedStickerId(stickerId);
-    markStickerInteraction();
-    if (!onUpdateStickers) return;
-
-    const canvasEl = targetCanvasRef?.current || contentCanvasRef.current;
-    if (!canvasEl) return;
-
-    const currentStickers = profile?.designSettings?.stickers || [];
-    const targetSticker = currentStickers.find((s) => s.id === stickerId);
-    const stickerAnchor = targetSticker?.anchorType || 'HEADER';
-
-    const targetEl = stickerAnchor === 'PROFILE_HEADER'
-      ? canvasEl.querySelector('[data-anchor-section="PROFILE_HEADER"]') || canvasEl
-      : stickerAnchor === 'HEADER'
-        ? canvasEl.querySelector('[data-anchor-section="HEADER"]') || canvasEl
-        : canvasEl;
-    const targetRect = targetEl.getBoundingClientRect();
-    const coordinateMode = stickerAnchor === 'PROFILE_HEADER' ? 'pixel-offset' : 'height-percent';
-
+  // Run a pointer drag (mouse, pen or touch) until release, then swallow the
+  // trailing click so it does not deselect the sticker or open a card.
+  const trackPointerDrag = (e, onMove) => {
+    const pointerId = e.pointerId;
     let hasMoved = false;
 
-    const onMouseMove = (moveEvent) => {
+    const onPointerMove = (moveEvent) => {
+      if (pointerId !== undefined && moveEvent.pointerId !== pointerId) return;
       moveEvent.preventDefault();
       hasMoved = true;
       markStickerInteraction();
-      const currentX = moveEvent.clientX - targetRect.left;
-      const currentY = moveEvent.clientY - targetRect.top;
-      const xPct = Math.max(2, Math.min(98, Math.round((currentX / targetRect.width) * 100)));
-      const y = coordinateMode === 'pixel-offset'
-        ? Number((currentY * targetEl.offsetHeight / targetRect.height).toFixed(3))
-        : Math.max(2, Math.min(98, Math.round((currentY / targetRect.height) * 100)));
-
-      updateStickerWithMode(stickerId, (props) => ({ ...props, x: xPct, y, anchorType: stickerAnchor, coordinateMode }));
+      onMove(moveEvent);
     };
 
-    const onMouseUp = () => {
-      window.removeEventListener('mousemove', onMouseMove);
-      window.removeEventListener('mouseup', onMouseUp);
+    const onPointerUp = (upEvent) => {
+      if (pointerId !== undefined && upEvent.pointerId !== pointerId) return;
+      window.removeEventListener('pointermove', onPointerMove);
+      window.removeEventListener('pointerup', onPointerUp);
+      window.removeEventListener('pointercancel', onPointerUp);
       markStickerInteraction();
-      setSelectedStickerId(stickerId);
-
       if (hasMoved) {
-        // Prevent trailing synthetic click events from deselecting sticker or activating cards
         const swallowClick = (clickEvent) => {
           clickEvent.stopPropagation();
           clickEvent.preventDefault();
@@ -757,8 +734,61 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
       }
     };
 
-    window.addEventListener('mousemove', onMouseMove);
-    window.addEventListener('mouseup', onMouseUp);
+    window.addEventListener('pointermove', onPointerMove, { passive: false });
+    window.addEventListener('pointerup', onPointerUp);
+    window.addEventListener('pointercancel', onPointerUp);
+  };
+
+  const handleStickerMouseDown = (e, stickerId, targetCanvasRef) => {
+    if (e.target.tagName === 'BUTTON' || e.target.closest('button')) {
+      return;
+    }
+    if (e.button !== undefined && e.button !== 0) return;
+    e.stopPropagation();
+    e.preventDefault();
+    setSelectedStickerId(stickerId);
+    markStickerInteraction();
+    if (!onUpdateStickers) return;
+
+    const canvasEl = targetCanvasRef?.current || contentCanvasRef.current;
+    if (!canvasEl) return;
+
+    const currentStickers = profile?.designSettings?.stickers || [];
+    const targetSticker = currentStickers.find((s) => s.id === stickerId);
+    const stickerAnchor = getStickerDeviceProps(targetSticker, deviceMode).anchorType || 'HEADER';
+
+    const targetEl = stickerAnchor === 'PROFILE_HEADER'
+      ? canvasEl.querySelector('[data-anchor-section="PROFILE_HEADER"]') || canvasEl
+      : stickerAnchor === 'HEADER'
+        ? canvasEl.querySelector('[data-anchor-section="HEADER"]') || canvasEl
+        : canvasEl;
+    const refWidth = targetEl.offsetWidth;
+
+    // Keep the point that was grabbed under the pointer: measure where the
+    // pointer is relative to the sticker's centre and preserve that offset.
+    const stickerEl = e.currentTarget.closest('[data-sticker-id]') || e.currentTarget;
+    const stickerRect = stickerEl.getBoundingClientRect();
+    const grabDX = e.clientX - (stickerRect.left + stickerRect.width / 2);
+    const grabDY = e.clientY - (stickerRect.top + stickerRect.height / 2);
+
+    trackPointerDrag(e, (moveEvent) => {
+      // Re-read the anchor on every move: the preview can scroll mid-drag.
+      const targetRect = targetEl.getBoundingClientRect();
+      const centerX = moveEvent.clientX - grabDX - targetRect.left;
+      const centerY = moveEvent.clientY - grabDY - targetRect.top;
+      const xPct = Math.max(0, Math.min(100, Number(((centerX / targetRect.width) * 100).toFixed(2))));
+      // Canvas px, independent of the preview zoom.
+      const y = Number((centerY * (targetEl.offsetHeight / (targetRect.height || 1))).toFixed(2));
+
+      updateStickerWithMode(stickerId, (props) => ({
+        ...props,
+        x: xPct,
+        y,
+        anchorType: stickerAnchor,
+        coordinateMode: 'pixel-offset',
+        refWidth,
+      }));
+    });
   };
 
   // Interactive Drag-to-Resize Handle
@@ -805,12 +835,7 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
     const grabOffsetY = e.clientY - (handleRect.top + handleRect.height / 2);
     const fixedCornerX = centerX - (Math.cos(rotation) * (stickerWidth * startScale / 2) - Math.sin(rotation) * (stickerHeight * startScale / 2)) * screenScaleX;
     const fixedCornerY = centerY - (Math.sin(rotation) * (stickerWidth * startScale / 2) + Math.cos(rotation) * (stickerHeight * startScale / 2)) * screenScaleY;
-    let hasMoved = false;
-
     const onMouseMove = (moveEvent) => {
-      moveEvent.preventDefault();
-      hasMoved = true;
-      markStickerInteraction();
       const cornerVectorX = moveEvent.clientX - grabOffsetX - fixedCornerX;
       const cornerVectorY = moveEvent.clientY - grabOffsetY - fixedCornerY;
       const normalizedVectorX = cornerVectorX / (screenScaleX || 1);
@@ -837,26 +862,7 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
       updateStickerWithMode(stickerId, (props) => ({ ...props, x: nextX, y: nextY, scale: newScale }));
     };
 
-    const onMouseUp = () => {
-      window.removeEventListener('mousemove', onMouseMove);
-      window.removeEventListener('mouseup', onMouseUp);
-      markStickerInteraction();
-      setSelectedStickerId(stickerId);
-
-      if (hasMoved) {
-        const swallowClick = (clickEvent) => {
-          clickEvent.stopPropagation();
-          clickEvent.preventDefault();
-        };
-        window.addEventListener('click', swallowClick, { capture: true, once: true });
-        setTimeout(() => {
-          window.removeEventListener('click', swallowClick, { capture: true });
-        }, 350);
-      }
-    };
-
-    window.addEventListener('mousemove', onMouseMove);
-    window.addEventListener('mouseup', onMouseUp);
+    trackPointerDrag(e, onMouseMove);
   };
 
   // Interactive Drag-to-Rotate Lollipop Handle
@@ -879,12 +885,8 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
     const centerY = rect.top + rect.height / 2;
 
     const initialAngle = Math.atan2(e.clientY - centerY, e.clientX - centerX) * (180 / Math.PI);
-    let hasMoved = false;
 
     const onMouseMove = (moveEvent) => {
-      moveEvent.preventDefault();
-      hasMoved = true;
-      markStickerInteraction();
       const currentAngle = Math.atan2(moveEvent.clientY - centerY, moveEvent.clientX - centerX) * (180 / Math.PI);
       const angleDiff = currentAngle - initialAngle;
       let newRotate = Math.round((startRotate + angleDiff) % 360);
@@ -898,26 +900,7 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
       updateStickerWithMode(stickerId, (props) => ({ ...props, rotate: newRotate, rotation: newRotate }));
     };
 
-    const onMouseUp = () => {
-      window.removeEventListener('mousemove', onMouseMove);
-      window.removeEventListener('mouseup', onMouseUp);
-      markStickerInteraction();
-      setSelectedStickerId(stickerId);
-
-      if (hasMoved) {
-        const swallowClick = (clickEvent) => {
-          clickEvent.stopPropagation();
-          clickEvent.preventDefault();
-        };
-        window.addEventListener('click', swallowClick, { capture: true, once: true });
-        setTimeout(() => {
-          window.removeEventListener('click', swallowClick, { capture: true });
-        }, 350);
-      }
-    };
-
-    window.addEventListener('mousemove', onMouseMove);
-    window.addEventListener('mouseup', onMouseUp);
+    trackPointerDrag(e, onMouseMove);
   };
 
   // Flip Horizontal Toggle
@@ -961,10 +944,7 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
     const stickersList = profile?.designSettings?.stickers || [];
     if (!stickersList.length) return null;
 
-    const filtered = stickersList.filter((s) => {
-      const anchor = s.anchorType || 'HEADER';
-      return anchor === sectionFilter;
-    });
+    const filtered = stickersList.filter((s) => getStickerDeviceProps(s, deviceMode).anchorType === sectionFilter);
 
     if (!filtered.length) return null;
 
@@ -996,7 +976,7 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
                 setSelectedStickerId(stk.id);
                 markStickerInteraction();
               }}
-              onMouseDown={(e) => handleStickerMouseDown(e, stk.id, targetCanvasRef)}
+              onPointerDown={(e) => handleStickerMouseDown(e, stk.id, targetCanvasRef)}
               title={`[${deviceMode.toUpperCase()}] Drag to move, click to edit sticker`}
             >
               {/* Top Rotation Lollipop Handle (anchored directly to top boundary 50% 0%) */}
@@ -1009,7 +989,7 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
                     transform: `translate(-50%, -100%) scale(${scaleInv})`,
                     transformOrigin: 'bottom center',
                   }}
-                  onMouseDown={(e) => handleStickerRotateMouseDown(e, stk.id)}
+                  onPointerDown={(e) => { e.preventDefault(); handleStickerRotateMouseDown(e, stk.id); }}
                   onClick={(e) => e.stopPropagation()}
                   title="Drag handle to rotate sticker (hold Shift for 15° snap)"
                 >
@@ -1032,7 +1012,7 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
                     transform: `translate(-50%, -50%) scale(${scaleInv})`,
                     transformOrigin: 'center center',
                   }}
-                  onMouseDown={(e) => handleStickerResizeMouseDown(e, stk.id)}
+                  onPointerDown={(e) => { e.preventDefault(); handleStickerResizeMouseDown(e, stk.id); }}
                   onClick={(e) => e.stopPropagation()}
                   title="Drag handle to resize sticker"
                 >

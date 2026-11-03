@@ -598,10 +598,11 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
 
   // Section-anchored stickers rendering (HEADER vs CONTENT)
   const renderStickersSection = (targetMode, anchorFilter = 'HEADER') => {
-    const stickersList = (profile?.designSettings?.stickers || []).filter((stk) => {
-      const anchor = stk.anchorType || 'HEADER';
-      return anchor === anchorFilter;
-    });
+    // Resolve the anchor the same way the editor does (per-device placement
+    // first); profiles saved before the fix lost the top-level anchorType.
+    const stickersList = (profile?.designSettings?.stickers || []).filter((stk) => (
+      getStickerDeviceProps(stk, targetMode, desktopLayout).anchorType === anchorFilter
+    ));
     if (!stickersList.length) return null;
 
     return (

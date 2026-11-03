@@ -10,6 +10,9 @@ import { requireProfileOwner } from '@/lib/authorization';
 import { hashPassword } from '@/lib/auth';
 import { safeLinkUrl, safeMediaUrl } from '@/lib/safeUrl';
 
+const STICKER_ANCHORS = ['HEADER', 'PROFILE_HEADER', 'CONTENT'];
+const STICKER_COORDINATE_MODES = ['height-percent', 'pixel-offset'];
+
 // GET profile by ?username=xyz or current authenticated user
 export async function GET(request) {
   try {
@@ -257,6 +260,16 @@ export async function POST(request) {
               const isImgUrl = typeof stk.imageUrl === 'string' && /^(https?:\/\/|\/|data:image\/|blob:)/i.test(stk.imageUrl.trim());
               const cleanSrc = isImg ? stk.src.trim() : (isImgUrl ? stk.imageUrl.trim() : '');
               const cleanEmoji = stk.emoji || (!isImg && stk.src ? stk.src : '✨');
+              // Keep where the sticker is anchored: dropping these made every
+              // sticker fall back to the HEADER anchor once published.
+              const mobilePlacement = stk.devices?.mobile || {};
+              const anchorType = STICKER_ANCHORS.includes(stk.anchorType)
+                ? stk.anchorType
+                : (STICKER_ANCHORS.includes(mobilePlacement.anchorType) ? mobilePlacement.anchorType : 'HEADER');
+              const coordinateMode = STICKER_COORDINATE_MODES.includes(stk.coordinateMode)
+                ? stk.coordinateMode
+                : (STICKER_COORDINATE_MODES.includes(mobilePlacement.coordinateMode) ? mobilePlacement.coordinateMode : 'height-percent');
+              const refWidth = Number(stk.refWidth ?? mobilePlacement.refWidth);
 
               return {
                 id: stk.id || `stk_${Date.now()}_${sIdx}`,
@@ -271,6 +284,9 @@ export async function POST(request) {
                 rotate: typeof stk.rotate === 'number' ? stk.rotate : (typeof stk.rotation === 'number' ? stk.rotation : 0),
                 flipX: Boolean(stk.flipX ?? stk.flipHorizontal),
                 flipHorizontal: Boolean(stk.flipHorizontal ?? stk.flipX),
+                anchorType,
+                coordinateMode,
+                ...(refWidth > 0 && refWidth < 5000 ? { refWidth } : {}),
                 devices: stk.devices && typeof stk.devices === 'object' ? stk.devices : {},
               };
             })
