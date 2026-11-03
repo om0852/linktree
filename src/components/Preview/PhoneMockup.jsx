@@ -69,6 +69,7 @@ import CarouselSlider from '../Common/CarouselSlider';
 import StickerBlockLayer, { getBlockStickerPositionStyle, findStickerBlockAt } from '../Common/StickerBlockLayer';
 import ScaledCanvas from '../Common/ScaledCanvas';
 import { THEME_PRESETS, CURATED_THEMES, getTitleFontName, getFontStack, loadGoogleFont, linkHighlightClass, bentoWideFlags, hasMediaKitStats, getStickerDeviceProps, getStickerPlacementKey, getStickerCanvasPositionStyle, getStickerGraphicSizeStyle, isImageUrl, parseTailwindGradient } from '../../constants/app';
+import WallpaperImage from '../PublicBio/WallpaperImage';
 
 const ICON_MAP = {
   Video, Star, Mail, FileText, Music, ShoppingBag, Zap, Briefcase, BookOpen, Calendar, MessageSquare, TrendingUp, Ticket, Globe,
@@ -338,13 +339,9 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
 
     // 1. Explicit Image / Blur / Pattern overrides
     if (wp) {
+      // Photos are drawn by <WallpaperImage>; this colour shows while one loads.
       if ((wp.type === 'image' || wp.type === 'blur') && (wp.imageUrl || wp.blurImage)) {
-        return {
-          backgroundImage: `url("${wp.imageUrl || wp.blurImage}")`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-        };
+        return { backgroundColor: wp.imageMeta?.avg || '#1f2937' };
       }
       if (wp.type === 'pattern') {
         return {
@@ -2387,9 +2384,10 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
         {/* 1. MOBILE HARDWARE FRAME */}
         {deviceMode === 'mobile' && (
           <div 
-            className={`phone-frame profile-typography`}
+            className={`phone-frame profile-typography isolate`}
             style={{ ...getWallpaperStyle(), ...pageFontStyle, color: themeStyles.bioColor }}
           >
+            <WallpaperImage wallpaper={profile?.designSettings?.wallpaper} />
             {/* Background Video if configured */}
             {profile?.designSettings?.wallpaper?.type === 'video' && profile.designSettings.wallpaper.videoUrl && (
               <video
@@ -2449,9 +2447,10 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
         {/* 2. TABLET HARDWARE FRAME */}
         {deviceMode === 'tablet' && (
           <div 
-            className={`tablet-frame profile-typography`}
+            className={`tablet-frame profile-typography isolate`}
             style={{ ...getWallpaperStyle(), ...pageFontStyle, color: themeStyles.bioColor }}
           >
+            <WallpaperImage wallpaper={profile?.designSettings?.wallpaper} />
             {/* Background Video if configured */}
             {profile?.designSettings?.wallpaper?.type === 'video' && profile.designSettings.wallpaper.videoUrl && (
               <video
@@ -2506,9 +2505,10 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
           <div className="laptop-container">
             {/* Screen Lid */}
             <div 
-              className={`laptop-screen profile-typography`}
+              className={`laptop-screen profile-typography isolate`}
               style={{ ...getWallpaperStyle(), ...pageFontStyle, color: themeStyles.bioColor }}
             >
+              <WallpaperImage wallpaper={profile?.designSettings?.wallpaper} />
               {/* Background Video if configured */}
               {profile?.designSettings?.wallpaper?.type === 'video' && profile.designSettings.wallpaper.videoUrl && (
                 <video

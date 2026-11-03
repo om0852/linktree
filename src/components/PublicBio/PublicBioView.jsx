@@ -60,6 +60,7 @@ import CarouselSlider from '../Common/CarouselSlider';
 import StickerBlockLayer, { getBlockStickerPositionStyle } from '../Common/StickerBlockLayer';
 import { THEME_PRESETS, CURATED_THEMES, getTitleFontName, getFontStack, loadGoogleFont, linkHighlightClass, bentoWideFlags, hasMediaKitStats, getStickerDeviceProps, getStickerCanvasPositionStyle, getStickerGraphicSizeStyle, isImageUrl, parseTailwindGradient } from '../../constants/app';
 import { safeLinkUrl } from '../../lib/safeUrl';
+import WallpaperImage from './WallpaperImage';
 
 const ICON_MAP = {
   Video, Star, Mail, FileText, Music, ShoppingBag, Zap, Briefcase, BookOpen, Calendar, MessageSquare, TrendingUp, Ticket, Globe,
@@ -232,13 +233,9 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
 
     // 1. Explicit Image / Blur / Pattern overrides
     if (wp) {
+      // Photos are drawn by <WallpaperImage>; this colour shows while one loads.
       if ((wp.type === 'image' || wp.type === 'blur') && (wp.imageUrl || wp.blurImage)) {
-        return {
-          backgroundImage: `url("${wp.imageUrl || wp.blurImage}")`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-        };
+        return { backgroundColor: wp.imageMeta?.avg || '#1f2937' };
       }
       if (wp.type === 'pattern') {
         return {
@@ -1417,9 +1414,10 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
 
   return (
     <div 
-      className={`min-h-screen w-full flex flex-col items-center justify-start profile-typography relative`}
+      className={`min-h-screen w-full flex flex-col items-center justify-start profile-typography relative isolate`}
       style={{ ...getWallpaperStyle(), ...pageFontStyle, color: themeStyles.bioColor }}
     >
+      <WallpaperImage wallpaper={profile?.designSettings?.wallpaper} fixed />
       {/* Background Video if configured */}
       {profile?.designSettings?.wallpaper?.type === 'video' && profile.designSettings.wallpaper.videoUrl && (
         <video

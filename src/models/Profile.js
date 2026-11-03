@@ -204,7 +204,9 @@ const ProfileSchema = new mongoose.Schema({
       id: { type: String, required: true },
       title: { type: String, required: true },
     }],
-    products: [{
+    // `collection` (the shop category the Studio shows) is a name Mongoose
+    // reserves on documents; it is a plain string here, so the warning is muted.
+    products: [new mongoose.Schema({
       id: { type: String, required: true },
       title: { type: String, required: true },
       description: { type: String, default: '' },
@@ -216,7 +218,7 @@ const ProfileSchema = new mongoose.Schema({
       collection: { type: String, default: '' },
       collectionId: { type: String, default: '' },
       pinned: { type: Boolean, default: false },
-    }],
+    }, { suppressReservedKeysWarning: true })],
   },
   designSettings: {
     wallpaper: {
@@ -227,6 +229,13 @@ const ProfileSchema = new mongoose.Schema({
       blurImage: { type: String, default: '' },
       videoUrl: { type: String, default: '' },
       blur: { type: Number, default: 0 },
+      // Photo wallpapers: which point stays in view when cropped, the shade
+      // that keeps text readable, and colours measured at upload.
+      focalX: { type: Number, default: 50 },
+      focalY: { type: Number, default: 50 },
+      overlay: { type: String, enum: ['auto', 'none', 'dark', 'light'], default: 'auto' },
+      overlayOpacity: { type: Number, default: 0.4 },
+      imageMeta: { type: mongoose.Schema.Types.Mixed, default: null },
     },
     buttonStyle: { type: String, enum: ['solid', 'glass', 'outline'], default: 'solid' },
     buttonRoundness: { type: String, enum: ['sharp', 'slight', 'moderate', 'pill', 'rounded', 'full'], default: 'pill' },

@@ -117,6 +117,7 @@ import {
   Smile
 } from '@/components/icons';
 import PaletteSuggester from '../components/Builder/PaletteSuggester';
+import WallpaperPhotoPanel from '../components/Builder/WallpaperPhotoPanel';
 import { detectEmbed } from '../utils/embedDetector';
 
 /** Creatosaurus secondary button (AccountDeletePopup Cancel). */
@@ -3209,30 +3210,33 @@ export default function AtelierStudioPage() {
                       )}
 
                       {(currentProfile.designSettings?.wallpaper?.type === 'blur' || currentProfile.designSettings?.wallpaper?.type === 'image') && (
-                        <div className="p-[15px] rounded-[10px] bg-surface-2 border-[0.5px] border-line space-y-2">
-                          <Label htmlFor="wallpaper-image">Background Image URL</Label>
-                          <Input
-                            id="wallpaper-image"
-                            type="url"
-                            placeholder="https://images.unsplash.com/photo-..."
-                            value={currentProfile.designSettings?.wallpaper?.imageUrl || ''}
-                            onChange={(e) => {
-                              const val = e.target.value;
-                              setCurrentProfile((prev) => ({
+                        <WallpaperPhotoPanel
+                          wallpaper={currentProfile.designSettings?.wallpaper || {}}
+                          onChange={(patch) => {
+                            setCurrentProfile((prev) => ({
+                              ...prev,
+                              designSettings: {
+                                ...(prev.designSettings || {}),
+                                wallpaper: { ...(prev.designSettings?.wallpaper || {}), ...patch },
+                              },
+                            }));
+                          }}
+                          onMatchColors={(colors) => {
+                            setCurrentProfile((prev) => {
+                              const ds = prev.designSettings || {};
+                              // Glass cards (no card colour) let the photo show through.
+                              return {
                                 ...prev,
                                 designSettings: {
-                                  ...(prev.designSettings || {}),
-                                  wallpaper: {
-                                    ...(prev.designSettings?.wallpaper || {}),
-                                    imageUrl: val,
-                                    blurImage: val,
-                                  },
+                                  ...ds,
+                                  buttonColor: colors.button,
+                                  buttonTextColor: colors.buttonText,
+                                  customColors: { ...(ds.customColors || {}), card: '' },
                                 },
-                              }));
-                            }}
-                            className="text-[12px]"
-                          />
-                        </div>
+                              };
+                            });
+                          }}
+                        />
                       )}
 
                       {(currentProfile.designSettings?.wallpaper?.type === 'video') && (

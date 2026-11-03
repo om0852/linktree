@@ -18,8 +18,9 @@ export function auditPage(profile, { domains = [] } = {}) {
   const readable = getReadableThemeColors(theme, ds.wallpaper, ds.customColors || {});
   if (ds.customColors?.title && ds.customColors.title.toLowerCase() !== readable.title) issues.push(issue('info', 'design', `The chosen title colour is hard to read and is shown as ${readable.title}.`, 'update_design colors.title'));
   if (ds.customColors?.pageText && ds.customColors.pageText.toLowerCase() !== readable.body) issues.push(issue('info', 'design', `The chosen text colour is hard to read and is shown as ${readable.body}.`, 'update_design colors.page_text'));
-  if (readable.cardsFollowPage) issues.push(issue('info', 'design', 'The wallpaper and the theme\'s cards clash, so cards are drawn as glass. Pick a theme for this wallpaper or set a card colour.', 'apply_theme / update_design colors.card'));
+  if (readable.cardsFollowPage && !readable.onImage) issues.push(issue('info', 'design', 'The wallpaper and the theme\'s cards clash, so cards are drawn as glass. Pick a theme for this wallpaper or set a card colour.', 'apply_theme / update_design colors.card'));
   if (ds.wallpaper?.type === 'image' && !ds.wallpaper.imageUrl) issues.push(issue('warning', 'design', 'Wallpaper is set to an image but has no image URL.', 'update_design wallpaper'));
+  if (readable.onImage && !String(ds.wallpaper.imageUrl).startsWith('/api/media/')) issues.push(issue('info', 'design', 'The background photo is a link, so its colours cannot be measured and a strong shade is used to keep text readable. Uploading it in the Studio allows a lighter shade and match_photo_colors.'));
   if ((ds.stickers || []).length) issues.push(issue('info', 'design', `${ds.stickers.length} sticker(s) on the page. Placement can only be checked visually; make sure none cover text.`, 'list_stickers / remove_stickers'));
 
   // Profile

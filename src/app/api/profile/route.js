@@ -9,6 +9,7 @@ import { toVisitorProfile, toOwnerProfile } from '@/lib/publicProfile';
 import { requireAuth, requireProfileOwner, userOwnsProfile } from '@/lib/authorization';
 import { hashPassword } from '@/lib/auth';
 import { safeLinkUrl, safeMediaUrl } from '@/lib/safeUrl';
+import { sanitizeWallpaperImage } from '@/lib/wallpaperImage';
 
 const STICKER_ANCHORS = ['HEADER', 'PROFILE_HEADER', 'CONTENT'];
 const STICKER_COORDINATE_MODES = ['height-percent', 'pixel-offset'];
@@ -250,7 +251,13 @@ export async function POST(request) {
       } : { enabled: false, products: [] },
       designSettings: body.designSettings ? {
         wallpaper: body.designSettings.wallpaper
-          ? { ...body.designSettings.wallpaper, ...(body.designSettings.wallpaper.videoUrl !== undefined ? { videoUrl: safeMediaUrl(body.designSettings.wallpaper.videoUrl) } : {}) }
+          ? {
+              type: ['fill', 'gradient', 'blur', 'pattern', 'image', 'video'].includes(body.designSettings.wallpaper.type) ? body.designSettings.wallpaper.type : 'fill',
+              value: typeof body.designSettings.wallpaper.value === 'string' ? body.designSettings.wallpaper.value.slice(0, 40) : '',
+              gradient: typeof body.designSettings.wallpaper.gradient === 'string' ? body.designSettings.wallpaper.gradient.slice(0, 300) : '',
+              videoUrl: safeMediaUrl(body.designSettings.wallpaper.videoUrl),
+              ...sanitizeWallpaperImage(body.designSettings.wallpaper),
+            }
           : { type: 'fill', value: '', blur: 0 },
         buttonStyle: ['solid', 'glass', 'outline'].includes(body.designSettings.buttonStyle) ? body.designSettings.buttonStyle : 'solid',
         buttonRoundness: (() => {

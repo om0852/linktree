@@ -12,7 +12,7 @@ import * as verifyDomainRoute from '@/app/api/v1/domains/verify/route';
 import { AVATAR_SHAPES, GOOGLE_FONTS_LIST, LINK_HIGHLIGHTS, PAGE_FONTS, getTitleFontName } from '@/constants/app';
 import { PROFILE_TEMPLATES } from '@/constants/templates';
 import { ALL_THEMES, findTheme } from '@/lib/profileDesign';
-import { getThemeAppearance, getReadableThemeColors, getReadableButtonText } from '@/lib/theme-contrast';
+import { getThemeAppearance, getReadableThemeColors, getReadableButtonText, isImageWallpaper, resolveImageOverlay } from '@/lib/theme-contrast';
 import { apiKeyCanWrite, requireAuth, userOwnsProfile } from '@/lib/authorization';
 import { consumeSharedQuota } from '@/lib/sharedRateLimit';
 import connectToDatabase from '@/lib/mongodb';
@@ -197,7 +197,17 @@ export function createTreeInBioMcpServer({ request, session }) {
         title_font: getTitleFontName(profile.alternativeTitleFont) || null,
         header_layout: profile.headerLayout,
         avatar_shape: profile.avatarShape,
-        wallpaper: ds.wallpaper,
+        wallpaper: isImageWallpaper(ds.wallpaper)
+          ? {
+              type: ds.wallpaper.type,
+              image_url: ds.wallpaper.imageUrl,
+              uploaded: String(ds.wallpaper.imageUrl).startsWith('/api/media/'),
+              focal_point: { x: ds.wallpaper.focalX ?? 50, y: ds.wallpaper.focalY ?? 50 },
+              shade: (({ mode, tone, opacity }) => ({ mode, tone, strength: Math.round(opacity * 100) }))(resolveImageOverlay(ds.wallpaper)),
+              blur: ds.wallpaper.blur || 0,
+              photo_colors: ds.wallpaper.imageMeta?.palette || null,
+            }
+          : ds.wallpaper,
         button_style: ds.buttonStyle,
         button_roundness: ds.buttonRoundness,
         button_shadow: ds.buttonShadow,

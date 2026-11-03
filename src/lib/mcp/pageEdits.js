@@ -6,6 +6,8 @@ import { z } from 'zod';
 import { AVATAR_SHAPES, GOOGLE_FONTS_LIST, LINK_HIGHLIGHT_IDS, PAGE_FONTS } from '@/constants/app';
 import { ALL_THEMES, applyTemplateToProfile, applyThemeToProfile, findTemplate, findTheme } from '@/lib/profileDesign';
 import { ToolError } from './routeCall';
+import { getPhotoButtonColors, isImageWallpaper } from '@/lib/theme-contrast';
+import { MAX_WALLPAPER_BLUR, OVERLAY_MODES } from '@/lib/wallpaperImage';
 
 // Icon names the renderers know (ICON_MAP in PhoneMockup / PublicBioView).
 export const LINK_ICONS = ['Globe', 'Video', 'Star', 'Mail', 'FileText', 'Music', 'ShoppingBag', 'Zap', 'Briefcase', 'BookOpen', 'Calendar', 'MessageSquare', 'TrendingUp', 'Ticket', 'Youtube', 'Instagram', 'Twitter', 'Linkedin', 'Github', 'Spotify', 'Imdb'];
@@ -165,7 +167,12 @@ export const PAGE_EDITS = {
         type: z.enum(['fill', 'gradient', 'image']),
         color: hex.optional().describe('For fill'),
         gradient: z.string().max(300).regex(/^(linear|radial)-gradient\([#\d\s,.%a-z()-]+\)$/i, 'Use linear-gradient(...) or radial-gradient(...) with colours').optional().describe('For gradient, e.g. "linear-gradient(135deg, #0f2027, #2c5364)"'),
-        image_url: imageUrl.optional().describe('For image'),
+        image_url: imageUrl.optional().describe('For image: an https photo link. Omit to keep the current photo (uploads happen only in the Studio).'),
+        focal_x: z.number().min(0).max(100).optional().describe('For image: % from the left of the part that must stay in view (default 50)'),
+        focal_y: z.number().min(0).max(100).optional().describe('For image: % from the top of the part that must stay in view (default 50)'),
+        shade: z.enum(OVERLAY_MODES).optional().describe('For image: shade over the photo so text reads. auto (recommended) picks the lightest readable shade'),
+        shade_strength: z.number().int().min(0).max(85).optional().describe('For image with shade dark/light: strength in %'),
+        blur: z.number().int().min(0).max(MAX_WALLPAPER_BLUR).optional().describe('For image: blur in px'),
       }).optional(),
       button_style: z.enum(BUTTON_STYLES).optional(),
       button_roundness: z.enum(BUTTON_ROUNDNESS).optional(),
@@ -180,7 +187,8 @@ export const PAGE_EDITS = {
       if (title_font && !titleFonts().includes(title_font)) throw new ToolError(`Unknown title font "${title_font}". Use list_design_options.`);
       if (wallpaper?.type === 'fill' && !wallpaper.color) throw new ToolError('A fill wallpaper needs color.');
       if (wallpaper?.type === 'gradient' && !wallpaper.gradient) throw new ToolError('A gradient wallpaper needs gradient.');
-      if (wallpaper?.type === 'image' && !wallpaper.image_url) throw new ToolError('An image wallpaper needs image_url.');
+      const currentPhoto = ['image', 'blur'].includes(p.designSettings?.wallpaper?.type) ? p.designSettings.wallpaper.imageUrl : '';
+      if (wallpaper?.type === 'image' && !wallpaper.image_url && !currentPhoto) throw new ToolError('An image wallpaper needs image_url (or upload a photo in the Studio first).');
       const ds = { ...(p.designSettings || {}) };
       if (wallpaper) {
         ds.wallpaper = {
@@ -188,8 +196,19 @@ export const PAGE_EDITS = {
           type: wallpaper.type,
           value: wallpaper.type === 'fill' ? wallpaper.color : '',
           gradient: wallpaper.type === 'gradient' ? wallpaper.gradient : '',
-          imageUrl: wallpaper.type === 'image' ? wallpaper.image_url.trim() : '',
+          imageUrl: wallpaper.type === 'image' ? (wallpaper.image_url?.trim() || currentPhoto) : '',
         };
+        if (wallpaper.type === 'image') {
+          const photo = ds.wallpaper;
+          photo.blurImage = photo.imageUrl;
+          // A new link has not been measured, so its colours are unknown.
+          if (wallpaper.image_url) photo.imageMeta = null;
+          if (wallpaper.focal_x !== undefined) photo.focalX = wallpaper.focal_x;
+          if (wallpaper.focal_y !== undefined) photo.focalY = wallpaper.focal_y;
+          if (wallpaper.shade) photo.overlay = wallpaper.shade;
+          if (wallpaper.shade_strength !== undefined) photo.overlayOpacity = wallpaper.shade_strength / 100;
+          if (wallpaper.blur !== undefined) photo.blur = wallpaper.blur;
+        }
       }
       if (button_style) ds.buttonStyle = button_style;
       if (button_roundness) ds.buttonRoundness = button_roundness;
@@ -209,6 +228,21 @@ export const PAGE_EDITS = {
       if (page_font) next.font = page_font;
       if (title_font !== undefined) next.alternativeTitleFont = title_font ? { enabled: true, font: title_font } : { enabled: false, font: 'DM Sans' };
       return next;
+    },
+  },
+
+  match_photo_colors: {
+    title: 'Match colours to the photo',
+    description: 'Colour the buttons from the background photo (its strongest colour, adjusted to stand out) and turn cards to glass so the photo shows through. Needs a photo uploaded in the Studio.',
+    input: {},
+    apply(p) {
+      const wallpaper = p.designSettings?.wallpaper;
+      const colors = isImageWallpaper(wallpaper) ? getPhotoButtonColors(wallpaper) : null;
+      if (!colors) throw new ToolError('The page needs a background photo uploaded in the Studio (linked photos cannot be measured).');
+      const ds = { ...(p.designSettings || {}), buttonColor: colors.button, buttonTextColor: colors.buttonText };
+      ds.customColors = { ...(ds.customColors || {}) };
+      delete ds.customColors.card;
+      return { ...p, designSettings: ds };
     },
   },
 

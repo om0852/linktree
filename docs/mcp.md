@@ -89,6 +89,25 @@ Create a key on the **AI Assistants** page, then:
 - `apply_changes` makes up to 15 edits as one save with one undo; every item
   is validated first and nothing is saved if one is invalid.
 
+## Photo wallpapers
+
+- Owners upload photos in the Studio (Design → Wallpaper → Image). The
+  browser fixes orientation, makes a 2560px and a 1280px copy and measures
+  the photo's colours; `POST /api/media` checks the file by its bytes (JPEG,
+  PNG or WebP only, so no SVG or HTML), caps sizes and keeps 30 photos per
+  account. `GET /api/media/:id` serves them with `nosniff`, a sandbox CSP and
+  a one-year cache.
+- The photo is pinned to the screen and cropped around a focal point, with
+  `srcset`/`sizes` worked out for a full-screen crop, so phones, tablets and
+  wide screens each show the important part without stretching.
+- A shade (auto, dark, light or none) keeps text readable; auto picks the
+  lightest shade that lets text reach WCAG AA on every measured part of the
+  photo. Linked photos cannot be measured, so they get a stronger shade.
+- Assistants can adjust a photo (`update_design wallpaper`: `focal_x`,
+  `focal_y`, `shade`, `shade_strength` up to 85%, `blur`) or set an https
+  link, and `match_photo_colors` colours the buttons from an uploaded photo.
+  They cannot upload files (API keys are refused by `/api/media`).
+
 ## What assistants can never do
 
 There are no tools, and no tool arguments, for: the account (email,

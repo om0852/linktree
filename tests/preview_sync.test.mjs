@@ -44,7 +44,7 @@ describe('Theme, Appearance & Feature Add-ons Field Synchronization Suite', () =
     for (const preset of [...THEME_PRESETS, ...CURATED_THEMES]) {
       const readable = getReadableThemeColors(preset);
       for (const [role, color] of Object.entries(readable)) {
-        if (role === 'isDark' || role === 'cardsFollowPage' || role === 'customCard') continue;
+        if (role === 'isDark' || role === 'cardsFollowPage' || role === 'customCard' || role === 'onImage') continue;
         assert.match(color, /^#[\da-f]{6}$/i, `${preset.id} ${role} should resolve to a solid hex color`);
         for (const background of themeBackgroundSamples(preset)) {
           assert.ok(
