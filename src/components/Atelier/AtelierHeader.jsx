@@ -44,9 +44,11 @@ export default function AtelierHeader({
     });
   }, [signedInUsername, profileUsername, profileName]);
 
-  const handleLogout = () => {
+  // Signing out leaves the platform: back to the landing page.
+  const handleLogout = async () => {
     clearWorkspaceSession();
-    if (onLogout) onLogout();
+    if (onLogout) await onLogout();
+    window.location.replace('/');
   };
 
   return (

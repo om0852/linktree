@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import connectMongo from '@/lib/mongodb';
 import User from '@/models/User';
 import Profile from '@/models/Profile';
-import { INITIAL_USER_PROFILE } from '@/constants/app';
+import { INITIAL_USER_PROFILE, RESERVED_USERNAMES } from '@/constants/app';
 import { requireAuth } from '@/lib/authorization';
 import { toOwnerProfile } from '@/lib/publicProfile';
 
@@ -23,6 +23,9 @@ export async function POST(req) {
     const cleanUsername = username.toLowerCase().trim().replace(/[^a-z0-9_-]/g, '');
     if (cleanUsername.length < 2) {
       return NextResponse.json({ success: false, error: 'Username must be at least 2 characters long' }, { status: 400 });
+    }
+    if (RESERVED_USERNAMES.includes(cleanUsername)) {
+      return NextResponse.json({ success: false, error: 'This username is reserved. Please choose another.' }, { status: 409 });
     }
 
     // Check if username taken

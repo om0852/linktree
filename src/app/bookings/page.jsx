@@ -6,6 +6,7 @@ import AuthModal from '../../components/Auth/AuthModal';
 import { DEFAULT_EMPTY_PROFILE } from '@/constants/app';
 import { Toolbar, InfoChip, SearchPill, RoundIconButton, KpiCard, KpiGrid, EmptyState, PrimaryPill, SkeletonRows, Modal, ModalButton, Field, inputClass, table } from '@/components/ui';
 import { Calendar, Clock, AlertCircle, CheckCircle2, RefreshCw, Trash2 } from '@/components/icons';
+import { endSignedOutSession } from '@/lib/workspaceStore';
 
 const STATUS_STYLE = {
   confirmed: 'bg-[#EAF7EE] text-[#16A34A]',
@@ -76,6 +77,10 @@ export default function BookingsPage() {
       try {
         const res = await fetch('/api/auth/me');
         const data = await res.json();
+        if (!data.authenticated || !data.user) {
+          endSignedOutSession();
+          return;
+        }
         if (data.authenticated && data.user) {
           setAuthUser(data.user);
           if (data.profile) setCurrentProfile(data.profile);

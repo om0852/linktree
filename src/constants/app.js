@@ -11,6 +11,13 @@ export const DEFAULT_AVATAR_COLOR = 'FFFEFA';
 export const AUTH_COOKIE_NAME = 'tb_auth_token';
 export const AUTH_TOKEN_EXPIRY_DAYS = 7;
 
+// App pages that need a signed-in user (see src/proxy.js). "/" is the Studio
+// when signed in and the landing page otherwise.
+export const PLATFORM_ROUTES = ['/analytics', '/bookings', '/connectors', '/domains', '/leads'];
+
+// Usernames that would collide with app routes ("/welcome", "/leads", ...).
+export const RESERVED_USERNAMES = ['welcome', 'analytics', 'bookings', 'connectors', 'domains', 'leads', 'media-kit', 'api', 'login', 'signup', 'admin'];
+
 export const DEFAULT_APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 
 export const INITIAL_USER_PROFILE = {

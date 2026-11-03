@@ -12,7 +12,7 @@ try {
 }
 
 import { DOMAIN_TARGET_CNAME as TARGET_CNAME, DOMAIN_TARGET_IP as TARGET_IP, RESERVED_HOSTNAMES, domainVerificationRecordName } from '@/constants/domains';
-import { requireAuth } from '@/lib/authorization';
+import { requireAuth, userOwnsProfile } from '@/lib/authorization';
 
 function sanitizeHostname(raw) {
   if (!raw) return '';
@@ -41,9 +41,10 @@ export async function GET(request) {
     const rawUsername = searchParams.get('username')?.toLowerCase()?.trim();
     const username = rawUsername || authUser?.username;
 
-    if (rawUsername && authUser.role !== 'admin' && rawUsername !== authUser.username) return NextResponse.json({ success: false, error: 'Forbidden.' }, { status: 403 });
+    // Domains belong to one workspace; list only a workspace this user owns.
+    if (!(await userOwnsProfile(authUser, username))) return NextResponse.json({ success: false, error: 'Forbidden.' }, { status: 403 });
 
-    const query = username ? { username } : {};
+    const query = { username };
     const domains = await CustomDomain.find(query).sort({ createdAt: -1 }).lean();
     // Domains claimed before ownership tokens existed need one to verify.
     await Promise.all(domains.filter((d) => !d.verified && !d.verificationToken).map(async (d) => {
@@ -95,9 +96,9 @@ export async function POST(request) {
     const hostname = sanitizeHostname(rawHostname);
     const username = rawUsername.toLowerCase().trim();
 
-    if (authUser.username !== username && authUser.role !== 'admin') {
+    if (!(await userOwnsProfile(authUser, username))) {
       return NextResponse.json(
-        { success: false, error: 'You are not authorized to add domains for another user.' },
+        { success: false, error: 'You are not authorized to add domains to this workspace.' },
         { status: 403 }
       );
     }
@@ -225,7 +226,7 @@ export async function DELETE(request) {
       return NextResponse.json({ success: false, error: 'Domain not found.' }, { status: 404 });
     }
 
-    if (authUser.username !== domainRecord.username && authUser.role !== 'admin') {
+    if (!(await userOwnsProfile(authUser, domainRecord.username))) {
       return NextResponse.json(
         { success: false, error: 'You are not authorized to delete this domain.' },
         { status: 403 }

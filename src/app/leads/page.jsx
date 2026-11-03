@@ -7,6 +7,7 @@ import AuthModal from '../../components/Auth/AuthModal';
 import { DEFAULT_EMPTY_PROFILE } from '@/constants/app';
 import { Toolbar, PillTab, ToolbarPill, SearchPill, RoundIconButton, KpiCard, KpiGrid, SettingRow, Toggle, EmptyState, PrimaryPill, SkeletonRows, table } from '@/components/ui';
 import { Users, Phone, Mail, Trash2, RefreshCw, Copy, Check, X } from '@/components/icons';
+import { endSignedOutSession } from '@/lib/workspaceStore';
 
 export default function LeadsPage() {
   const [currentProfile, setCurrentProfile] = useState(DEFAULT_EMPTY_PROFILE);
@@ -87,6 +88,10 @@ export default function LeadsPage() {
       try {
         const res = await fetch('/api/auth/me');
         const data = await res.json();
+        if (!data.authenticated || !data.user) {
+          endSignedOutSession();
+          return;
+        }
         if (data.authenticated && data.user) {
           setAuthUser(data.user);
           if (data.profile) setCurrentProfile(data.profile);

@@ -7,6 +7,7 @@ import { DOMAIN_TARGET_CNAME, DOMAIN_TARGET_IP, domainVerificationRecordName } f
 import { DEFAULT_EMPTY_PROFILE } from '@/constants/app';
 import { InfoChip, RoundIconButton, SkeletonRows, Tooltip, table } from '@/components/ui';
 import { RefreshCw, Trash2, Copy, Check, Info, X } from '@/components/icons';
+import { endSignedOutSession } from '@/lib/workspaceStore';
 
 export default function DomainsPage() {
   const [currentProfile, setCurrentProfile] = useState(DEFAULT_EMPTY_PROFILE);
@@ -52,6 +53,10 @@ export default function DomainsPage() {
       try {
         const res = await fetch('/api/auth/me');
         const data = await res.json();
+        if (!data.authenticated || !data.user) {
+          endSignedOutSession();
+          return;
+        }
         if (data.authenticated && data.user) {
           setAuthUser(data.user);
           if (data.profile) {
@@ -97,7 +102,7 @@ export default function DomainsPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           hostname: newHostname.trim(),
-          username: authUser.username,
+          username: currentProfile?.username || authUser.username,
         }),
       });
 

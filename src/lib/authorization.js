@@ -40,6 +40,15 @@ export async function requireProfileOwner(request, username) {
     : { error: NextResponse.json({ success: false, error: 'You are not authorized to access this profile.' }, { status: 403 }) };
 }
 
+/** Whether `user` may manage the workspace (profile) `username`: own account, linked workspace or admin. */
+export async function userOwnsProfile(user, username) {
+  const normalized = String(username || '').toLowerCase().trim();
+  if (!normalized) return false;
+  if (canAccessProfile(user, normalized)) return true;
+  const profile = await Profile.findOne({ username: normalized }).select('_id').lean();
+  return canAccessProfile(user, normalized, profile?._id);
+}
+
 export function unauthorizedResponse(message = 'Authentication required.') {
   return NextResponse.json({ success: false, error: message }, { status: 401 });
 }

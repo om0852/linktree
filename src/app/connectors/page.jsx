@@ -6,6 +6,7 @@ import { Toolbar, PillTab, SearchPill, RoundIconButton, InfoChip } from '@/compo
 import AuthModal from '../../components/Auth/AuthModal';
 import { AVAILABLE_CONNECTORS, CONNECTOR_CATEGORIES } from '@/constants/connectors';
 import { DEFAULT_EMPTY_PROFILE } from '@/constants/app';
+import { endSignedOutSession } from '@/lib/workspaceStore';
 import { 
   Sparkles, 
   Search, 
@@ -67,6 +68,10 @@ export default function ConnectorsPage() {
       try {
         const res = await fetch('/api/auth/me');
         const data = await res.json();
+        if (!data.authenticated || !data.user) {
+          endSignedOutSession();
+          return;
+        }
         if (data.authenticated && data.user) {
           setAuthUser(data.user);
           if (data.profile) {

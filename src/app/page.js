@@ -16,6 +16,7 @@ import ThumbnailPopover from '../components/Modals/ThumbnailPopover';
 import TitleFontModal from '../components/Modals/TitleFontModal';
 import AddProductModal from '../components/Modals/AddProductModal';
 import UnsavedChangesBar from '../components/Common/UnsavedChangesBar';
+import { endSignedOutSession } from '@/lib/workspaceStore';
 import PhoneMockup from '../components/Preview/PhoneMockup';
 import { getReadableThemeColors, getReadableButtonText, getThemeAppearance, getPresetWallpaper } from '@/lib/theme-contrast';
 import ThemeCard from '../components/Builder/ThemeCard';
@@ -286,20 +287,16 @@ export default function AtelierStudioPage() {
             setHistoryIndex(0);
             return;
           }
-        }
-
-        const profileRes = await fetch('/api/profile');
-        const profileData = await profileRes.json();
-        if (profileData.success && profileData.profile) {
-          setCurrentProfile(profileData.profile);
-          setSavedSnapshot(JSON.stringify(profileData.profile));
-          setHistory([profileData.profile]);
-          setHistoryIndex(0);
-        } else {
+          // Signed in but no profile yet: start from the empty profile.
           setSavedSnapshot(JSON.stringify(DEFAULT_EMPTY_PROFILE));
           setHistory([DEFAULT_EMPTY_PROFILE]);
           setHistoryIndex(0);
+          return;
         }
+
+        // No valid session: the proxy normally shows the landing page instead,
+        // so this only happens when the account is gone or the session ended.
+        endSignedOutSession();
       } catch (err) {
         console.error('Failed to initialize session and profile:', err);
       }

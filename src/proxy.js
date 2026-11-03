@@ -1,4 +1,6 @@
 import { NextResponse } from 'next/server';
+import { verifyToken } from '@/lib/auth';
+import { AUTH_COOKIE_NAME, PLATFORM_ROUTES } from '@/constants/app';
 
 // Platform hostnames that should bypass custom domain routing
 const PLATFORM_HOSTS = [
@@ -37,7 +39,29 @@ function isPlatformHost(host) {
   );
 }
 
-export async function middleware(request) {
+// Platform pages need a signed-in user. Logged-out visitors see the landing
+// page at "/" and are sent there (with the sign-in form open) from the rest.
+// This is an optimistic check on the session cookie; every API route still
+// verifies the user itself.
+function gatePlatformRoutes(request) {
+  const { pathname, search } = request.nextUrl;
+  const isPlatformPage = PLATFORM_ROUTES.some((route) => pathname === route || pathname.startsWith(`${route}/`));
+  const isLanding = pathname === '/welcome';
+  if (!isPlatformPage && pathname !== '/' && !isLanding) return null;
+
+  const signedIn = Boolean(verifyToken(request.cookies.get(AUTH_COOKIE_NAME)?.value || ''));
+  if (signedIn) {
+    return isLanding ? NextResponse.redirect(new URL('/', request.url)) : null;
+  }
+  if (pathname === '/') return NextResponse.rewrite(new URL(`/welcome${search}`, request.url));
+  if (isLanding) return null;
+  const target = new URL('/', request.url);
+  target.searchParams.set('auth', 'login');
+  target.searchParams.set('next', `${pathname}${search}`);
+  return NextResponse.redirect(target);
+}
+
+export async function proxy(request) {
   const { pathname } = request.nextUrl;
 
   // 1. Skip Next.js internal assets, public files, and API routes
@@ -59,9 +83,9 @@ export async function middleware(request) {
 
   const host = cleanHost(incomingHost);
 
-  // 3. If it's standard platform traffic, proceed normally
+  // 3. If it's standard platform traffic, gate the app pages behind sign-in
   if (isPlatformHost(host)) {
-    return NextResponse.next();
+    return gatePlatformRoutes(request) || NextResponse.next();
   }
 
   // 4. Custom Domain Routing: Resolve host to creator username

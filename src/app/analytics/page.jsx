@@ -6,6 +6,7 @@ import AuthModal from '../../components/Auth/AuthModal';
 import { DEFAULT_EMPTY_PROFILE } from '@/constants/app';
 import { Toolbar, PillTab, ToolbarPill, SearchPill, RoundIconButton, KpiCard, KpiGrid, ChartCard, BreakdownRows, SERIES_COLORS, table } from '@/components/ui';
 import { Eye, MousePointer, Users, TrendingUp, RefreshCw } from '@/components/icons';
+import { endSignedOutSession } from '@/lib/workspaceStore';
 
 const RANGES = [
   { id: '24h', label: '24 Hours' },
@@ -81,6 +82,10 @@ export default function AnalyticsPage() {
         const meData = await meRes.json();
         let target = '';
 
+        if (!meData.authenticated || !meData.user) {
+          endSignedOutSession();
+          return;
+        }
         if (meData.authenticated && meData.user) {
           setAuthUser(meData.user);
           target = meData.profile?.username || meData.user.username;

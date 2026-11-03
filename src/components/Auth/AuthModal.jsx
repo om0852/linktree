@@ -4,11 +4,11 @@ import React, { useState } from 'react';
 import { Modal, ModalButton, Field, inputClass } from '@/components/ui';
 import { PLATFORM_NAME } from '@/constants/app';
 
-export default function AuthModal({ isOpen = true, onClose, onSuccess, initialMode = 'login', mode: propMode }) {
+export default function AuthModal({ isOpen = true, onClose, onSuccess, initialMode = 'login', mode: propMode, initialUsername = '' }) {
   const [mode, setMode] = useState(propMode || initialMode); // 'login' | 'register'
   const [emailOrUsername, setEmailOrUsername] = useState('');
   const [email, setEmail] = useState('');
-  const [username, setUsername] = useState('');
+  const [username, setUsername] = useState(initialUsername);
   const [name, setName] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);

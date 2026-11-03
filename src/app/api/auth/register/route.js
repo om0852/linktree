@@ -3,7 +3,7 @@ import connectToDatabase from '@/lib/mongodb';
 import User from '@/models/User';
 import Profile from '@/models/Profile';
 import { hashPassword, signToken, setAuthCookie } from '@/lib/auth';
-import { INITIAL_USER_PROFILE } from '@/constants/app';
+import { INITIAL_USER_PROFILE, RESERVED_USERNAMES } from '@/constants/app';
 import { consumeRateLimit } from '@/lib/rateLimit';
 
 const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$/;
@@ -29,6 +29,9 @@ export async function POST(request) {
     }
 
     const cleanUsername = username.toLowerCase().trim();
+    if (RESERVED_USERNAMES.includes(cleanUsername)) {
+      return NextResponse.json({ success: false, error: 'This username is reserved. Please choose another.' }, { status: 409 });
+    }
     if (!USERNAME_REGEX.test(cleanUsername)) {
       return NextResponse.json({
         success: false,

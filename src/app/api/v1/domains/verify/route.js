@@ -12,7 +12,7 @@ try {
 }
 
 import { DOMAIN_TARGET_CNAME as TARGET_CNAME, DOMAIN_TARGET_IP as TARGET_IP, domainVerificationRecordName } from '@/constants/domains';
-import { requireAuth } from '@/lib/authorization';
+import { requireAuth, userOwnsProfile } from '@/lib/authorization';
 
 function sanitizeHostname(raw) {
   if (!raw) return '';
@@ -59,7 +59,7 @@ export async function POST(request) {
         { status: 404 }
       );
     }
-    if (access.user.role !== 'admin' && access.user.username !== domainRecord.username) {
+    if (!(await userOwnsProfile(access.user, domainRecord.username))) {
       return NextResponse.json({ success: false, error: 'You are not authorized to verify this domain.' }, { status: 403 });
     }
 
