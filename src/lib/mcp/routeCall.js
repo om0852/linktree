@@ -37,6 +37,12 @@ export async function callRoute(incoming, handler, { method = 'GET', path, query
   } catch {
     data = { raw: text };
   }
+  if (response.status >= 500) {
+    // Server-side failures can carry internal details (database errors);
+    // log them here and give the assistant a plain message.
+    console.error(`MCP route call ${method} ${url.pathname} failed (${response.status}):`, data?.error || data);
+    throw new ToolError('Something went wrong on the TreeInBio server. Please try again.', response.status);
+  }
   if (!response.ok || data?.success === false) {
     throw new ToolError(data?.error || data?.message || `Request failed (${response.status}).`, response.status);
   }

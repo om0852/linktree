@@ -1,6 +1,7 @@
 import { WebStandardStreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js';
 import { getAuthUser } from '@/lib/auth';
 import { createTreeInBioMcpServer } from '@/lib/mcp/server';
+import { consumeSharedQuota } from '@/lib/sharedRateLimit';
 
 // Remote MCP endpoint (Streamable HTTP). Any MCP client connects with
 //   URL:    https://<host>/api/mcp
@@ -19,10 +20,31 @@ function unauthorized() {
   });
 }
 
+// 120 requests a minute, 5,000 a day per key (an assistant uses one request
+// per tool call, plus a couple to connect).
+const MCP_LIMITS = [
+  { windowMs: 60 * 1000, max: 120 },
+  { windowMs: 24 * 60 * 60 * 1000, max: 5000 },
+];
+
+function tooManyRequests(retryAfterSeconds) {
+  return new Response(JSON.stringify({
+    jsonrpc: '2.0',
+    error: { code: -32029, message: `Rate limit reached for this API key. Try again in ${retryAfterSeconds} seconds.` },
+    id: null,
+  }), { status: 429, headers: { 'content-type': 'application/json', 'retry-after': String(retryAfterSeconds) } });
+}
+
 async function handle(request) {
   const session = await getAuthUser(request);
-  // Only API keys: browser cookies must not turn a page visit into tool access.
-  if (!session?.isApiKey) return unauthorized();
+  // Only personal API keys: browser cookies must not turn a page visit into
+  // tool access, and the platform master key never drives an assistant.
+  if (!session?.isApiKey || session.isMasterKey) return unauthorized();
+
+  // Per key, across all server instances: a leaked key or a looping
+  // assistant cannot hammer the API.
+  const quota = await consumeSharedQuota(`mcp:${session.apiKeyId}`, MCP_LIMITS);
+  if (!quota.allowed) return tooManyRequests(quota.retryAfterSeconds);
 
   const server = createTreeInBioMcpServer({ request, session });
   const transport = new WebStandardStreamableHTTPServerTransport({ sessionIdGenerator: undefined, enableJsonResponse: true });

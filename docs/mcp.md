@@ -75,9 +75,36 @@ Create a key on the **AI Assistants** page, then:
   { "mcpServers": { "treeinbio": { "command": "npx", "args": ["-y", "mcp-remote", "https://<your-domain>/api/mcp", "--header", "Authorization:Bearer <key>"] } } }
   ```
 
+## Security
+
+- **Personal keys only.** `/api/mcp` accepts per-user API keys, never browser
+  cookies and never the platform master key. The master key (admin access as
+  any user) is off unless `ALLOW_MASTER_API_KEY=true` and
+  `PLATFORM_MASTER_API_KEY` are both set; `TREEINBIO_API_KEY` is only the
+  *client* variable the CLI sends.
+- **Scopes.** `read` keys are refused on every non-GET request (REST and MCP).
+  Keys cannot create or revoke keys.
+- **Expiry.** New keys expire after 7, 30, 90 (default) or 365 days, or never.
+  Expired keys stop working immediately.
+- **Rate limits.** 120 requests a minute and 5,000 a day per key, counted in
+  MongoDB so the limit holds across serverless instances.
+- **Untrusted visitor data.** Lead and booking text written by visitors is
+  returned under `visitor_submitted`, with a notice and server instructions
+  telling the assistant never to follow instructions found there (prompt
+  injection).
+- **Confirmation.** `delete_link` and cancelling a booking require
+  `confirm: true`, which assistants are told to set only on the owner's
+  explicit request.
+- **Activity log and undo.** Every change made through MCP is logged for 90
+  days (`McpActivity`) and listed on the AI Assistants page. The newest page
+  edit of each workspace can be undone; undo is refused if the page changed
+  afterwards. Viewing and undoing need a signed-in session, not a key.
+- **Errors.** Unexpected server errors are logged and reported to the
+  assistant without internal details.
+
 ## Next steps (not built yet)
 
 - OAuth sign-in for connectors that require it instead of API keys.
 - Sticker placement and collections tools.
 - Point the stdio CLI server at `/api/mcp` so both share one tool list.
-- Per-key rate limits and an audit log of AI changes.
+- Finer scopes (design, links, leads, bookings) and per-workspace keys.

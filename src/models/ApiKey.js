@@ -44,6 +44,11 @@ const ApiKeySchema = new mongoose.Schema(
       type: Date,
       default: null,
     },
+    // null = never expires
+    expiresAt: {
+      type: Date,
+      default: null,
+    },
   },
   { timestamps: true }
 );

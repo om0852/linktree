@@ -80,7 +80,9 @@ export default function AiAssistantsPage() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [keys, setKeys] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [form, setForm] = useState({ name: '', access: 'write' });
+  const [form, setForm] = useState({ name: '', access: 'write', expiresInDays: 90 });
+  const [activity, setActivity] = useState([]);
+  const [undoingId, setUndoingId] = useState(null);
   const [creating, setCreating] = useState(false);
   const [newKey, setNewKey] = useState(null);
   const [error, setError] = useState('');
@@ -98,6 +100,31 @@ export default function AiAssistantsPage() {
     }
   };
 
+  // Changes made through MCP, newest first; page edits can be undone.
+  const loadActivity = async () => {
+    try {
+      const data = await (await fetch('/api/v1/mcp-activity')).json();
+      if (data.success) setActivity(data.activity || []);
+    } catch (err) {
+      console.error('Failed to load AI activity:', err);
+    }
+  };
+
+  const handleUndo = async (entry) => {
+    if (!confirm(`Undo "${entry.tool}" on @${entry.workspace}? The page goes back to how it was before this change.`)) return;
+    setUndoingId(entry.id);
+    setError('');
+    try {
+      const data = await (await fetch(`/api/v1/mcp-activity/${entry.id}/undo`, { method: 'POST' })).json();
+      if (!data.success) throw new Error(data.error || 'Undo failed.');
+      await loadActivity();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setUndoingId(null);
+    }
+  };
+
   useEffect(() => {
     (async () => {
       const data = await (await fetch('/api/auth/me')).json();
@@ -107,7 +134,7 @@ export default function AiAssistantsPage() {
       }
       setAuthUser(data.user);
       if (data.profile) setCurrentProfile(data.profile);
-      await loadKeys();
+      await Promise.all([loadKeys(), loadActivity()]);
     })().catch((err) => console.error('Failed to load AI page:', err));
   }, []);
 
@@ -120,12 +147,12 @@ export default function AiAssistantsPage() {
       const res = await fetch('/api/v1/api-keys', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: form.name.trim(), permissions: [form.access] }),
+        body: JSON.stringify({ name: form.name.trim(), permissions: [form.access], expiresInDays: form.expiresInDays }),
       });
       const data = await res.json();
       if (!data.success) throw new Error(data.error || 'Could not create the key.');
       setNewKey({ ...data.key, fullKey: data.fullKey });
-      setForm({ name: '', access: 'write' });
+      setForm({ name: '', access: 'write', expiresInDays: 90 });
       await loadKeys();
     } catch (err) {
       setError(err.message);
@@ -208,6 +235,18 @@ export default function AiAssistantsPage() {
                     </PillTab>
                   ))}
                 </div>
+                <select
+                  aria-label="Expires"
+                  value={form.expiresInDays}
+                  onChange={(e) => setForm((f) => ({ ...f, expiresInDays: Number(e.target.value) }))}
+                  className="h-[34px] rounded-[50px] border-[0.5px] border-[#DCDCDC] bg-white px-[12px] text-[12px]"
+                >
+                  <option value={7}>Expires in 7 days</option>
+                  <option value={30}>Expires in 30 days</option>
+                  <option value={90}>Expires in 90 days</option>
+                  <option value={365}>Expires in 1 year</option>
+                  <option value={0}>Never expires</option>
+                </select>
                 <button type="submit" disabled={creating || !form.name.trim()} className="h-[34px] rounded-[50px] bg-[#16A34A] px-[16px] text-[12px] text-white hover:bg-[#15803D] disabled:opacity-50">
                   {creating ? 'Creating...' : 'Create key'}
                 </button>
@@ -238,6 +277,7 @@ export default function AiAssistantsPage() {
                           <th className={table.th}>Key</th>
                           <th className={table.th}>Access</th>
                           <th className={table.th}>Last used</th>
+                          <th className={table.th}>Expires</th>
                           <th className={`${table.th} w-[60px]`} />
                         </tr>
                       </thead>
@@ -248,6 +288,11 @@ export default function AiAssistantsPage() {
                             <td className={`${table.td} font-mono text-[11px]`}>{key.keyPrefix}…</td>
                             <td className={table.td}>{accessOf(key.permissions)}</td>
                             <td className={table.td}>{key.lastUsed ? new Date(key.lastUsed).toLocaleString() : 'Never'}</td>
+                            <td className={table.td}>
+                              {key.expired
+                                ? <span className="text-[#FF4359]">Expired</span>
+                                : key.expiresAt ? new Date(key.expiresAt).toLocaleDateString() : 'Never'}
+                            </td>
                             <td className={table.td}>
                               <button type="button" onClick={() => handleRevoke(key)} aria-label={`Revoke ${key.name}`} title="Revoke" className="text-[#808080] hover:text-[#FF4359]">
                                 <Trash2 size={14} />
@@ -280,6 +325,63 @@ export default function AiAssistantsPage() {
               <p className="mt-[10px] text-[11px] text-[#808080]">
                 Then try: &ldquo;Show my TreeInBio analytics for the last 7 days&rdquo; or &ldquo;Give my page the Musician template and add a link to my new single.&rdquo;
               </p>
+            </section>
+
+            {/* Every change an assistant made, with undo for page edits */}
+            <section className="rounded-[10px] border-[0.5px] border-[#DCDCDC] p-[15px]">
+              <div className="flex items-center justify-between gap-[10px]">
+                <h2 className="text-[14px] font-semibold text-black">Recent AI activity</h2>
+                <button type="button" onClick={loadActivity} className="text-[11px] text-[#16A34A] hover:underline">Refresh</button>
+              </div>
+              <p className="mt-[3px] text-[12px] text-[#808080]">Every change made through an assistant, kept for 90 days. You can undo the latest page edit of each workspace.</p>
+              {activity.length === 0 ? (
+                <p className="mt-[12px] text-[12px] text-[#808080]">No AI changes yet.</p>
+              ) : (
+                <div className={`${table.wrapper} mt-[12px]`}>
+                  <table className={table.table}>
+                    <thead className={table.head}>
+                      <tr>
+                        <th className={table.th}>When</th>
+                        <th className={table.th}>Change</th>
+                        <th className={table.th}>Workspace</th>
+                        <th className={table.th}>Key</th>
+                        <th className={table.th}>Result</th>
+                        <th className={`${table.th} w-[80px]`} />
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {activity.map((entry) => (
+                        <tr key={entry.id} className={table.row}>
+                          <td className={`${table.td} whitespace-nowrap`}>{new Date(entry.createdAt).toLocaleString()}</td>
+                          <td className={table.td}>
+                            <span className="font-mono text-[11px]">{entry.tool}</span>
+                            <span className="block max-w-[320px] truncate text-[10px] text-[#808080]" title={entry.args}>{entry.args}</span>
+                          </td>
+                          <td className={table.td}>@{entry.workspace}</td>
+                          <td className={table.td}>{entry.keyName || '—'}</td>
+                          <td className={table.td}>
+                            {entry.undoneAt
+                              ? <span className="text-[#808080]">Undone</span>
+                              : entry.ok ? <span className="text-[#16A34A]">Done</span> : <span className="text-[#FF4359]" title={entry.error}>Failed</span>}
+                          </td>
+                          <td className={table.td}>
+                            {entry.undoable && (
+                              <button
+                                type="button"
+                                onClick={() => handleUndo(entry)}
+                                disabled={undoingId === entry.id}
+                                className="h-[24px] rounded-[50px] border-[0.5px] border-[#DCDCDC] px-[10px] text-[11px] hover:bg-[#F8F8F9] disabled:opacity-50"
+                              >
+                                {undoingId === entry.id ? 'Undoing...' : 'Undo'}
+                              </button>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
             </section>
           </div>
         </main>

@@ -36,6 +36,8 @@ export async function GET(request) {
       role: k.role,
       permissions: k.permissions || ['*'],
       lastUsed: k.lastUsed,
+      expiresAt: k.expiresAt || null,
+      expired: Boolean(k.expiresAt && new Date(k.expiresAt).getTime() <= Date.now()),
       createdAt: k.createdAt,
     }));
 
@@ -65,7 +67,7 @@ export async function POST(request) {
     }
 
     const body = await request.json();
-    const { name, permissions, username: customUser } = body;
+    const { name, permissions, username: customUser, expiresInDays } = body;
 
     if (!name || typeof name !== 'string' || !name.trim()) {
       return NextResponse.json({ success: false, error: 'Key name is required.' }, { status: 400 });
@@ -99,6 +101,10 @@ export async function POST(request) {
       username: targetUsername,
       role: authUser.role === 'admin' ? 'admin' : 'creator',
       permissions: perms,
+      // Default 90 days; 0 / null = never (the AI Assistants page offers both).
+      expiresAt: expiresInDays === 0 || expiresInDays === null
+        ? null
+        : new Date(Date.now() + Math.min(Math.max(Number(expiresInDays) || 90, 1), 365) * 86400000),
     });
 
     return NextResponse.json({
@@ -111,6 +117,7 @@ export async function POST(request) {
         username: newKey.username,
         role: newKey.role,
         permissions: newKey.permissions,
+        expiresAt: newKey.expiresAt,
         createdAt: newKey.createdAt,
       },
       fullKey,

@@ -68,8 +68,10 @@ export async function getAuthUser(request) {
     }
 
     if (candidateKey) {
-      // A. Master Platform Key check via timingSafeEqual
-      const masterKey = process.env.TREEINBIO_API_KEY || process.env.PLATFORM_API_KEY;
+      // A. Master platform key: admin access as any user (x-target-user). Off
+      // unless explicitly enabled, and read from its own variable so it is never
+      // confused with the per-user key the CLI sends as TREEINBIO_API_KEY.
+      const masterKey = process.env.ALLOW_MASTER_API_KEY === 'true' ? process.env.PLATFORM_MASTER_API_KEY : '';
       if (masterKey) {
         const bufA = Buffer.from(candidateKey);
         const bufB = Buffer.from(masterKey);
@@ -92,6 +94,8 @@ export async function getAuthUser(request) {
         await connectToDatabase();
         const keyHash = crypto.createHash('sha256').update(candidateKey).digest('hex');
         const keyDoc = await ApiKey.findOne({ keyHash }).lean();
+        // Expired keys stop working the moment they expire.
+        if (keyDoc && keyDoc.expiresAt && new Date(keyDoc.expiresAt).getTime() <= Date.now()) return null;
         if (keyDoc) {
           ApiKey.updateOne({ _id: keyDoc._id }, { $set: { lastUsed: new Date() } }).catch(() => {});
           const resolvedId = keyDoc.userId ? keyDoc.userId.toString() : `key_${keyDoc._id.toString()}`;
@@ -103,6 +107,8 @@ export async function getAuthUser(request) {
             role: keyDoc.role || 'creator',
             permissions: keyDoc.permissions || ['*'],
             isApiKey: true,
+            apiKeyId: keyDoc._id.toString(),
+            apiKeyName: keyDoc.name,
           };
         }
       } catch (err) {
