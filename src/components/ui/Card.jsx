@@ -8,15 +8,11 @@ export function Card({
   className = '',
   ...props
 }) {
-  const bgClass = variant === 'muted' 
-    ? 'bg-[#F5F3ED]' 
-    : variant === 'pure'
-    ? 'bg-white'
-    : 'bg-[#FFFEFA]';
+  const bgClass = variant === 'muted' ? 'bg-surface-1' : 'bg-white';
 
   return (
     <div
-      className={`border border-[#CAD8CE]/80 rounded-xl p-4 sm:p-5 shadow-xs flex flex-col gap-3.5 ${bgClass} ${className}`}
+      className={`border-[0.5px] border-line rounded-lg p-[15px] flex flex-col gap-[15px] ${bgClass} ${className}`}
       {...props}
     >
       {children}
@@ -31,7 +27,7 @@ export function CardHeader({
 }) {
   return (
     <div
-      className={`flex items-center justify-between pb-2.5 border-b border-[#CAD8CE]/50 gap-3 ${className}`}
+      className={`flex items-center justify-between pb-[10px] border-b-[0.5px] border-line gap-[10px] ${className}`}
       {...props}
     >
       {children}
@@ -46,9 +42,9 @@ export function CardTitle({
   ...props
 }) {
   return (
-    <div className={`flex items-center gap-2 ${className}`} {...props}>
-      {Icon && <Icon className="w-4 h-4 text-[#52796F] shrink-0" />}
-      <h3 className="font-sans font-bold text-base sm:text-lg text-[#28352F] tracking-tight">
+    <div className={`flex items-center gap-[8px] ${className}`} {...props}>
+      {Icon && <Icon className="size-[16px] text-ink-500 shrink-0" strokeWidth={1.5} />}
+      <h3 className="font-sans text-[14px] font-semibold text-ink-700">
         {children}
       </h3>
     </div>
@@ -61,7 +57,7 @@ export function CardDescription({
   ...props
 }) {
   return (
-    <p className={`text-xs text-[#5C6B64] mt-0.5 leading-normal ${className}`} {...props}>
+    <p className={`text-[12px] text-ink-500 mt-[2px] leading-[18px] ${className}`} {...props}>
       {children}
     </p>
   );
@@ -73,7 +69,7 @@ export function CardContent({
   ...props
 }) {
   return (
-    <div className={`flex flex-col gap-3 ${className}`} {...props}>
+    <div className={`flex flex-col gap-[10px] ${className}`} {...props}>
       {children}
     </div>
   );
@@ -86,7 +82,7 @@ export function CardFooter({
 }) {
   return (
     <div
-      className={`pt-3 border-t border-[#CAD8CE]/50 flex items-center justify-between gap-3 ${className}`}
+      className={`pt-[10px] border-t-[0.5px] border-line flex items-center justify-between gap-[10px] ${className}`}
       {...props}
     >
       {children}

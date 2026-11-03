@@ -228,13 +228,13 @@ export default function DomainsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FFFEFA] text-[#28352F]">
+    <div className="min-h-screen bg-canvas text-ink-700">
       <AtelierSidebar 
         mobileOpen={mobileOpen} 
         onToggleMobile={() => setMobileOpen(!mobileOpen)} 
       />
 
-      <div className="lg:pl-64 flex flex-col min-h-screen">
+      <div className="lg:pl-[280px] flex flex-col min-h-screen">
         <AtelierHeader
           currentProfile={currentProfile}
           authUser={authUser}
@@ -253,30 +253,30 @@ export default function DomainsPage() {
         />
 
         {/* Main Domains Content Workspace */}
-        <main className="flex-1 pt-16 sm:pt-20 px-5 sm:px-8 lg:px-10 pb-12 w-full max-w-7xl mx-auto flex flex-col gap-4 sm:gap-5">
+        <main className="flex-1 mt-[74px] mx-[10px] mb-[10px] lg:ml-0 min-w-0 rounded-lg bg-white p-[15px] flex flex-col gap-[15px]">
           {/* Top Header Banner */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#E0DCD3]/80">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b-[0.5px] border-line/80">
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-xs font-semibold text-[#52796F] uppercase tracking-wider font-mono">
+                <span className="text-xs font-semibold text-brand-500 uppercase tracking-wider font-mono">
                   Custom Branding
                 </span>
-                <span className="px-2 py-0.5 bg-[#CAD8CE]/70 text-[#28352F] font-mono text-xs font-semibold rounded">
+                <span className="px-2 py-0.5 bg-brand-100/70 text-ink-700 font-mono text-xs font-semibold rounded">
                   Free Automatic SSL
                 </span>
               </div>
-              <h1 className="font-sans font-bold text-lg sm:text-xl text-[#28352F] tracking-tight mt-1">
+              <h1 className="text-[16px] font-sans font-semibold text-ink-700 mt-1">
                 Custom Domains &amp; Branded URLs
               </h1>
-              <p className="text-xs text-[#5C6B64] mt-0.5 leading-normal">
+              <p className="text-xs text-ink-500 mt-0.5 leading-normal">
                 Point any custom apex domain or subdomain to your TreeInBio profile with instant, automated SSL certificates.
               </p>
             </div>
 
             <div className="flex items-center gap-2 self-start sm:self-auto">
-              <div className="flex items-center gap-1.5 bg-[#F5F3ED] border border-[#CAD8CE] px-3 py-1.5 rounded-lg shadow-xs">
-                <ShieldCheck className="w-4 h-4 text-[#52796F]" />
-                <span className="text-xs font-mono font-medium text-[#28352F]">Automatic HTTPS</span>
+              <div className="flex items-center gap-1.5 bg-surface-2 border-[0.5px] border-line px-3 py-1.5 rounded-lg ">
+                <ShieldCheck className="w-4 h-4 text-brand-500" />
+                <span className="text-xs font-mono font-medium text-ink-700">Automatic HTTPS</span>
               </div>
             </div>
           </div>
@@ -284,16 +284,16 @@ export default function DomainsPage() {
           {/* Action Feedback Banner */}
           {actionFeedback && (
             <div
-              className={`p-3 rounded-lg text-xs flex items-center justify-between shadow-xs ${
+              className={`p-3 rounded-lg text-xs flex items-center justify-between ${
                 actionFeedback.type === 'success'
-                  ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                  ? 'bg-brand-50 text-brand-800 border border-brand-200'
                   : actionFeedback.type === 'warning'
                   ? 'bg-amber-50 text-amber-800 border border-amber-200'
                   : 'bg-rose-50 text-rose-800 border border-rose-200'
               }`}
             >
               <div className="flex items-center gap-2">
-                {actionFeedback.type === 'success' && <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />}
+                {actionFeedback.type === 'success' && <CheckCircle2 className="w-4 h-4 text-brand-600 shrink-0" />}
                 {actionFeedback.type === 'warning' && <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />}
                 {actionFeedback.type === 'error' && <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />}
                 <span className="font-medium">{actionFeedback.text}</span>
@@ -308,17 +308,17 @@ export default function DomainsPage() {
           )}
 
           {/* Add Domain Card */}
-          <div className="bg-[#F5F3ED] border border-[#CAD8CE]/80 rounded-xl p-4 sm:p-5 shadow-xs flex flex-col gap-3.5">
+          <div className="bg-surface-2 border-[0.5px] border-line/80 rounded-xl p-4 sm:p-5 flex flex-col gap-3.5">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-white border border-[#CAD8CE] flex items-center justify-center text-[#52796F] shadow-xs">
+              <div className="w-10 h-10 rounded-lg bg-white border-[0.5px] border-line flex items-center justify-center text-brand-500 ">
                 <Globe className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="font-sans font-semibold text-base text-[#28352F]">
+                <h3 className="text-[14px] font-sans font-semibold text-ink-700">
                   Connect a Branded Custom Domain
                 </h3>
-                <p className="text-xs text-[#5C6B64] mt-0.5">
-                  Enter your domain name (e.g., <span className="font-mono text-[#52796F]">links.yourbrand.com</span> or <span className="font-mono text-[#52796F]">yourname.com</span>)
+                <p className="text-xs text-ink-500 mt-0.5">
+                  Enter your domain name (e.g., <span className="font-mono text-brand-500">links.yourbrand.com</span> or <span className="font-mono text-brand-500">yourname.com</span>)
                 </p>
               </div>
             </div>
@@ -331,13 +331,13 @@ export default function DomainsPage() {
                   placeholder="links.yourdomain.com or yourbrand.com"
                   value={newHostname}
                   onChange={(e) => setNewHostname(e.target.value)}
-                  className="w-full px-4 py-2.5 min-h-[42px] bg-white border border-[#CAD8CE] rounded-lg text-sm text-[#28352F] font-mono focus:outline-none focus:border-[#52796F] shadow-xs"
+                  className="w-full px-4 py-2.5 min-h-[42px] bg-white border-[0.5px] border-line rounded-lg text-sm text-ink-700 font-mono focus:outline-none focus:border-brand-500 "
                 />
               </div>
               <button
                 type="submit"
                 disabled={addingDomain}
-                className="px-5 py-2.5 min-h-[42px] bg-[#52796F] hover:bg-[#3D5C54] text-white text-xs sm:text-sm font-semibold rounded-lg shadow-xs flex items-center justify-center gap-2 transition-all cursor-pointer shrink-0 disabled:opacity-50"
+                className="px-5 py-2.5 min-h-[42px] bg-brand-500 hover:bg-brand-600 text-white text-xs sm:text-sm font-semibold rounded-lg flex items-center justify-center gap-2 transition-all cursor-pointer shrink-0 disabled:opacity-50"
               >
                 {addingDomain ? (
                   <>
@@ -355,74 +355,74 @@ export default function DomainsPage() {
           </div>
 
           {/* DNS Configuration Instructions */}
-          <div className="bg-white border border-[#CAD8CE]/80 rounded-xl p-4 sm:p-5 shadow-xs flex flex-col gap-3.5">
-            <div className="flex items-center justify-between pb-2 border-b border-[#E0DCD3]">
+          <div className="bg-white border-[0.5px] border-line/80 rounded-xl p-4 sm:p-5 flex flex-col gap-3.5">
+            <div className="flex items-center justify-between pb-2 border-b-[0.5px] border-line">
               <div className="flex items-center gap-2">
-                <Server className="w-4 h-4 text-[#52796F]" />
-                <h3 className="font-sans font-bold text-sm sm:text-base text-[#28352F]">
+                <Server className="w-4 h-4 text-brand-500" />
+                <h3 className="text-[14px] font-sans font-semibold text-ink-700">
                   DNS Configuration Records
                 </h3>
               </div>
-              <span className="text-xs font-mono text-[#5C6B64]">
+              <span className="text-xs font-mono text-ink-500">
                 Configure at your domain registrar (GoDaddy, Cloudflare, Namecheap)
               </span>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 pt-1">
               {/* CNAME Record */}
-              <div className="p-4 bg-[#F5F3ED] border border-[#CAD8CE] rounded-xl flex flex-col justify-between gap-3">
+              <div className="p-4 bg-surface-2 border-[0.5px] border-line rounded-xl flex flex-col justify-between gap-3">
                 <div>
                   <div className="flex items-center justify-between">
-                    <span className="px-2 py-0.5 bg-[#CAD8CE] text-[#28352F] text-xs font-mono font-bold rounded">
+                    <span className="px-2 py-0.5 bg-brand-100 text-ink-700 text-xs font-mono font-semibold rounded">
                       OPTION 1: SUBDOMAIN (Recommended)
                     </span>
-                    <span className="text-xs font-mono text-[#52796F] font-bold">TYPE: CNAME</span>
+                    <span className="text-xs font-mono text-brand-500 font-semibold">TYPE: CNAME</span>
                   </div>
-                  <p className="text-xs sm:text-sm text-[#28352F] mt-2 font-medium">
-                    For subdomains such as <span className="font-mono text-[#52796F]">links.yourbrand.com</span> or <span className="font-mono text-[#52796F]">bio.yourdomain.com</span>:
+                  <p className="text-xs sm:text-sm text-ink-700 mt-2 font-medium">
+                    For subdomains such as <span className="font-mono text-brand-500">links.yourbrand.com</span> or <span className="font-mono text-brand-500">bio.yourdomain.com</span>:
                   </p>
                 </div>
 
-                <div className="p-3 bg-white border border-[#CAD8CE] rounded-lg font-mono text-xs flex items-center justify-between">
+                <div className="p-3 bg-white border-[0.5px] border-line rounded-lg font-mono text-xs flex items-center justify-between">
                   <div className="truncate">
-                    <span className="text-[#5C6B64] text-xs block">CNAME TARGET:</span>
-                    <span className="font-bold text-[#28352F] truncate">{CNAME_TARGET}</span>
+                    <span className="text-ink-500 text-xs block">CNAME TARGET:</span>
+                    <span className="font-semibold text-ink-700 truncate">{CNAME_TARGET}</span>
                   </div>
                   <button
                     onClick={() => handleCopy(CNAME_TARGET, 'cname')}
-                    className="p-1.5 hover:bg-[#F5F3ED] text-[#52796F] rounded-lg transition-colors ml-2 cursor-pointer"
+                    className="p-1.5 hover:bg-surface-2 text-brand-500 rounded-lg transition-colors ml-2 cursor-pointer"
                     title="Copy CNAME"
                   >
-                    {copiedKey === 'cname' ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
+                    {copiedKey === 'cname' ? <Check className="w-4 h-4 text-brand-600" /> : <Copy className="w-4 h-4" />}
                   </button>
                 </div>
               </div>
 
               {/* A Record */}
-              <div className="p-4 bg-[#F5F3ED] border border-[#CAD8CE] rounded-xl flex flex-col justify-between gap-3">
+              <div className="p-4 bg-surface-2 border-[0.5px] border-line rounded-xl flex flex-col justify-between gap-3">
                 <div>
                   <div className="flex items-center justify-between">
-                    <span className="px-2 py-0.5 bg-[#CAD8CE] text-[#28352F] text-xs font-mono font-bold rounded">
+                    <span className="px-2 py-0.5 bg-brand-100 text-ink-700 text-xs font-mono font-semibold rounded">
                       OPTION 2: ROOT DOMAIN
                     </span>
-                    <span className="text-xs font-mono text-[#52796F] font-bold">TYPE: A RECORD</span>
+                    <span className="text-xs font-mono text-brand-500 font-semibold">TYPE: A RECORD</span>
                   </div>
-                  <p className="text-xs sm:text-sm text-[#28352F] mt-2 font-medium">
-                    For root / apex domains such as <span className="font-mono text-[#52796F]">yourbrand.com</span>:
+                  <p className="text-xs sm:text-sm text-ink-700 mt-2 font-medium">
+                    For root / apex domains such as <span className="font-mono text-brand-500">yourbrand.com</span>:
                   </p>
                 </div>
 
-                <div className="p-3 bg-white border border-[#CAD8CE] rounded-lg font-mono text-xs flex items-center justify-between">
+                <div className="p-3 bg-white border-[0.5px] border-line rounded-lg font-mono text-xs flex items-center justify-between">
                   <div className="truncate">
-                    <span className="text-[#5C6B64] text-xs block">A RECORD IP:</span>
-                    <span className="font-bold text-[#28352F] truncate">{IP_TARGET}</span>
+                    <span className="text-ink-500 text-xs block">A RECORD IP:</span>
+                    <span className="font-semibold text-ink-700 truncate">{IP_TARGET}</span>
                   </div>
                   <button
                     onClick={() => handleCopy(IP_TARGET, 'ip')}
-                    className="p-1.5 hover:bg-[#F5F3ED] text-[#52796F] rounded-lg transition-colors ml-2 cursor-pointer"
+                    className="p-1.5 hover:bg-surface-2 text-brand-500 rounded-lg transition-colors ml-2 cursor-pointer"
                     title="Copy IP"
                   >
-                    {copiedKey === 'ip' ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
+                    {copiedKey === 'ip' ? <Check className="w-4 h-4 text-brand-600" /> : <Copy className="w-4 h-4" />}
                   </button>
                 </div>
               </div>
@@ -430,17 +430,17 @@ export default function DomainsPage() {
           </div>
 
           {/* Connected Domains Table */}
-          <div className="bg-white border border-[#CAD8CE]/80 rounded-xl p-4 sm:p-5 shadow-xs flex flex-col gap-3.5">
-            <div className="flex items-center justify-between pb-2 border-b border-[#E0DCD3]">
+          <div className="bg-white border-[0.5px] border-line/80 rounded-xl p-4 sm:p-5 flex flex-col gap-3.5">
+            <div className="flex items-center justify-between pb-2 border-b-[0.5px] border-line">
               <div className="flex items-center gap-2">
-                <Globe className="w-4 h-4 text-[#52796F]" />
-                <h3 className="font-sans font-bold text-sm sm:text-base text-[#28352F]">
+                <Globe className="w-4 h-4 text-brand-500" />
+                <h3 className="text-[14px] font-sans font-semibold text-ink-700">
                   Your Connected Domains ({domains.length})
                 </h3>
               </div>
               <button
                 onClick={() => refreshDomains()}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono text-[#52796F] hover:text-[#28352F] hover:bg-[#F5F3ED] rounded-lg transition-colors cursor-pointer"
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono text-brand-500 hover:text-ink-700 hover:bg-surface-2 rounded-lg transition-colors cursor-pointer"
               >
                 <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
                 <span>Refresh</span>
@@ -448,13 +448,13 @@ export default function DomainsPage() {
             </div>
 
             {loading ? (
-              <div className="p-8 text-center text-xs sm:text-sm text-[#5C6B64] flex items-center justify-center gap-2">
-                <Loader2 className="w-4 h-4 animate-spin text-[#52796F]" />
+              <div className="p-8 text-center text-xs sm:text-sm text-ink-500 flex items-center justify-center gap-2">
+                <Loader2 className="w-4 h-4 animate-spin text-brand-500" />
                 <span>Checking domain status...</span>
               </div>
             ) : domains.length === 0 ? (
-              <div className="p-8 text-center text-xs sm:text-sm text-[#5C6B64] border border-dashed border-[#CAD8CE] rounded-xl flex flex-col items-center gap-2">
-                <Globe className="w-8 h-8 text-[#CAD8CE]" />
+              <div className="p-8 text-center text-xs sm:text-sm text-ink-500 border border-dashed border-line rounded-xl flex flex-col items-center gap-2">
+                <Globe className="w-8 h-8 text-line" />
                 <p>No custom domains connected yet.</p>
                 <p className="text-xs">Add your first branded domain above to get started.</p>
               </div>
@@ -463,32 +463,32 @@ export default function DomainsPage() {
                 {domains.map((d) => (
                   <div
                     key={d._id || d.hostname}
-                    className="p-3.5 sm:p-4 bg-[#F5F3ED] border border-[#CAD8CE] rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:border-[#52796F] transition-all"
+                    className="p-3.5 sm:p-4 bg-surface-2 border-[0.5px] border-line rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:border-brand-500 transition-all"
                   >
                     <div className="flex items-center gap-3 min-w-0">
-                      <div className="w-9 h-9 rounded-lg bg-white border border-[#CAD8CE] flex items-center justify-center text-[#52796F] shrink-0">
+                      <div className="w-9 h-9 rounded-lg bg-white border-[0.5px] border-line flex items-center justify-center text-brand-500 shrink-0">
                         <Lock className="w-4 h-4" />
                       </div>
                       <div className="truncate">
                         <div className="flex items-center gap-2">
-                          <span className="font-mono font-bold text-xs text-[#28352F] truncate">
+                          <span className="font-mono font-semibold text-xs text-ink-700 truncate">
                             {d.hostname}
                           </span>
                           <span
-                            className={`px-1.5 py-0.2 rounded text-[0.62rem] font-mono font-bold uppercase ${
+                            className={`px-1.5 py-0.2 rounded text-[0.62rem] font-mono font-semibold uppercase ${
                               d.verified || d.status === 'active'
-                                ? 'bg-emerald-100 text-emerald-800'
+                                ? 'bg-brand-100 text-brand-800'
                                 : 'bg-amber-100 text-amber-800'
                             }`}
                           >
                             {d.verified || d.status === 'active' ? 'Active & SSL Verified' : 'DNS Pending'}
                           </span>
                         </div>
-                        <span className="text-[0.65rem] text-[#5C6B64] font-mono block">
+                        <span className="text-[0.65rem] text-ink-500 font-mono block">
                           Routes to: @{d.username} • Target: {d.target || CNAME_TARGET}
                         </span>
                         {!d.verified && d.verificationToken && (
-                          <span className="text-[0.65rem] text-[#5C6B64] font-mono block break-all">
+                          <span className="text-[0.65rem] text-ink-500 font-mono block break-all">
                             TXT {domainVerificationRecordName(d.hostname)} = {d.verificationToken}
                           </span>
                         )}
@@ -500,16 +500,16 @@ export default function DomainsPage() {
                       <button
                         onClick={() => handleVerify(d._id, d.hostname)}
                         disabled={verifyingId === d._id}
-                        className="px-2.5 py-1 rounded bg-white hover:bg-[#F5F3ED] text-[#28352F] border border-[#CAD8CE] text-xs font-semibold flex items-center gap-1 cursor-pointer transition-all shadow-xs disabled:opacity-50"
+                        className="px-2.5 py-1 rounded bg-white hover:bg-surface-2 text-ink-700 border-[0.5px] border-line text-xs font-semibold flex items-center gap-1 cursor-pointer transition-all disabled:opacity-50"
                       >
                         {verifyingId === d._id ? (
                           <>
-                            <Loader2 className="w-3 h-3 animate-spin text-[#52796F]" />
+                            <Loader2 className="w-3 h-3 animate-spin text-brand-500" />
                             <span>Checking...</span>
                           </>
                         ) : (
                           <>
-                            <RefreshCw className="w-3 h-3 text-[#52796F]" />
+                            <RefreshCw className="w-3 h-3 text-brand-500" />
                             <span>Check DNS</span>
                           </>
                         )}
@@ -520,7 +520,7 @@ export default function DomainsPage() {
                         href={`https://${d.hostname}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="p-1 text-[#5C6B64] hover:text-[#28352F] transition-colors rounded"
+                        className="p-1 text-ink-500 hover:text-ink-700 transition-colors rounded"
                         title="Open Domain"
                       >
                         <ExternalLink className="w-3.5 h-3.5" />
@@ -529,7 +529,7 @@ export default function DomainsPage() {
                       {/* Delete */}
                       <button
                         onClick={() => handleDelete(d._id, d.hostname)}
-                        className="p-1 text-[#5C6B64] hover:text-rose-600 transition-colors rounded cursor-pointer"
+                        className="p-1 text-ink-500 hover:text-rose-600 transition-colors rounded cursor-pointer"
                         title="Delete Domain"
                       >
                         <Trash2 className="w-3.5 h-3.5" />

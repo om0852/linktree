@@ -52,41 +52,41 @@ export default function ViewAsModal({
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div 
-        className="modal-content max-w-md w-full rounded-2xl bg-[#FFFEFA] border border-[#CAD8CE] shadow-2xl overflow-hidden flex flex-col text-[#28352F] animate-fadeIn"
+        className="modal-content max-w-md w-full rounded-2xl bg-white border-[0.5px] border-line shadow-modal overflow-hidden flex flex-col text-ink-700 animate-fadeIn"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Header */}
-        <div className="px-5 py-4 border-b border-[#E0DCD3] flex items-center justify-between bg-[#F5F3ED]/70">
+        <div className="px-5 py-4 border-b-[0.5px] border-line flex items-center justify-between bg-surface-2/70">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-[#52796F]/10 border border-[#52796F]/20 flex items-center justify-center text-[#52796F]">
+            <div className="w-9 h-9 rounded-xl bg-brand-500/10 border border-brand-500/20 flex items-center justify-center text-brand-500">
               <Eye className="w-4.5 h-4.5" />
             </div>
             <div>
-              <h3 className="font-sans text-base font-bold text-[#28352F] leading-tight flex items-center gap-2">
+              <h3 className="text-[14px] font-sans font-semibold text-ink-700 flex items-center gap-2">
                 <span>View as...</span>
-                <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-[#E8EFEA] text-[#52796F] border border-[#CAD8CE]">
+                <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-semibold bg-brand-50 text-brand-500 border-[0.5px] border-line">
                   Simulator
                 </span>
               </h3>
-              <p className="text-xs text-[#5C6B64] mt-0.5 font-medium">
+              <p className="text-xs text-ink-500 mt-0.5 font-medium">
                 Test how your profile renders for different visitors worldwide
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-full text-[#5C6B64] hover:text-[#28352F] hover:bg-[#EAE7DE] flex items-center justify-center transition-all cursor-pointer"
+            className="w-8 h-8 rounded-full text-ink-500 hover:text-ink-700 hover:bg-surface-3 flex items-center justify-center transition-all cursor-pointer"
             aria-label="Close"
           >
-            <X className="w-4 h-4 text-[#5C6B64]" />
+            <X className="w-4 h-4 text-ink-500" />
           </button>
         </div>
 
         {/* Info Banner */}
-        <div className="p-4 mx-5 mt-4 rounded-xl bg-[#F5F3ED]/90 border border-[#CAD8CE] flex items-start gap-3 text-xs text-[#5C6B64]">
-          <Info className="w-4 h-4 text-[#52796F] shrink-0 mt-0.5" />
+        <div className="p-4 mx-5 mt-4 rounded-xl bg-surface-2/90 border-[0.5px] border-line flex items-start gap-3 text-xs text-ink-500">
+          <Info className="w-4 h-4 text-brand-500 shrink-0 mt-0.5" />
           <p className="leading-relaxed">
-            <strong className="text-[#28352F]">Audience Simulation:</strong> Preview rules, geo-targeted links, localized dates, and safe-area margins based on visitor location, operating system, and language.
+            <strong className="text-ink-700">Audience Simulation:</strong> Preview rules, geo-targeted links, localized dates, and safe-area margins based on visitor location, operating system, and language.
           </p>
         </div>
 
@@ -94,8 +94,8 @@ export default function ViewAsModal({
         <div className="p-5 space-y-4 overflow-y-auto max-h-[65vh]">
           {/* 1. Location Selector */}
           <div>
-            <label className="text-xs font-bold text-[#28352F] flex items-center gap-1.5 mb-2">
-              <MapPin className="w-3.5 h-3.5 text-[#52796F]" /> Visitor Country / Location
+            <label className="text-xs font-semibold text-ink-700 flex items-center gap-1.5 mb-2">
+              <MapPin className="w-3.5 h-3.5 text-brand-500" /> Visitor Country / Location
             </label>
             <div className="grid grid-cols-2 gap-2">
               {SIMULATION_LOCATIONS.map((loc) => {
@@ -107,17 +107,17 @@ export default function ViewAsModal({
                     onClick={() => onUpdateSimulation('location', loc.id)}
                     className={`p-2.5 rounded-xl text-left transition-all border flex items-center justify-between cursor-pointer ${
                       isSelected
-                        ? 'bg-[#52796F] text-white border-[#3D5C54] shadow-xs'
-                        : 'bg-[#F5F3ED] text-[#28352F] border-[#CAD8CE] hover:bg-[#EAE7DE]'
+                        ? 'bg-brand-500 text-white border-brand-600 '
+                        : 'bg-surface-2 text-ink-700 border-line hover:bg-surface-3'
                     }`}
                   >
                     <div className="flex items-center gap-2 min-w-0">
                       <span className="text-base shrink-0">{loc.flag}</span>
                       <div className="min-w-0">
-                        <span className="font-bold text-xs block truncate leading-tight">
+                        <span className="font-semibold text-xs block truncate leading-tight">
                           {loc.name}
                         </span>
-                        <span className={`text-[10px] font-mono ${isSelected ? 'text-white/80' : 'text-[#5C6B64]'}`}>
+                        <span className={`text-[10px] font-mono ${isSelected ? 'text-white/80' : 'text-ink-500'}`}>
                           {loc.currency}
                         </span>
                       </div>
@@ -131,8 +131,8 @@ export default function ViewAsModal({
 
           {/* 2. Platform / Device Simulation */}
           <div>
-            <label className="text-xs font-bold text-[#28352F] flex items-center gap-1.5 mb-2">
-              <Smartphone className="w-3.5 h-3.5 text-[#52796F]" /> Platform / In-App WebView
+            <label className="text-xs font-semibold text-ink-700 flex items-center gap-1.5 mb-2">
+              <Smartphone className="w-3.5 h-3.5 text-brand-500" /> Platform / In-App WebView
             </label>
             <div className="grid grid-cols-2 gap-2">
               {SIMULATION_PLATFORMS.map((plat) => {
@@ -144,14 +144,14 @@ export default function ViewAsModal({
                     onClick={() => onUpdateSimulation('platform', plat.id)}
                     className={`p-2.5 rounded-xl text-left transition-all border flex items-center justify-between cursor-pointer ${
                       isSelected
-                        ? 'bg-[#52796F] text-white border-[#3D5C54] shadow-xs'
-                        : 'bg-[#F5F3ED] text-[#28352F] border-[#CAD8CE] hover:bg-[#EAE7DE]'
+                        ? 'bg-brand-500 text-white border-brand-600 '
+                        : 'bg-surface-2 text-ink-700 border-line hover:bg-surface-3'
                     }`}
                   >
                     <div className="flex items-center gap-2 min-w-0">
                       <span className="text-base shrink-0">{plat.icon}</span>
                       <div className="min-w-0">
-                        <span className="font-bold text-xs block truncate leading-tight">
+                        <span className="font-semibold text-xs block truncate leading-tight">
                           {plat.name}
                         </span>
                       </div>
@@ -165,8 +165,8 @@ export default function ViewAsModal({
 
           {/* 3. Language Selector */}
           <div>
-            <label className="text-xs font-bold text-[#28352F] flex items-center gap-1.5 mb-2">
-              <Languages className="w-3.5 h-3.5 text-[#52796F]" /> Browser Language
+            <label className="text-xs font-semibold text-ink-700 flex items-center gap-1.5 mb-2">
+              <Languages className="w-3.5 h-3.5 text-brand-500" /> Browser Language
             </label>
             <div className="grid grid-cols-3 gap-2">
               {SIMULATION_LANGUAGES.map((lang) => {
@@ -178,14 +178,14 @@ export default function ViewAsModal({
                     onClick={() => onUpdateSimulation('language', lang.id)}
                     className={`p-2 rounded-xl text-center transition-all border cursor-pointer ${
                       isSelected
-                        ? 'bg-[#52796F] text-white border-[#3D5C54] shadow-xs font-bold'
-                        : 'bg-[#F5F3ED] text-[#28352F] border-[#CAD8CE] hover:bg-[#EAE7DE]'
+                        ? 'bg-brand-500 text-white border-brand-600 font-semibold'
+                        : 'bg-surface-2 text-ink-700 border-line hover:bg-surface-3'
                     }`}
                   >
-                    <span className="font-bold text-xs block truncate leading-tight">
+                    <span className="font-semibold text-xs block truncate leading-tight">
                       {lang.name.split(' ')[0]}
                     </span>
-                    <span className={`text-[10px] ${isSelected ? 'text-white/80' : 'text-[#5C6B64]'}`}>
+                    <span className={`text-[10px] ${isSelected ? 'text-white/80' : 'text-ink-500'}`}>
                       {lang.native}
                     </span>
                   </button>
@@ -196,11 +196,11 @@ export default function ViewAsModal({
         </div>
 
         {/* Modal Footer */}
-        <div className="px-5 py-3.5 border-t border-[#E0DCD3] flex items-center justify-between bg-[#F5F3ED]/70">
+        <div className="px-5 py-3.5 border-t-[0.5px] border-line flex items-center justify-between bg-surface-2/70">
           <button
             type="button"
             onClick={onResetSimulation}
-            className="flex items-center gap-1.5 text-xs text-[#5C6B64] hover:text-[#28352F] font-semibold cursor-pointer transition-colors"
+            className="flex items-center gap-1.5 text-xs text-ink-500 hover:text-ink-700 font-semibold cursor-pointer transition-colors"
           >
             <RotateCcw className="w-3.5 h-3.5" />
             <span>Reset to Default</span>
@@ -209,7 +209,7 @@ export default function ViewAsModal({
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 rounded-xl bg-[#52796F] hover:bg-[#3D5C54] text-white text-xs font-bold shadow-sm transition-all cursor-pointer flex items-center gap-1.5"
+            className="px-4 py-2 rounded-xl bg-brand-500 hover:bg-brand-600 text-white text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5"
           >
             <Sparkles className="w-3.5 h-3.5 fill-white" />
             <span>Apply Simulation</span>

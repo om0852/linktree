@@ -11,27 +11,27 @@ export default function Label({
   size = 'sm',
   ...props
 }) {
-  const sizeClasses = size === 'xs' 
-    ? 'text-[0.6875rem]' 
-    : size === 'md' 
-    ? 'text-sm' 
-    : 'text-xs';
+  const sizeClasses = size === 'xs'
+    ? 'text-[11px]'
+    : size === 'md'
+    ? 'text-[14px]'
+    : 'text-[12px]';
 
   return (
-    <div className={`flex items-center justify-between mb-1.5 ${className}`}>
+    <div className={`flex items-center justify-between mb-[5px] ${className}`}>
       <label
         htmlFor={htmlFor}
-        className={`font-semibold text-[#28352F] uppercase tracking-wider font-sans select-none flex items-center ${sizeClasses}`}
+        className={`font-medium text-ink-800 font-sans select-none flex items-center ${sizeClasses}`}
         {...props}
       >
         <span>{children}</span>
         {required && (
-          <span className="text-rose-500 font-bold ml-1 text-xs" title="Required field">*</span>
+          <span className="text-danger ml-[2px]" title="Required field">*</span>
         )}
       </label>
 
       {sub && (
-        <span className="text-[0.6875rem] font-mono text-[#5C6B64]">
+        <span className="text-[10px] text-ink-500">
           {sub}
         </span>
       )}

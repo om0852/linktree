@@ -315,24 +315,24 @@ export default function LinkMarketplaceModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
-      <div className="bg-[#FFFEFA] border border-[#CAD8CE] rounded-2xl w-full max-w-4xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden text-[#28352F]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-[#00000A73] backdrop-blur-[5px] animate-in fade-in duration-200">
+      <div className="bg-white border-[0.5px] border-line rounded-2xl w-full max-w-4xl max-h-[90vh] flex flex-col shadow-modal overflow-hidden text-ink-700">
         
         {/* Header with Omni-Bar */}
-        <div className="p-4 sm:p-5 border-b border-[#CAD8CE]/80 bg-[#F5F3ED]/40 flex flex-col gap-3.5">
+        <div className="p-4 sm:p-5 border-b-[0.5px] border-line/80 bg-surface-2/40 flex flex-col gap-3.5">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-[#52796F]/15 flex items-center justify-center text-[#52796F]">
+              <div className="w-8 h-8 rounded-lg bg-brand-500/15 flex items-center justify-center text-brand-500">
                 <Sparkles className="w-4 h-4" />
               </div>
               <div>
-                <h2 className="font-sans font-bold text-base sm:text-lg text-[#28352F]">Add to Profile</h2>
-                <p className="text-xs text-[#5C6B64]">Choose a block type, integration, or paste any URL</p>
+                <h2 className="text-[16px] font-sans font-semibold text-ink-700">Add to Profile</h2>
+                <p className="text-xs text-ink-500">Choose a block type, integration, or paste any URL</p>
               </div>
             </div>
             <button
               onClick={onClose}
-              className="p-2 rounded-xl text-[#5C6B64] hover:text-[#28352F] hover:bg-[#E8EFEA] transition-colors cursor-pointer"
+              className="p-2 rounded-xl text-ink-500 hover:text-ink-700 hover:bg-brand-50 transition-colors cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
@@ -340,19 +340,19 @@ export default function LinkMarketplaceModal({
 
           {/* Omni Search & Link Paste Bar */}
           <form onSubmit={handleOmniSubmit} className="relative w-full">
-            <Search className="w-4 h-4 text-[#52796F] absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <Search className="w-4 h-4 text-brand-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Paste any link URL or search apps (Spotify, Instagram, Amaze, Form, PDF)..."
-              className="w-full pl-10 pr-24 py-2.5 bg-white border border-[#CAD8CE] rounded-xl text-xs sm:text-sm font-medium placeholder:text-[#5C6B64]/60 focus:outline-none focus:border-[#52796F] focus:ring-2 focus:ring-[#52796F]/15 transition-all shadow-xs"
+              className="w-full pl-10 pr-24 py-2.5 bg-white border-[0.5px] border-line rounded-xl text-xs sm:text-sm font-medium placeholder:text-ink-500/60 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/15 transition-all "
               autoFocus
             />
             {search.trim().length > 3 && (
               <button
                 type="submit"
-                className="absolute right-2 top-1/2 -translate-y-1/2 px-3 py-1 bg-[#52796F] hover:bg-[#3D5C54] text-white rounded-lg text-xs font-semibold shadow-xs transition-colors cursor-pointer"
+                className="absolute right-2 top-1/2 -translate-y-1/2 px-3 py-1 bg-brand-500 hover:bg-brand-600 text-white rounded-lg text-xs font-semibold transition-colors cursor-pointer"
               >
                 Add Link
               </button>
@@ -364,40 +364,40 @@ export default function LinkMarketplaceModal({
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1">
               <button
                 onClick={() => handleItemClick(MARKETPLACE_ITEMS.find(it => it.id === 'link') || MARKETPLACE_ITEMS[0])}
-                className="p-2.5 rounded-xl border border-[#CAD8CE] bg-white hover:border-[#52796F] hover:shadow-xs transition-all flex items-center gap-2.5 text-left cursor-pointer group"
+                className="p-2.5 rounded-xl border-[0.5px] border-line bg-white hover:border-brand-500 transition-all flex items-center gap-2.5 text-left cursor-pointer group"
               >
-                <div className="w-8 h-8 rounded-lg bg-[#E8EFEA] flex items-center justify-center text-[#52796F] shrink-0 group-hover:scale-105 transition-transform">
+                <div className="w-8 h-8 rounded-lg bg-brand-50 flex items-center justify-center text-brand-500 shrink-0 group-hover:scale-105 transition-transform">
                   <LinkIcon className="w-4 h-4" />
                 </div>
                 <div>
-                  <div className="text-xs font-bold text-[#28352F]">Link</div>
-                  <div className="text-[10px] text-[#5C6B64]">Standard card</div>
+                  <div className="text-xs font-semibold text-ink-700">Link</div>
+                  <div className="text-[10px] text-ink-500">Standard card</div>
                 </div>
               </button>
 
               <button
                 onClick={() => handleItemClick(MARKETPLACE_ITEMS.find(it => it.id === 'collection') || MARKETPLACE_ITEMS[1])}
-                className="p-2.5 rounded-xl border border-[#CAD8CE] bg-white hover:border-[#52796F] hover:shadow-xs transition-all flex items-center gap-2.5 text-left cursor-pointer group"
+                className="p-2.5 rounded-xl border-[0.5px] border-line bg-white hover:border-brand-500 transition-all flex items-center gap-2.5 text-left cursor-pointer group"
               >
                 <div className="w-8 h-8 rounded-lg bg-teal-50 flex items-center justify-center text-teal-700 shrink-0 group-hover:scale-105 transition-transform">
                   <FolderPlus className="w-4 h-4" />
                 </div>
                 <div>
-                  <div className="text-xs font-bold text-[#28352F]">Collection</div>
-                  <div className="text-[10px] text-[#5C6B64]">Folder group</div>
+                  <div className="text-xs font-semibold text-ink-700">Collection</div>
+                  <div className="text-[10px] text-ink-500">Folder group</div>
                 </div>
               </button>
 
               <button
                 onClick={() => handleItemClick(MARKETPLACE_ITEMS.find(it => it.id === 'product') || MARKETPLACE_ITEMS[4])}
-                className="p-2.5 rounded-xl border border-[#CAD8CE] bg-white hover:border-[#52796F] hover:shadow-xs transition-all flex items-center gap-2.5 text-left cursor-pointer group"
+                className="p-2.5 rounded-xl border-[0.5px] border-line bg-white hover:border-brand-500 transition-all flex items-center gap-2.5 text-left cursor-pointer group"
               >
                 <div className="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center text-amber-700 shrink-0 group-hover:scale-105 transition-transform">
                   <ShoppingBag className="w-4 h-4" />
                 </div>
                 <div>
-                  <div className="text-xs font-bold text-[#28352F]">Product</div>
-                  <div className="text-[10px] text-[#5C6B64]">Merch / Digital</div>
+                  <div className="text-xs font-semibold text-ink-700">Product</div>
+                  <div className="text-[10px] text-ink-500">Merch / Digital</div>
                 </div>
               </button>
 
@@ -412,14 +412,14 @@ export default function LinkMarketplaceModal({
                   type: 'standard',
                   defaultData: { type: 'standard', title: 'Exchange Contact With Me', badge: 'Connect' }
                 })}
-                className="p-2.5 rounded-xl border border-[#CAD8CE] bg-white hover:border-[#52796F] hover:shadow-xs transition-all flex items-center gap-2.5 text-left cursor-pointer group"
+                className="p-2.5 rounded-xl border-[0.5px] border-line bg-white hover:border-brand-500 transition-all flex items-center gap-2.5 text-left cursor-pointer group"
               >
-                <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-700 shrink-0 group-hover:scale-105 transition-transform">
+                <div className="w-8 h-8 rounded-lg bg-brand-50 flex items-center justify-center text-brand-700 shrink-0 group-hover:scale-105 transition-transform">
                   <FileText className="w-4 h-4" />
                 </div>
                 <div>
-                  <div className="text-xs font-bold text-[#28352F]">Form / Lead</div>
-                  <div className="text-[10px] text-[#5C6B64]">CRM contact</div>
+                  <div className="text-xs font-semibold text-ink-700">Form / Lead</div>
+                  <div className="text-[10px] text-ink-500">CRM contact</div>
                 </div>
               </button>
             </div>
@@ -431,8 +431,8 @@ export default function LinkMarketplaceModal({
           
           {/* Category Rail (Visible on md+, horizontal scroll on mobile) */}
           {!search && (
-            <div className="w-48 sm:w-56 border-r border-[#CAD8CE]/80 bg-[#F5F3ED]/30 p-2.5 overflow-y-auto shrink-0 flex flex-col gap-1">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-[#5C6B64] px-2.5 py-1">Categories</span>
+            <div className="w-48 sm:w-56 border-r-[0.5px] border-line/80 bg-surface-2/30 p-2.5 overflow-y-auto shrink-0 flex flex-col gap-1">
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-ink-500 px-2.5 py-1">Categories</span>
               {MARKETPLACE_CATEGORIES.map((cat) => {
                 const isActive = activeCategory === cat.id;
                 return (
@@ -441,8 +441,8 @@ export default function LinkMarketplaceModal({
                     onClick={() => setActiveCategory(cat.id)}
                     className={`w-full px-3 py-2 rounded-xl text-left text-xs font-semibold flex items-center justify-between transition-colors cursor-pointer ${
                       isActive 
-                        ? 'bg-[#52796F] text-white shadow-xs' 
-                        : 'text-[#28352F] hover:bg-[#E8EFEA]'
+                        ? 'bg-brand-500 text-white ' 
+                        : 'text-ink-700 hover:bg-brand-50'
                     }`}
                   >
                     <span>{cat.label}</span>
@@ -456,9 +456,9 @@ export default function LinkMarketplaceModal({
           {/* Items Grid */}
           <div className="flex-1 p-4 sm:p-5 overflow-y-auto">
             {filteredItems.length === 0 ? (
-              <div className="text-center py-16 flex flex-col items-center justify-center gap-2 text-[#5C6B64]">
+              <div className="text-center py-16 flex flex-col items-center justify-center gap-2 text-ink-500">
                 <Search className="w-8 h-8 opacity-40" />
-                <p className="text-sm font-semibold text-[#28352F]">No integration apps match &quot;{search}&quot;</p>
+                <p className="text-sm font-semibold text-ink-700">No integration apps match &quot;{search}&quot;</p>
                 <p className="text-xs">Press Enter to add it as a direct URL link.</p>
               </div>
             ) : (
@@ -471,25 +471,25 @@ export default function LinkMarketplaceModal({
                       key={item.id}
                       type="button"
                       onClick={() => handleItemClick(item)}
-                      className="p-3.5 rounded-xl border border-[#CAD8CE] bg-white hover:border-[#52796F] hover:shadow-md transition-all flex items-start gap-3.5 text-left cursor-pointer group relative w-full"
+                      className="p-3.5 rounded-xl border-[0.5px] border-line bg-white hover:border-brand-500 transition-all flex items-start gap-3.5 text-left cursor-pointer group relative w-full"
                     >
-                      <div className="w-10 h-10 rounded-xl bg-[#F5F3ED] border border-[#CAD8CE] flex items-center justify-center text-[#52796F] shrink-0 group-hover:scale-105 transition-transform">
+                      <div className="w-10 h-10 rounded-xl bg-surface-2 border-[0.5px] border-line flex items-center justify-center text-brand-500 shrink-0 group-hover:scale-105 transition-transform">
                         <Icon className="w-5 h-5" />
                       </div>
 
                       <div className="flex-1 min-w-0 pr-6">
                         <div className="flex items-center gap-2">
-                          <h4 className="text-xs sm:text-sm font-bold text-[#28352F] group-hover:text-[#52796F] transition-colors truncate">
+                          <h4 className="text-[12px] font-semibold text-ink-700 group-hover:text-brand-500 transition-colors truncate">
                             {item.title}
                           </h4>
                         </div>
-                        <p className="text-[11px] text-[#5C6B64] line-clamp-2 mt-0.5 leading-snug">
+                        <p className="text-[11px] text-ink-500 line-clamp-2 mt-0.5 leading-snug">
                           {item.subtitle}
                         </p>
                       </div>
 
                       {item.badge && (
-                        <span className="absolute top-3 right-3 px-1.5 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider bg-[#E8EFEA] text-[#52796F] border border-[#CAD8CE]/50">
+                        <span className="absolute top-3 right-3 px-1.5 py-0.5 rounded text-[8px] font-semibold uppercase tracking-wider bg-brand-50 text-brand-500 border-[0.5px] border-line/50">
                           {item.badge}
                         </span>
                       )}

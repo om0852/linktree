@@ -3,20 +3,20 @@
 import React from 'react';
 
 const BADGE_VARIANTS = {
-  sage: 'bg-[#52796F]/15 text-[#3D5C54] border border-[#52796F]/30',
-  mint: 'bg-[#CAD8CE]/70 text-[#28352F] border border-[#52796F]/20',
-  neutral: 'bg-[#F5F3ED] text-[#5C6B64] border border-[#CAD8CE]',
-  emerald: 'bg-emerald-50 text-emerald-800 border border-emerald-200',
-  amber: 'bg-amber-50 text-amber-800 border border-amber-200',
-  rose: 'bg-rose-50 text-rose-800 border border-rose-200',
-  mono: 'bg-[#F5F3ED] text-[#28352F] font-mono border border-[#CAD8CE]',
-  dark: 'bg-[#28352F] text-white border border-[#1C2723]',
+  sage: 'bg-brand-100 text-brand-800',
+  mint: 'bg-brand-50 text-brand-800',
+  neutral: 'bg-surface-2 text-ink-700',
+  emerald: 'bg-success-soft text-success',
+  amber: 'bg-warning-soft text-warning-ink',
+  rose: 'bg-danger-soft text-danger',
+  mono: 'bg-[#EEEEEE] text-[#888888] font-mono',
+  dark: 'bg-black text-white',
 };
 
 const BADGE_SIZES = {
-  xs: 'px-2 py-0.5 text-[0.6875rem] gap-1 rounded',
-  sm: 'px-2.5 py-1 text-xs gap-1.5 rounded-md font-semibold',
-  md: 'px-3 py-1.5 text-xs sm:text-sm gap-2 rounded-lg font-semibold',
+  xs: 'px-[4px] py-[1px] text-[9px] gap-[2px] rounded-xs font-medium',
+  sm: 'px-[6px] py-[2px] text-[10px] gap-[4px] rounded-[4px] font-medium',
+  md: 'h-[23px] px-[10px] text-[10px] gap-[4px] rounded-pill font-medium',
 };
 
 export default function Badge({
@@ -35,7 +35,7 @@ export default function Badge({
       className={`inline-flex items-center font-sans select-none shrink-0 ${variantClass} ${sizeClass} ${className}`}
       {...props}
     >
-      {Icon && <Icon className="w-3.5 h-3.5 shrink-0" />}
+      {Icon && <Icon className="size-[12px] shrink-0" strokeWidth={1.5} />}
       <span>{children}</span>
     </span>
   );

@@ -115,21 +115,21 @@ export default async function PublicProfilePage({ params }) {
   if (!profileData) {
     const isDomain = username?.includes('.') || Boolean(customDomainHeader);
     return (
-      <div className="min-h-screen bg-[#FFFEFA] flex flex-col items-center justify-center p-6 text-center text-[#28352F]">
-        <div className="w-14 h-14 rounded-full bg-[#F5F3ED] border border-[#CAD8CE] flex items-center justify-center text-2xl mb-4 shadow-sm">
+      <div className="min-h-screen bg-white flex flex-col items-center justify-center p-6 text-center text-ink-700">
+        <div className="w-14 h-14 rounded-full bg-surface-2 border border-line flex items-center justify-center text-2xl mb-4 shadow-sm">
           🌲
         </div>
-        <h1 className="font-sans text-2xl font-bold text-[#28352F] tracking-tight">
+        <h1 className="font-sans text-2xl font-bold text-ink-700 tracking-tight">
           {isDomain ? `${username || customDomainHeader} is not configured` : `@${username} is available!`}
         </h1>
-        <p className="text-[#5C6B64] text-sm max-w-sm mt-2 leading-relaxed">
+        <p className="text-ink-500 text-sm max-w-sm mt-2 leading-relaxed">
           {isDomain
             ? 'This custom domain is pointed to TreeInBio but has not been linked or verified to a creator profile yet.'
             : 'Nobody has claimed this TreeInBio link yet. Claim your custom bio page and start sharing your links today.'}
         </p>
         <Link
           href="/"
-          className="mt-6 px-6 py-2.5 rounded-sm bg-[#52796F] hover:bg-[#3D5C54] text-white font-semibold text-xs tracking-wide transition-all shadow-sm"
+          className="mt-6 px-6 py-2.5 rounded-sm bg-brand-500 hover:bg-brand-600 text-white font-semibold text-xs tracking-wide transition-all shadow-sm"
         >
           {isDomain ? 'Configure in TreeInBio Studio' : `Claim @${username} Now`}
         </Link>

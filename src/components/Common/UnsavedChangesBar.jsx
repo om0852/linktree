@@ -24,7 +24,7 @@ export default function UnsavedChangesBar({
 
   return (
     <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 w-[95%] max-w-xl animate-in fade-in slide-in-from-bottom-5 duration-300">
-      <div className="bg-[#28352F] text-[#FFFEFA] border border-[#52796F]/50 px-4 py-3 rounded-2xl shadow-2xl flex items-center justify-between gap-3 backdrop-blur-md">
+      <div className="bg-ink-900 text-white border border-brand-500/50 px-4 py-3 rounded-2xl shadow-modal flex items-center justify-between gap-3 backdrop-blur-md">
         
         {/* Left: Status & Undo/Redo */}
         <div className="flex items-center gap-2.5">
@@ -75,7 +75,7 @@ export default function UnsavedChangesBar({
             type="button"
             onClick={onSave}
             disabled={saving}
-            className="px-4 py-1.5 text-xs font-bold bg-[#52796F] hover:bg-[#3D5C54] text-white rounded-xl shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+            className="px-4 py-1.5 text-xs font-semibold bg-brand-500 hover:bg-brand-600 text-white rounded-xl transition-colors flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
           >
             {saving ? (
               <>

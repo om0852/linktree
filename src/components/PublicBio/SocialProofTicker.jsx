@@ -63,23 +63,23 @@ export default function SocialProofTicker({ username, enabled = true, initialInt
         isVisible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0 pointer-events-none'
       }`}
     >
-      <div className="flex items-center gap-3 p-2.5 pr-8 rounded-2xl bg-[#FFFEFA]/95 backdrop-blur-md border border-[#CAD8CE] shadow-lg text-[#28352F] relative group">
-        <div className="w-8 h-8 rounded-xl bg-[#F5F3ED] border border-[#CAD8CE] flex items-center justify-center shrink-0">
+      <div className="flex items-center gap-3 p-2.5 pr-8 rounded-2xl bg-white/95 backdrop-blur-md border border-line shadow-lg text-ink-700 relative group">
+        <div className="w-8 h-8 rounded-xl bg-surface-2 border border-line flex items-center justify-center shrink-0">
           {renderIcon()}
         </div>
 
         <div className="min-w-0 pr-1">
-          <p className="text-[11px] font-semibold text-[#28352F] truncate leading-tight">
+          <p className="text-[11px] font-semibold text-ink-700 truncate leading-tight">
             {currentEvent.title}
           </p>
-          <p className="text-[10px] text-[#5C6B64] truncate leading-tight mt-0.5">
-            {currentEvent.subtitle} <span className="text-[#5C6B64]/70">· {currentEvent.timeAgo}</span>
+          <p className="text-[10px] text-ink-500 truncate leading-tight mt-0.5">
+            {currentEvent.subtitle} <span className="text-ink-500/70">· {currentEvent.timeAgo}</span>
           </p>
         </div>
 
         <button
           onClick={() => setDismissed(true)}
-          className="absolute top-2 right-2 p-1 text-[#5C6B64] hover:text-[#28352F] rounded-md transition-colors"
+          className="absolute top-2 right-2 p-1 text-ink-500 hover:text-ink-700 rounded-md transition-colors"
           title="Dismiss"
         >
           <X size={12} />

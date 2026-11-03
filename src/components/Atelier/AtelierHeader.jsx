@@ -1,21 +1,20 @@
 'use client';
 
 import React from 'react';
-import Link from 'next/link';
-import { 
-  Sparkles, 
-  Bolt, 
-  Check, 
-  Loader2, 
-  ExternalLink, 
-  Menu, 
-  User, 
-  LogOut, 
-  LogIn, 
-  UserPlus 
+import {
+  Bolt,
+  Check,
+  ExternalLink,
+  Menu,
+  LogOut,
+  LogIn,
+  UserPlus
 } from 'lucide-react';
 import WorkspaceSwitcher from './WorkspaceSwitcher';
 import Button from '../ui/Button';
+
+const fallbackAvatar = (name) =>
+  `https://ui-avatars.com/api/?name=${encodeURIComponent(name || 'Creator')}&background=16A34A&color=FFFFFF&bold=true&size=128`;
 
 export default function AtelierHeader({
   currentProfile,
@@ -28,134 +27,111 @@ export default function AtelierHeader({
   onLogout,
   onProfileSwitched,
 }) {
+  const avatarSrc =
+    currentProfile?.avatar && typeof currentProfile.avatar === 'string' && currentProfile.avatar.trim() !== ''
+      ? currentProfile.avatar.trim()
+      : fallbackAvatar(currentProfile?.name);
+
   return (
-    <header className="fixed top-0 left-0 lg:left-64 right-0 h-14 sm:h-16 bg-[#FFFEFA]/95 backdrop-blur-xl z-40 border-b border-[#E0DCD3]/80 shadow-xs transition-all">
-      <div className="h-14 sm:h-16 w-full px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-3">
-        {/* Left: Mobile Menu Toggle + Brand Logo */}
-        <div className="flex items-center gap-3">
+    <header className="fixed left-[10px] right-[10px] top-[10px] z-40 h-[54px] rounded-lg bg-white lg:left-[280px]">
+      <div className="flex h-full w-full items-center justify-between gap-[10px] px-[15px]">
+        {/* Left: mobile menu toggle + brand (the sidebar carries the brand on desktop) */}
+        <div className="flex min-w-0 items-center gap-[10px]">
           {onToggleMobile && (
-            <button 
+            <button
               onClick={onToggleMobile}
-              className="lg:hidden p-1.5 rounded text-[#5C6B64] hover:text-[#28352F] hover:bg-[#F5F3ED]"
-              title="Toggle Navigation Menu"
+              aria-label="Open navigation"
+              className="grid size-[30px] place-items-center rounded-full text-ink-500 hover:bg-surface-2 hover:text-ink-700 lg:hidden"
             >
-              <Menu className="w-5 h-5" />
+              <Menu className="size-[18px]" strokeWidth={1.5} />
             </button>
           )}
-
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-full bg-[#52796F] flex items-center justify-center text-[#FFFEFA] shadow-xs">
-              <Sparkles className="w-4 h-4 fill-[#FFFEFA]" />
-            </div>
-            <span className="font-sans font-bold text-base tracking-tight text-[#28352F]">
-              TreeInBio
-            </span>
-            <span className="px-2 py-0.5 bg-[#CAD8CE]/70 text-[#28352F] text-[0.65rem] tracking-widest font-bold border border-[#52796F]/20 rounded font-mono">
-              STUDIO
-            </span>
-          </div>
+          <span className="hidden text-[16px] font-semibold text-ink-900 sm:inline lg:hidden">TreeInBio</span>
+          {currentProfile?.username && (
+            <a
+              href={`/${currentProfile.username}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hidden h-[23px] items-center gap-[6px] rounded-pill border-[0.5px] border-transparent bg-surface-2 px-[10px] text-[10px] text-ink-700 hover:border-ink-300 sm:inline-flex"
+              title="Open public bio in a new tab"
+            >
+              <span className="max-w-[160px] truncate">/{currentProfile.username}</span>
+              <ExternalLink className="size-[12px]" strokeWidth={1.5} />
+            </a>
+          )}
         </div>
 
-        {/* Right: Auth Controls + Save Button + Bio Link & Avatar */}
-        <div className="flex items-center gap-2">
-          {/* Workspace & Multi-Profile Switcher */}
+        {/* Right: workspace, account, publish */}
+        <div className="flex items-center gap-[10px]">
           {authUser && (
-            <WorkspaceSwitcher 
-              currentUsername={currentProfile?.username || authUser?.username} 
-              onProfileSwitched={onProfileSwitched} 
+            <WorkspaceSwitcher
+              currentUsername={currentProfile?.username || authUser?.username}
+              onProfileSwitched={onProfileSwitched}
             />
           )}
 
-          {/* User Account / Auth Actions */}
           {authUser ? (
-            <div className="flex items-center gap-2 bg-[#F5F3ED] border border-[#CAD8CE] px-3 py-1.5 rounded-lg min-h-[38px]">
-              <User className="w-4 h-4 text-[#52796F]" />
-              <span className="text-xs sm:text-sm font-semibold text-[#28352F] max-w-[120px] truncate">
+            <div className="flex h-[34px] items-center gap-[8px] rounded-pill border-[0.5px] border-line bg-white pl-[4px] pr-[6px]">
+              <img
+                alt={currentProfile?.title || currentProfile?.name || 'Creator'}
+                src={avatarSrc}
+                className="size-[24px] rounded-full bg-surface-3 object-cover"
+                onError={(e) => {
+                  e.currentTarget.onerror = null;
+                  e.currentTarget.src = fallbackAvatar(currentProfile?.name);
+                }}
+              />
+              <span className="hidden max-w-[120px] truncate text-[12px] text-ink-800 sm:inline">
                 @{authUser.username}
               </span>
               {onLogout && (
                 <button
                   onClick={onLogout}
-                  className="p-1 text-[#5C6B64] hover:text-rose-600 transition-colors ml-0.5 rounded hover:bg-black/5"
-                  title="Sign Out"
+                  aria-label="Sign out"
+                  title="Sign out"
+                  className="grid size-[24px] place-items-center rounded-full text-ink-500 transition-colors hover:bg-danger/10 hover:text-danger"
                 >
-                  <LogOut className="w-3.5 h-3.5" />
+                  <LogOut className="size-[14px]" strokeWidth={1.5} />
                 </button>
               )}
             </div>
           ) : (
-            <div className="flex items-center gap-1.5">
-              {onOpenAuth && (
-                <>
-                  <Button
-                    id="tb-signin-btn"
-                    variant="outline"
-                    size="sm"
-                    leftIcon={LogIn}
-                    onClick={() => onOpenAuth('login')}
-                  >
-                    Sign In
-                  </Button>
-                  <Button
-                    id="tb-signup-btn"
-                    variant="dark"
-                    size="sm"
-                    leftIcon={UserPlus}
-                    onClick={() => onOpenAuth('register')}
-                    className="hidden sm:inline-flex"
-                  >
-                    Sign Up
-                  </Button>
-                </>
-              )}
-            </div>
+            onOpenAuth && (
+              <div className="flex items-center gap-[10px]">
+                <Button
+                  id="tb-signin-btn"
+                  variant="outline"
+                  size="sm"
+                  leftIcon={LogIn}
+                  onClick={() => onOpenAuth('login')}
+                >
+                  Sign In
+                </Button>
+                <Button
+                  id="tb-signup-btn"
+                  variant="dark"
+                  size="sm"
+                  leftIcon={UserPlus}
+                  onClick={() => onOpenAuth('register')}
+                  className="hidden sm:inline-flex"
+                >
+                  Sign Up
+                </Button>
+              </div>
+            )
           )}
 
-          {/* Save & Publish to MongoDB Button */}
           <Button
             variant="primary"
             size="sm"
             leftIcon={isSaving ? undefined : isSaved ? Check : Bolt}
             loading={isSaving}
             onClick={onSaveProfile}
-            className={isSaved ? '!bg-[#3D5C54]' : ''}
-            title="Save & Publish Profile to MongoDB Atlas"
+            className={isSaved ? '!bg-brand-700' : ''}
+            title="Save and publish profile"
           >
             {isSaving ? 'Saving...' : isSaved ? 'Published!' : 'Save & Publish'}
           </Button>
-
-          {/* Quick Live Public Bio URL Shortcut */}
-          {currentProfile?.username && (
-            <a
-              href={`/${currentProfile.username}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hidden sm:flex items-center gap-1.5 px-3 py-2 text-xs font-mono text-[#52796F] hover:text-[#28352F] bg-[#F5F3ED] border border-[#CAD8CE] rounded-lg transition-all min-h-[38px]"
-              title="Open Public Bio in New Tab"
-            >
-              <span>/{currentProfile.username}</span>
-              <ExternalLink className="w-3.5 h-3.5" />
-            </a>
-          )}
-
-          {/* Creator Avatar with Ring */}
-          <div className="flex items-center pl-1">
-            <div className="relative p-0.5 rounded-full ring-1 ring-[#52796F]/40 shadow-sm">
-              <img
-                alt={currentProfile?.title || currentProfile?.name || 'Creator'}
-                src={
-                  currentProfile?.avatar && typeof currentProfile.avatar === 'string' && currentProfile.avatar.trim() !== ''
-                    ? currentProfile.avatar.trim()
-                    : `https://ui-avatars.com/api/?name=${encodeURIComponent(currentProfile?.name || 'Creator')}&background=52796F&color=FFFEFA&bold=true&size=128`
-                }
-                className="w-7 h-7 rounded-full object-cover block bg-[#F5F3ED]"
-                onError={(e) => {
-                  e.currentTarget.onerror = null;
-                  e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(currentProfile?.name || 'Creator')}&background=52796F&color=FFFEFA&bold=true&size=128`;
-                }}
-              />
-            </div>
-          </div>
         </div>
       </div>
     </header>

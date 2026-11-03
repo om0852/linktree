@@ -13,11 +13,11 @@ export default function Switch({
 }) {
   const isSm = size === 'sm';
   const trackClasses = isSm
-    ? 'w-9 h-5'
-    : 'w-11 h-6';
+    ? 'w-[32px] h-[18px]'
+    : 'w-[40px] h-[22px]';
   const knobClasses = isSm
-    ? `w-3.5 h-3.5 ${checked ? 'translate-x-4' : 'translate-x-0.5'} top-[3px]`
-    : `w-4.5 h-4.5 ${checked ? 'translate-x-5' : 'translate-x-0.5'} top-[3px]`;
+    ? `size-[14px] ${checked ? 'translate-x-[16px]' : 'translate-x-[2px]'} top-[2px]`
+    : `size-[18px] ${checked ? 'translate-x-[20px]' : 'translate-x-[2px]'} top-[2px]`;
 
   return (
     <label
@@ -37,11 +37,11 @@ export default function Switch({
       />
       <div
         className={`${trackClasses} rounded-full transition-colors duration-200 relative ${
-          checked ? 'bg-[#52796F]' : 'bg-[#CAD8CE]'
-        } peer-focus:ring-2 peer-focus:ring-[#52796F]/20`}
+          checked ? 'bg-brand-500' : 'bg-line'
+        } peer-focus-visible:ring-2 peer-focus-visible:ring-brand-500 peer-focus-visible:ring-offset-2`}
       >
         <div
-          className={`${knobClasses} bg-white rounded-full shadow-xs transform transition-transform duration-200 absolute`}
+          className={`${knobClasses} bg-white rounded-full shadow-sm transform transition-transform duration-200 absolute`}
         />
       </div>
     </label>

@@ -307,15 +307,15 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
       }
       if (wp.type === 'pattern') {
         return {
-          backgroundColor: '#FFFEFA',
-          backgroundImage: 'radial-gradient(#CAD8CE 1.5px, transparent 1.5px)',
+          backgroundColor: '#FFFFFF',
+          backgroundImage: 'radial-gradient(#DCDCDC 1.5px, transparent 1.5px)',
           backgroundSize: '16px 16px',
         };
       }
       if (wp.type === 'gradient' && wp.gradient) {
         return { background: parseTailwindGradient(wp.gradient) };
       }
-      if (wp.type === 'fill' && wp.value && wp.value !== '#FFFEFA') {
+      if (wp.type === 'fill' && wp.value && wp.value !== '#FFFFFF') {
         return { backgroundColor: wp.value };
       }
     }
@@ -386,7 +386,7 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
     }
 
     if (!cardStyle.backgroundColor) {
-      cardStyle.backgroundColor = isDark ? 'rgba(255, 255, 255, 0.1)' : '#F5F3ED';
+      cardStyle.backgroundColor = isDark ? 'rgba(255, 255, 255, 0.1)' : '#F8F8F9';
     }
 
     // Border Resolution
@@ -405,10 +405,10 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
       } else if (preset.border === 'border-stone-200') {
         cardStyle.borderColor = '#e7e5e4';
       } else {
-        cardStyle.borderColor = isDark ? 'rgba(255, 255, 255, 0.18)' : '#CAD8CE';
+        cardStyle.borderColor = isDark ? 'rgba(255, 255, 255, 0.18)' : '#DCDCDC';
       }
     } else {
-      cardStyle.borderColor = isDark ? 'rgba(255, 255, 255, 0.18)' : '#CAD8CE';
+      cardStyle.borderColor = isDark ? 'rgba(255, 255, 255, 0.18)' : '#DCDCDC';
     }
 
     // Corner Roundness synchronized across all cards & buttons
@@ -439,7 +439,7 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
     } else if (shadow === 'hard') {
       cardStyle.boxShadow = isDark ? '0 8px 28px rgba(0, 0, 0, 0.5)' : '0 6px 20px rgba(0, 0, 0, 0.14)';
     } else if (shadow === 'offset') {
-      cardStyle.boxShadow = `3px 3px 0px ${preset?.accent || (isDark ? '#FFFFFF' : '#28352F')}`;
+      cardStyle.boxShadow = `3px 3px 0px ${preset?.accent || (isDark ? '#FFFFFF' : '#333333')}`;
     }
 
     // Icon Container Box Style
@@ -459,8 +459,8 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
       iconBoxStyle,
       btnRadius,
       cardRadius,
-      accentColor: preset?.accent || '#52796F',
-      primaryColor: preset?.primary || '#52796F',
+      accentColor: preset?.accent || '#16A34A',
+      primaryColor: preset?.primary || '#16A34A',
     };
   };
 
@@ -484,7 +484,7 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
       style.borderRadius = '16px';
     }
 
-    const btnColor = ds?.buttonColor || preset?.primary || '#52796F';
+    const btnColor = ds?.buttonColor || preset?.primary || '#16A34A';
     const textColor = ds?.buttonTextColor || '#FFFFFF';
     const btnStyle = ds?.buttonStyle || 'solid';
 
@@ -496,7 +496,7 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
       style.backgroundColor = themeStyles.isDark ? 'rgba(255, 255, 255, 0.2)' : 'rgba(255, 255, 255, 0.7)';
       style.backdropFilter = 'blur(16px)';
       style.WebkitBackdropFilter = 'blur(16px)';
-      style.color = themeStyles.isDark ? '#FFFFFF' : (themeStyles.titleColor || '#28352F');
+      style.color = themeStyles.isDark ? '#FFFFFF' : (themeStyles.titleColor || '#333333');
       style.border = themeStyles.isDark ? '1px solid rgba(255, 255, 255, 0.4)' : '1px solid rgba(255, 255, 255, 0.85)';
     } else if (btnStyle === 'outline') {
       style.backgroundColor = 'transparent';
@@ -515,7 +515,7 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
       } else if (shadow === 'hard') {
         style.boxShadow = '0 8px 22px rgba(0, 0, 0, 0.2)';
       } else if (shadow === 'offset') {
-        style.boxShadow = `3px 3px 0px ${preset?.accent || '#28352F'}`;
+        style.boxShadow = `3px 3px 0px ${preset?.accent || '#333333'}`;
       }
     } else {
       style.boxShadow = 'none';
@@ -663,7 +663,7 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
 
     const avatarUrl = profile?.avatar && typeof profile.avatar === 'string' && profile.avatar.trim() !== ''
       ? profile.avatar.trim()
-      : `https://ui-avatars.com/api/?name=${encodeURIComponent(profile?.title || profile?.name || 'Creator')}&background=52796F&color=FFFEFA&bold=true&size=256`;
+      : `https://ui-avatars.com/api/?name=${encodeURIComponent(profile?.title || profile?.name || 'Creator')}&background=16A34A&color=FFFFFF&bold=true&size=256`;
 
     return (
       <div 
@@ -683,7 +683,7 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
           {renderStickersSection(isMobileLayout ? 'mobile' : deviceMode, 'HEADER')}
           {/* Banner Cover Image (Banner Mode) */}
           {layoutMode === 'banner' && (
-            <div className={`w-full ${isMobileLayout ? 'h-20' : deviceMode === 'tablet' ? 'h-28' : 'h-32'} rounded-t-xl relative overflow-hidden bg-gradient-to-r from-[#28352F] via-[#52796F] to-[#CAD8CE]`}>
+            <div className={`w-full ${isMobileLayout ? 'h-20' : deviceMode === 'tablet' ? 'h-28' : 'h-32'} rounded-t-xl relative overflow-hidden bg-gradient-to-r from-ink-900 via-brand-500 to-brand-100`}>
             {hasCover ? (
               <img 
                 src={profile.coverImage} 
@@ -691,7 +691,7 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
                 className="w-full h-full object-cover"
               />
             ) : (
-              <div className="w-full h-full opacity-30 bg-[radial-gradient(#FFFEFA_1px,transparent_1px)] [background-size:16px_16px]" />
+              <div className="w-full h-full opacity-30 bg-[radial-gradient(#FFFFFF_1px,transparent_1px)] [background-size:16px_16px]" />
             )}
           </div>
         )}
@@ -703,15 +703,15 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
           }`}>
             {/* Avatar (Hero Portrait vs Classic / Banner) */}
             {layoutMode === 'hero' ? (
-              <div className="w-full max-w-[280px] aspect-[4/5] rounded-3xl overflow-hidden border-4 border-white shadow-lg relative group mb-2 bg-[#F5F3ED]">
+              <div className="w-full max-w-[280px] aspect-[4/5] rounded-3xl overflow-hidden border-4 border-white shadow-lg relative group mb-2 bg-surface-2">
                 <img 
                   src={avatarUrl} 
                   alt={profile?.name || 'Creator'} 
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                 />
                 {profile.verified && (
-                  <div className="absolute bottom-3 right-3 bg-[#52796F] text-white rounded-full p-1.5 shadow-md border-2 border-white" title="Verified Profile">
-                    <CheckCircle2 className="w-4 h-4 fill-[#52796F] text-white" />
+                  <div className="absolute bottom-3 right-3 bg-brand-500 text-white rounded-full p-1.5 shadow-md border-2 border-white" title="Verified Profile">
+                    <CheckCircle2 className="w-4 h-4 fill-brand-500 text-white" />
                   </div>
                 )}
               </div>
@@ -725,8 +725,8 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
                   sizeClasses={isMobileLayout ? 'w-20 h-20' : 'w-24 h-24 sm:w-28 sm:h-28'}
                 />
                 {profile.verified && (
-                  <div className="absolute bottom-0 right-0 bg-[#52796F] text-white rounded-full p-1 shadow-sm border-2 border-white" title="Verified Profile">
-                    <CheckCircle2 className="w-3.5 h-3.5 fill-[#52796F] text-white" />
+                  <div className="absolute bottom-0 right-0 bg-brand-500 text-white rounded-full p-1 shadow-sm border-2 border-white" title="Verified Profile">
+                    <CheckCircle2 className="w-3.5 h-3.5 fill-brand-500 text-white" />
                   </div>
                 )}
               </div>
@@ -909,7 +909,7 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
         <img
           src={link.thumbnail}
           alt=""
-          className="w-10 h-10 rounded-xl object-cover shrink-0 border border-[#CAD8CE]"
+          className="w-10 h-10 rounded-xl object-cover shrink-0 border border-line"
         />
       );
     }
@@ -920,18 +920,18 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
       const IconComp = ICON_MAP[link.thumbnailIcon];
       if (IconComp) {
         return (
-          <div className="p-2.5 rounded-xl bg-[#F5F3ED] border border-[#CAD8CE] text-[#52796F] shrink-0">
+          <div className="p-2.5 rounded-xl bg-surface-2 border border-line text-brand-500 shrink-0">
             <IconComp className="w-5 h-5" />
           </div>
         );
       }
     }
     if (link.leadMagnet?.enabled) {
-      return <Lock className="w-4 h-4 text-[#52796F]" />;
+      return <Lock className="w-4 h-4 text-brand-500" />;
     }
     const fallbackIcon = getIcon(link.icon);
     return fallbackIcon ? (
-      <div className="p-2.5 rounded-xl bg-[#F5F3ED] border border-[#CAD8CE] text-[#52796F] shrink-0">
+      <div className="p-2.5 rounded-xl bg-surface-2 border border-line text-brand-500 shrink-0">
         {fallbackIcon}
       </div>
     ) : null;
@@ -952,10 +952,10 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
 
   // Helper to render a single link card in stack/list mode
   const renderStackCard = (link) => {
-    const iconElement = link.leadMagnet?.enabled ? <Lock size={16} className="text-[#52796F]" /> : getIcon(link.icon);
+    const iconElement = link.leadMagnet?.enabled ? <Lock size={16} className="text-brand-500" /> : getIcon(link.icon);
     const btnCustomStyle = getButtonCustomStyle();
     const isSolid = (profile?.designSettings?.buttonStyle || 'solid') === 'solid';
-    const textColor = btnCustomStyle.color || '#28352F';
+    const textColor = btnCustomStyle.color || '#333333';
 
     return (
       <div
@@ -972,8 +972,8 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
               <div 
                 className="p-2.5 rounded-xl shrink-0"
                 style={{
-                  backgroundColor: isSolid ? 'rgba(255, 255, 255, 0.2)' : '#F5F3ED',
-                  color: isSolid ? '#FFFFFF' : '#52796F',
+                  backgroundColor: isSolid ? 'rgba(255, 255, 255, 0.2)' : '#F8F8F9',
+                  color: isSolid ? '#FFFFFF' : '#16A34A',
                   border: '1px solid rgba(0, 0, 0, 0.08)'
                 }}
               >
@@ -1007,7 +1007,7 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
               <span 
                 className="px-2 py-0.5 rounded-md text-[9px] font-bold uppercase shadow-xs"
                 style={{
-                  backgroundColor: isSolid ? 'rgba(255, 255, 255, 0.25)' : '#CAD8CE',
+                  backgroundColor: isSolid ? 'rgba(255, 255, 255, 0.25)' : '#DCDCDC',
                   color: textColor
                 }}
               >
@@ -1027,10 +1027,10 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
 
   // Helper to render a single link card in bento/grid mode
   const renderBentoCard = (link, spanTwo = false, isCarousel = false) => {
-    const iconElement = link.leadMagnet?.enabled ? <Lock size={16} className="text-[#52796F]" /> : getIcon(link.icon);
+    const iconElement = link.leadMagnet?.enabled ? <Lock size={16} className="text-brand-500" /> : getIcon(link.icon);
     const btnCustomStyle = getButtonCustomStyle();
     const isSolid = (profile?.designSettings?.buttonStyle || 'solid') === 'solid';
-    const textColor = btnCustomStyle.color || '#28352F';
+    const textColor = btnCustomStyle.color || '#333333';
 
     return (
       <div
@@ -1052,7 +1052,7 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
               <span 
                 className="px-2 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-wider shadow-xs"
                 style={{
-                  backgroundColor: isSolid ? 'rgba(255, 255, 255, 0.25)' : '#CAD8CE',
+                  backgroundColor: isSolid ? 'rgba(255, 255, 255, 0.25)' : '#DCDCDC',
                   color: textColor
                 }}
               >
@@ -1063,29 +1063,29 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
 
           <div className="flex items-center justify-between mb-3 w-full">
             {iconElement ? (
-              <div className="p-2.5 rounded-xl bg-[#F5F3ED] border border-[#CAD8CE] text-[#52796F]">
+              <div className="p-2.5 rounded-xl bg-surface-2 border border-line text-brand-500">
                 {iconElement}
               </div>
             ) : (
               <div />
             )}
-            <ExternalLink className="w-3.5 h-3.5 text-[#5C6B64] ml-auto" />
+            <ExternalLink className="w-3.5 h-3.5 text-ink-500 ml-auto" />
           </div>
 
         <div>
-          <h3 className="text-sm sm:text-base font-bold line-clamp-2 leading-tight text-[#28352F]">
+          <h3 className="text-sm sm:text-base font-bold line-clamp-2 leading-tight text-ink-700">
             {link.title}
           </h3>
           {link.leadMagnet?.enabled ? (
-            <p className="text-[10px] sm:text-xs text-[#5C6B64] font-semibold mt-1 flex items-center gap-1">
+            <p className="text-[10px] sm:text-xs text-ink-500 font-semibold mt-1 flex items-center gap-1">
               <span>🎁</span> {link.leadMagnet.previewText || 'Unlock Download'}
             </p>
           ) : link.subtitle ? (
-            <p className="text-[10px] sm:text-xs text-[#5C6B64] mt-1 truncate">
+            <p className="text-[10px] sm:text-xs text-ink-500 mt-1 truncate">
               {link.subtitle}
             </p>
           ) : link.clicks !== undefined ? (
-            <p className="text-[10px] sm:text-xs text-[#5C6B64] mt-1 font-mono font-semibold">
+            <p className="text-[10px] sm:text-xs text-ink-500 mt-1 font-mono font-semibold">
               {link.clicks.toLocaleString()} clicks
             </p>
           ) : null}
@@ -1124,17 +1124,17 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
         <div key={collection.id} className="w-full space-y-3 pt-2 min-w-0">
           <div className="w-full flex items-center justify-between px-2 py-1 text-left">
             <div className="flex items-center gap-2">
-              <div className="w-6 h-6 rounded-lg bg-[#52796F]/15 flex items-center justify-center text-[#52796F]">
+              <div className="w-6 h-6 rounded-lg bg-brand-500/15 flex items-center justify-center text-brand-500">
                 <Folder className="w-3.5 h-3.5" />
               </div>
-              <span className="font-sans font-bold text-xs sm:text-sm text-[#28352F]">
+              <span className="font-sans font-bold text-xs sm:text-sm text-ink-700">
                 {collection.title}
               </span>
-              <span className="px-1.5 py-0.5 rounded-full text-[9px] font-mono font-bold bg-[#E8EFEA] text-[#52796F]">
+              <span className="px-1.5 py-0.5 rounded-full text-[9px] font-mono font-bold bg-brand-50 text-brand-500">
                 {collectionLinks.length}
               </span>
             </div>
-            <span className="text-[9px] uppercase font-bold tracking-wider text-[#5C6B64] bg-[#F5F3ED] px-2 py-0.5 rounded border border-[#CAD8CE]">
+            <span className="text-[9px] uppercase font-bold tracking-wider text-ink-500 bg-surface-2 px-2 py-0.5 rounded border border-line">
               2-Grid
             </span>
           </div>
@@ -1152,17 +1152,17 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
         <div key={collection.id} className="w-full space-y-3 pt-2 min-w-0">
           <div className="w-full flex items-center justify-between px-2 py-1 text-left">
             <div className="flex items-center gap-2">
-              <div className="w-6 h-6 rounded-lg bg-[#52796F]/15 flex items-center justify-center text-[#52796F]">
+              <div className="w-6 h-6 rounded-lg bg-brand-500/15 flex items-center justify-center text-brand-500">
                 <Folder className="w-3.5 h-3.5" />
               </div>
-              <span className="font-sans font-bold text-xs sm:text-sm text-[#28352F]">
+              <span className="font-sans font-bold text-xs sm:text-sm text-ink-700">
                 {collection.title}
               </span>
-              <span className="px-1.5 py-0.5 rounded-full text-[9px] font-mono font-bold bg-[#E8EFEA] text-[#52796F]">
+              <span className="px-1.5 py-0.5 rounded-full text-[9px] font-mono font-bold bg-brand-50 text-brand-500">
                 {collectionLinks.length}
               </span>
             </div>
-            <span className="text-[9px] uppercase font-bold tracking-wider text-[#5C6B64] bg-[#F5F3ED] px-2 py-0.5 rounded border border-[#CAD8CE]">
+            <span className="text-[9px] uppercase font-bold tracking-wider text-ink-500 bg-surface-2 px-2 py-0.5 rounded border border-line">
               Showcase
             </span>
           </div>
@@ -1182,17 +1182,17 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
         <div key={collection.id} className="w-full space-y-3 pt-2 min-w-0">
           <div className="w-full flex items-center justify-between px-2 py-1 text-left">
             <div className="flex items-center gap-2">
-              <div className="w-6 h-6 rounded-lg bg-[#52796F]/15 flex items-center justify-center text-[#52796F]">
+              <div className="w-6 h-6 rounded-lg bg-brand-500/15 flex items-center justify-center text-brand-500">
                 <Folder className="w-3.5 h-3.5" />
               </div>
-              <span className="font-sans font-bold text-xs sm:text-sm text-[#28352F]">
+              <span className="font-sans font-bold text-xs sm:text-sm text-ink-700">
                 {collection.title}
               </span>
-              <span className="px-1.5 py-0.5 rounded-full text-[9px] font-mono font-bold bg-[#E8EFEA] text-[#52796F]">
+              <span className="px-1.5 py-0.5 rounded-full text-[9px] font-mono font-bold bg-brand-50 text-brand-500">
                 {collectionLinks.length}
               </span>
             </div>
-            <span className="text-[9px] uppercase font-bold tracking-wider text-[#5C6B64] bg-[#F5F3ED] px-2 py-0.5 rounded border border-[#CAD8CE]">
+            <span className="text-[9px] uppercase font-bold tracking-wider text-ink-500 bg-surface-2 px-2 py-0.5 rounded border border-line">
               2-Grid
             </span>
           </div>
@@ -1464,7 +1464,7 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
 
   // 8. Footer Branding & FTC Compliance Disclosure
   const renderFooter = () => (
-    <div className="pt-3 text-center border-t border-[#CAD8CE]/70 w-full flex flex-col items-center">
+    <div className="pt-3 text-center border-t border-line/70 w-full flex flex-col items-center">
       {/* Bottom Social Badges if positioned at bottom */}
       {profile?.socialsPosition === 'bottom' && (
         <div className="mb-3.5">
@@ -1482,7 +1482,7 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
         </div>
       )}
       {!profile?.designSettings?.hideFooter && (
-        <p className="text-[11px] text-[#5C6B64] font-mono tracking-wider uppercase font-bold">
+        <p className="text-[11px] text-ink-500 font-mono tracking-wider uppercase font-bold">
           Powered by TreeInBio
         </p>
       )}
@@ -1523,20 +1523,20 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
       />
 
       {/* Top Floating Admin & Device Switcher Bar */}
-      <div className="w-full max-w-6xl px-3 sm:px-4 py-2 flex flex-wrap items-center justify-between gap-2.5 sticky top-0 z-50 backdrop-blur-xl bg-[#FFFEFA]/95 border-b border-[#CAD8CE]/80 shadow-xs">
+      <div className="w-full max-w-6xl px-3 sm:px-4 py-2 flex flex-wrap items-center justify-between gap-2.5 sticky top-0 z-50 backdrop-blur-xl bg-white/95 border-b border-line/80 shadow-xs">
         {onBackToEditor ? (
           <button
             onClick={onBackToEditor}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-sm bg-[#52796F] hover:bg-[#3D5C54] text-white text-xs font-semibold transition-all cursor-pointer shadow-xs shrink-0"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-sm bg-brand-500 hover:bg-brand-600 text-white text-xs font-semibold transition-all cursor-pointer shadow-xs shrink-0"
           >
             <ArrowLeft className="w-3.5 h-3.5" /> Back to Editor
           </button>
         ) : (
           <Link
             href="/"
-            className="flex items-center gap-2 text-xs font-bold text-[#28352F] hover:text-[#52796F] transition-colors shrink-0"
+            className="flex items-center gap-2 text-xs font-bold text-ink-700 hover:text-brand-500 transition-colors shrink-0"
           >
-            <span className="w-6 h-6 rounded bg-[#F5F3ED] border border-[#CAD8CE] flex items-center justify-center text-xs">🌲</span>
+            <span className="w-6 h-6 rounded bg-surface-2 border border-line flex items-center justify-center text-xs">🌲</span>
             <span className="font-sans font-bold text-sm tracking-tight hidden sm:inline">TreeInBio</span>
           </Link>
         )}
@@ -1544,12 +1544,12 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
         {/* Center: 4 Device Type Modes + Interactive Zoom Controls */}
         <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
           {/* Multi-Device Switcher (Mobile, Tablet, Laptop, Fluid) */}
-          <div className="flex items-center gap-1 bg-[#F5F3ED] p-0.5 rounded border border-[#CAD8CE]">
+          <div className="flex items-center gap-1 bg-surface-2 p-0.5 rounded border border-line">
             <button
               type="button"
               onClick={() => setDeviceMode('mobile')}
               className={`px-2.5 py-1 rounded text-xs font-medium flex items-center gap-1.5 transition-all cursor-pointer ${
-                deviceMode === 'mobile' ? 'bg-white text-[#28352F] shadow-xs font-bold border border-[#CAD8CE]/60' : 'text-[#5C6B64] hover:text-[#28352F]'
+                deviceMode === 'mobile' ? 'bg-white text-ink-700 shadow-xs font-bold border border-line/60' : 'text-ink-500 hover:text-ink-700'
               }`}
               title="Mobile View (410px phone chassis)"
             >
@@ -1561,7 +1561,7 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
               type="button"
               onClick={() => setDeviceMode('tablet')}
               className={`px-2.5 py-1 rounded text-xs font-medium flex items-center gap-1.5 transition-all cursor-pointer ${
-                deviceMode === 'tablet' ? 'bg-white text-[#28352F] shadow-xs font-bold border border-[#CAD8CE]/60' : 'text-[#5C6B64] hover:text-[#28352F]'
+                deviceMode === 'tablet' ? 'bg-white text-ink-700 shadow-xs font-bold border border-line/60' : 'text-ink-500 hover:text-ink-700'
               }`}
               title="Tablet View (768px iPad layout)"
             >
@@ -1573,7 +1573,7 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
               type="button"
               onClick={() => setDeviceMode('laptop')}
               className={`px-2.5 py-1 rounded text-xs font-medium flex items-center gap-1.5 transition-all cursor-pointer ${
-                deviceMode === 'laptop' ? 'bg-white text-[#28352F] shadow-xs font-bold border border-[#CAD8CE]/60' : 'text-[#5C6B64] hover:text-[#28352F]'
+                deviceMode === 'laptop' ? 'bg-white text-ink-700 shadow-xs font-bold border border-line/60' : 'text-ink-500 hover:text-ink-700'
               }`}
               title="Laptop Desktop View (1024px MacBook split bento)"
             >
@@ -1583,11 +1583,11 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
           </div>
 
           {/* Interactive Zoom Controls: Zoom Out [-], Scale %, Zoom In [+] */}
-          <div className="flex items-center gap-1 bg-[#F5F3ED] p-0.5 rounded border border-[#CAD8CE]">
+          <div className="flex items-center gap-1 bg-surface-2 p-0.5 rounded border border-line">
             <button
               type="button"
               onClick={handleZoomOut}
-              className="p-1 hover:bg-white text-[#28352F] rounded text-xs transition-colors cursor-pointer disabled:opacity-30"
+              className="p-1 hover:bg-white text-ink-700 rounded text-xs transition-colors cursor-pointer disabled:opacity-30"
               title="Zoom Out"
               disabled={zoomScale <= 0.3}
             >
@@ -1597,7 +1597,7 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
             <button
               type="button"
               onClick={handleZoomReset}
-              className="px-1.5 py-0.5 text-[11px] font-mono font-bold text-[#28352F] hover:text-[#52796F] transition-colors"
+              className="px-1.5 py-0.5 text-[11px] font-mono font-bold text-ink-700 hover:text-brand-500 transition-colors"
               title="Click to reset zoom to 100%"
             >
               {Math.round(zoomScale * 100)}%
@@ -1606,7 +1606,7 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
             <button
               type="button"
               onClick={handleZoomIn}
-              className="p-1 hover:bg-white text-[#28352F] rounded text-xs transition-colors cursor-pointer disabled:opacity-30"
+              className="p-1 hover:bg-white text-ink-700 rounded text-xs transition-colors cursor-pointer disabled:opacity-30"
               title="Zoom In"
               disabled={zoomScale >= 1.75}
             >
@@ -1619,12 +1619,12 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
         <div className="flex items-center gap-1.5 shrink-0">
           {/* Desktop Layout Toggle (Visible on wide screens) */}
           {(deviceMode === 'laptop' || deviceMode === 'fluid') && (
-            <div className="hidden lg:flex items-center gap-1 bg-[#F5F3ED] p-0.5 rounded border border-[#CAD8CE] mr-1">
+            <div className="hidden lg:flex items-center gap-1 bg-surface-2 p-0.5 rounded border border-line mr-1">
               <button
                 type="button"
                 onClick={() => setDesktopLayout('split')}
                 className={`px-2 py-0.5 rounded text-[11px] font-medium flex items-center gap-1 transition-all cursor-pointer ${
-                  desktopLayout === 'split' ? 'bg-white text-[#28352F] font-bold shadow-xs border border-[#CAD8CE]/60' : 'text-[#5C6B64] hover:text-[#28352F]'
+                  desktopLayout === 'split' ? 'bg-white text-ink-700 font-bold shadow-xs border border-line/60' : 'text-ink-500 hover:text-ink-700'
                 }`}
                 title="2-Column Split Bento View"
               >
@@ -1635,7 +1635,7 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
                 type="button"
                 onClick={() => setDesktopLayout('centered')}
                 className={`px-2 py-0.5 rounded text-[11px] font-medium flex items-center gap-1 transition-all cursor-pointer ${
-                  desktopLayout === 'centered' ? 'bg-white text-[#28352F] font-bold shadow-xs border border-[#CAD8CE]/60' : 'text-[#5C6B64] hover:text-[#28352F]'
+                  desktopLayout === 'centered' ? 'bg-white text-ink-700 font-bold shadow-xs border border-line/60' : 'text-ink-500 hover:text-ink-700'
                 }`}
                 title="Focused Centered Stream View"
               >
@@ -1648,7 +1648,7 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
           {!onBackToEditor && (
             <Link
               href="/"
-              className="hidden sm:inline-flex items-center gap-1 px-3 py-1 rounded-sm bg-white hover:bg-[#F5F3ED] text-[#28352F] border border-[#CAD8CE] text-xs font-semibold transition-all shadow-xs"
+              className="hidden sm:inline-flex items-center gap-1 px-3 py-1 rounded-sm bg-white hover:bg-surface-2 text-ink-700 border border-line text-xs font-semibold transition-all shadow-xs"
             >
               Build Your Bio
             </Link>
@@ -1656,15 +1656,15 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
           <button
             type="button"
             onClick={() => setShowQrModal(true)}
-            className="p-1.5 rounded-sm bg-white hover:bg-[#F5F3ED] text-[#28352F] border border-[#CAD8CE] transition-all cursor-pointer shadow-xs"
+            className="p-1.5 rounded-sm bg-white hover:bg-surface-2 text-ink-700 border border-line transition-all cursor-pointer shadow-xs"
             title="Show QR Code"
           >
-            <QrCode className="w-3.5 h-3.5 text-[#52796F]" />
+            <QrCode className="w-3.5 h-3.5 text-brand-500" />
           </button>
           <button
             type="button"
             onClick={handleCopyLink}
-            className="flex items-center gap-1 px-3 py-1 rounded-sm bg-[#52796F] hover:bg-[#3D5C54] text-white text-xs font-semibold transition-all cursor-pointer shadow-xs"
+            className="flex items-center gap-1 px-3 py-1 rounded-sm bg-brand-500 hover:bg-brand-600 text-white text-xs font-semibold transition-all cursor-pointer shadow-xs"
           >
             <Share2 className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">{copiedLink ? 'Copied!' : 'Share'}</span>
@@ -1709,14 +1709,14 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
                   {renderHeroVideo()}
           
                   {profile.shop?.published && (
-                    <div className="flex items-center justify-center gap-1 p-1 bg-[#F5F3ED]/90 backdrop-blur-md rounded-2xl border border-[#CAD8CE] w-full max-w-[240px] mx-auto shadow-xs mb-1">
+                    <div className="flex items-center justify-center gap-1 p-1 bg-surface-2/90 backdrop-blur-md rounded-2xl border border-line w-full max-w-[240px] mx-auto shadow-xs mb-1">
                       <button
                         type="button"
                         onClick={() => setActiveBioTab('links')}
                         className={`flex-1 py-1.5 px-3 rounded-xl text-xs font-bold transition-all ${
                           activeBioTab === 'links'
-                            ? 'bg-[#52796F] text-white shadow-xs'
-                            : 'text-[#5C6B64] hover:text-[#28352F]'
+                            ? 'bg-brand-500 text-white shadow-xs'
+                            : 'text-ink-500 hover:text-ink-700'
                         }`}
                       >
                         Links
@@ -1726,8 +1726,8 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
                         onClick={() => setActiveBioTab('shop')}
                         className={`flex-1 py-1.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
                           activeBioTab === 'shop'
-                            ? 'bg-[#52796F] text-white shadow-xs'
-                            : 'text-[#5C6B64] hover:text-[#28352F]'
+                            ? 'bg-brand-500 text-white shadow-xs'
+                            : 'text-ink-500 hover:text-ink-700'
                         }`}
                       >
                         <ShoppingBag className="w-3.5 h-3.5" />
@@ -1759,14 +1759,14 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
                   {renderScheduleMeeting()}
                   {renderHeroVideo()}
                   {profile.shop?.published && (
-                    <div className="flex items-center justify-center gap-1 p-1 bg-[#F5F3ED]/90 backdrop-blur-md rounded-2xl border border-[#CAD8CE] w-full max-w-[240px] mx-auto shadow-xs mb-1">
+                    <div className="flex items-center justify-center gap-1 p-1 bg-surface-2/90 backdrop-blur-md rounded-2xl border border-line w-full max-w-[240px] mx-auto shadow-xs mb-1">
                       <button
                         type="button"
                         onClick={() => setActiveBioTab('links')}
                         className={`flex-1 py-1.5 px-3 rounded-xl text-xs font-bold transition-all ${
                           activeBioTab === 'links'
-                            ? 'bg-[#52796F] text-white shadow-xs'
-                            : 'text-[#5C6B64] hover:text-[#28352F]'
+                            ? 'bg-brand-500 text-white shadow-xs'
+                            : 'text-ink-500 hover:text-ink-700'
                         }`}
                       >
                         Links
@@ -1776,8 +1776,8 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
                         onClick={() => setActiveBioTab('shop')}
                         className={`flex-1 py-1.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
                           activeBioTab === 'shop'
-                            ? 'bg-[#52796F] text-white shadow-xs'
-                            : 'text-[#5C6B64] hover:text-[#28352F]'
+                            ? 'bg-brand-500 text-white shadow-xs'
+                            : 'text-ink-500 hover:text-ink-700'
                         }`}
                       >
                         <ShoppingBag className="w-3.5 h-3.5" />
@@ -1823,14 +1823,14 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
                         {renderScheduleMeeting()}
                         {renderHeroVideo()}
                         {profile.shop?.published && (
-                          <div className="flex items-center justify-center gap-1 p-1 bg-[#F5F3ED]/90 backdrop-blur-md rounded-2xl border border-[#CAD8CE] w-full max-w-[240px] mx-auto shadow-xs mb-1">
+                          <div className="flex items-center justify-center gap-1 p-1 bg-surface-2/90 backdrop-blur-md rounded-2xl border border-line w-full max-w-[240px] mx-auto shadow-xs mb-1">
                             <button
                               type="button"
                               onClick={() => setActiveBioTab('links')}
                               className={`flex-1 py-1.5 px-3 rounded-xl text-xs font-bold transition-all ${
                                 activeBioTab === 'links'
-                                  ? 'bg-[#52796F] text-white shadow-xs'
-                                  : 'text-[#5C6B64] hover:text-[#28352F]'
+                                  ? 'bg-brand-500 text-white shadow-xs'
+                                  : 'text-ink-500 hover:text-ink-700'
                               }`}
                             >
                               Links
@@ -1840,8 +1840,8 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
                               onClick={() => setActiveBioTab('shop')}
                               className={`flex-1 py-1.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
                                 activeBioTab === 'shop'
-                                  ? 'bg-[#52796F] text-white shadow-xs'
-                                  : 'text-[#5C6B64] hover:text-[#28352F]'
+                                  ? 'bg-brand-500 text-white shadow-xs'
+                                  : 'text-ink-500 hover:text-ink-700'
                               }`}
                             >
                               <ShoppingBag className="w-3.5 h-3.5" />
@@ -1864,14 +1864,14 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
                       {renderScheduleMeeting()}
                       {renderHeroVideo()}
                       {profile.shop?.published && (
-                        <div className="flex items-center justify-center gap-1 p-1 bg-[#F5F3ED]/90 backdrop-blur-md rounded-2xl border border-[#CAD8CE] w-full max-w-[240px] mx-auto shadow-xs mb-1">
+                        <div className="flex items-center justify-center gap-1 p-1 bg-surface-2/90 backdrop-blur-md rounded-2xl border border-line w-full max-w-[240px] mx-auto shadow-xs mb-1">
                           <button
                             type="button"
                             onClick={() => setActiveBioTab('links')}
                             className={`flex-1 py-1.5 px-3 rounded-xl text-xs font-bold transition-all ${
                               activeBioTab === 'links'
-                                ? 'bg-[#52796F] text-white shadow-xs'
-                                : 'text-[#5C6B64] hover:text-[#28352F]'
+                                ? 'bg-brand-500 text-white shadow-xs'
+                                : 'text-ink-500 hover:text-ink-700'
                             }`}
                           >
                             Links
@@ -1881,8 +1881,8 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
                             onClick={() => setActiveBioTab('shop')}
                             className={`flex-1 py-1.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
                               activeBioTab === 'shop'
-                                ? 'bg-[#52796F] text-white shadow-xs'
-                                : 'text-[#5C6B64] hover:text-[#28352F]'
+                                ? 'bg-brand-500 text-white shadow-xs'
+                                : 'text-ink-500 hover:text-ink-700'
                             }`}
                           >
                             <ShoppingBag className="w-3.5 h-3.5" />
@@ -1912,7 +1912,7 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
         <button
           id="floating-lead-trigger-btn"
           onClick={() => setShowLeadModal(true)}
-          className="fixed bottom-6 right-6 z-40 px-4 py-2.5 rounded-full bg-[#52796F] hover:bg-[#3D5C54] text-white font-bold text-xs shadow-lg flex items-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95 border border-[#CAD8CE]/50"
+          className="fixed bottom-6 right-6 z-40 px-4 py-2.5 rounded-full bg-brand-500 hover:bg-brand-600 text-white font-bold text-xs shadow-lg flex items-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95 border border-line/50"
           title={profile.leadCapture?.buttonText || "Exchange Contact"}
         >
           <PhoneCall className="w-4 h-4" />

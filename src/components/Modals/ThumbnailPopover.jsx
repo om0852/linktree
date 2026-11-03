@@ -186,36 +186,36 @@ export default function ThumbnailPopover({
   );
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#00000A73] backdrop-blur-[5px] animate-in fade-in duration-200">
       <div
-        className="w-full max-w-md bg-stone-900 border border-stone-800 rounded-2xl shadow-2xl overflow-hidden flex flex-col"
+        className="w-full max-w-md bg-white border-[0.5px] border-line rounded-2xl shadow-modal overflow-hidden flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-stone-800">
+        <div className="flex items-center justify-between px-5 py-4 border-b-[0.5px] border-line">
           <div>
-            <h3 className="text-base font-semibold text-white">Add Thumbnail</h3>
-            <p className="text-xs text-stone-400 truncate max-w-[280px]">
+            <h3 className="text-[14px] font-semibold text-ink-800">Add Thumbnail</h3>
+            <p className="text-xs text-ink-500 truncate max-w-[280px]">
               {link.title || 'Untitled link'}
             </p>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 text-stone-400 hover:text-white rounded-lg hover:bg-stone-800 transition"
+            className="p-1.5 text-ink-500 hover:text-ink-800 rounded-lg hover:bg-surface-2 transition"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* 3-Tab Segmented Control */}
-        <div className="p-4 border-b border-stone-800 bg-stone-950/40">
-          <div className="grid grid-cols-3 gap-1 p-1 bg-stone-800/80 rounded-xl border border-stone-700/50">
+        <div className="p-4 border-b-[0.5px] border-line bg-white/40">
+          <div className="grid grid-cols-3 gap-1 p-1 bg-surface-2/80 rounded-xl border border-ink-300/50">
             <button
               onClick={() => setActiveTab('image')}
               className={`flex items-center justify-center gap-1.5 py-2 px-3 text-xs font-medium rounded-lg transition ${
                 activeTab === 'image'
-                  ? 'bg-emerald-600 text-white shadow'
-                  : 'text-stone-400 hover:text-white'
+                  ? 'bg-brand-600 text-white shadow'
+                  : 'text-ink-500 hover:text-ink-800'
               }`}
             >
               <ImageIcon className="w-3.5 h-3.5" />
@@ -225,8 +225,8 @@ export default function ThumbnailPopover({
               onClick={() => setActiveTab('icon')}
               className={`flex items-center justify-center gap-1.5 py-2 px-3 text-xs font-medium rounded-lg transition ${
                 activeTab === 'icon'
-                  ? 'bg-emerald-600 text-white shadow'
-                  : 'text-stone-400 hover:text-white'
+                  ? 'bg-brand-600 text-white shadow'
+                  : 'text-ink-500 hover:text-ink-800'
               }`}
             >
               <Smile className="w-3.5 h-3.5" />
@@ -237,7 +237,7 @@ export default function ThumbnailPopover({
               className={`flex items-center justify-center gap-1.5 py-2 px-3 text-xs font-medium rounded-lg transition ${
                 activeTab === 'none'
                   ? 'bg-rose-600 text-white shadow'
-                  : 'text-stone-400 hover:text-white'
+                  : 'text-ink-500 hover:text-ink-800'
               }`}
             >
               <EyeOff className="w-3.5 h-3.5" />
@@ -258,11 +258,11 @@ export default function ThumbnailPopover({
                   onClick={() => setImageSource('upload')}
                   className={`flex flex-col items-center justify-center p-3 rounded-xl border text-center transition ${
                     imageSource === 'upload'
-                      ? 'bg-emerald-600/20 border-emerald-500 text-white'
-                      : 'bg-stone-950/60 border-stone-800 text-stone-400 hover:text-white hover:border-stone-700'
+                      ? 'bg-brand-600/20 border-brand-500 text-white'
+                      : 'bg-white/60 border-line text-ink-500 hover:text-ink-800 hover:border-ink-300'
                   }`}
                 >
-                  <Upload className="w-5 h-5 mb-1 text-emerald-400" />
+                  <Upload className="w-5 h-5 mb-1 text-brand-400" />
                   <span className="text-[11px] font-semibold">Upload</span>
                 </button>
 
@@ -271,8 +271,8 @@ export default function ThumbnailPopover({
                   onClick={() => setImageSource('canva')}
                   className={`flex flex-col items-center justify-center p-3 rounded-xl border text-center transition ${
                     imageSource === 'canva'
-                      ? 'bg-emerald-600/20 border-emerald-500 text-white'
-                      : 'bg-stone-950/60 border-stone-800 text-stone-400 hover:text-white hover:border-stone-700'
+                      ? 'bg-brand-600/20 border-brand-500 text-white'
+                      : 'bg-white/60 border-line text-ink-500 hover:text-ink-800 hover:border-ink-300'
                   }`}
                 >
                   <Palette className="w-5 h-5 mb-1 text-sky-400" />
@@ -284,8 +284,8 @@ export default function ThumbnailPopover({
                   onClick={() => setImageSource('giphy')}
                   className={`flex flex-col items-center justify-center p-3 rounded-xl border text-center transition ${
                     imageSource === 'giphy'
-                      ? 'bg-emerald-600/20 border-emerald-500 text-white'
-                      : 'bg-stone-950/60 border-stone-800 text-stone-400 hover:text-white hover:border-stone-700'
+                      ? 'bg-brand-600/20 border-brand-500 text-white'
+                      : 'bg-white/60 border-line text-ink-500 hover:text-ink-800 hover:border-ink-300'
                   }`}
                 >
                   <Film className="w-5 h-5 mb-1 text-purple-400" />
@@ -297,8 +297,8 @@ export default function ThumbnailPopover({
                   onClick={() => setImageSource('ai')}
                   className={`flex flex-col items-center justify-center p-3 rounded-xl border text-center transition ${
                     imageSource === 'ai'
-                      ? 'bg-emerald-600/20 border-emerald-500 text-white'
-                      : 'bg-stone-950/60 border-stone-800 text-stone-400 hover:text-white hover:border-stone-700'
+                      ? 'bg-brand-600/20 border-brand-500 text-white'
+                      : 'bg-white/60 border-line text-ink-500 hover:text-ink-800 hover:border-ink-300'
                   }`}
                 >
                   <Bot className="w-5 h-5 mb-1 text-amber-400" />
@@ -309,12 +309,12 @@ export default function ThumbnailPopover({
               {/* Source View 1: Upload */}
               {imageSource === 'upload' && (
                 <div className="space-y-3">
-                  <label className="flex flex-col items-center justify-center p-6 border-2 border-dashed border-stone-700 hover:border-emerald-500 rounded-xl bg-stone-950/50 hover:bg-stone-950 cursor-pointer transition group">
-                    <Upload className="w-7 h-7 text-stone-400 group-hover:text-emerald-400 mb-2 transition" />
-                    <span className="text-xs font-medium text-stone-200">
+                  <label className="flex flex-col items-center justify-center p-6 border-2 border-dashed border-ink-300 hover:border-brand-500 rounded-xl bg-white/50 hover:bg-white cursor-pointer transition group">
+                    <Upload className="w-7 h-7 text-ink-500 group-hover:text-brand-400 mb-2 transition" />
+                    <span className="text-xs font-medium text-ink-700">
                       {isUploading ? 'Processing...' : 'Upload an image from device'}
                     </span>
-                    <span className="text-[10px] text-stone-500 mt-1">PNG, JPG, GIF, WebP</span>
+                    <span className="text-[10px] text-ink-500 mt-1">PNG, JPG, GIF, WebP</span>
                     <input
                       type="file"
                       accept="image/*"
@@ -324,7 +324,7 @@ export default function ThumbnailPopover({
                   </label>
 
                   <div>
-                    <label className="block text-[11px] font-medium text-stone-400 mb-1">
+                    <label className="block text-[11px] font-medium text-ink-500 mb-1">
                       Or Paste Image URL
                     </label>
                     <div className="flex gap-2">
@@ -333,11 +333,11 @@ export default function ThumbnailPopover({
                         placeholder="https://example.com/cover.jpg"
                         value={imageUrlInput}
                         onChange={(e) => setImageUrlInput(e.target.value)}
-                        className="flex-1 bg-stone-950 border border-stone-800 rounded-xl px-3 py-2 text-xs text-white placeholder-stone-600 focus:outline-none focus:border-emerald-500"
+                        className="flex-1 bg-white border-[0.5px] border-line rounded-xl px-3 py-2 text-xs text-ink-800 placeholder-ink-500 focus:outline-none focus:border-brand-500"
                       />
                       <button
                         onClick={handleApplyUrl}
-                        className="px-3 py-2 bg-stone-800 hover:bg-emerald-600 text-white rounded-xl text-xs font-medium transition"
+                        className="px-3 py-2 bg-surface-2 hover:bg-brand-600 text-white rounded-xl text-xs font-medium transition"
                       >
                         Apply
                       </button>
@@ -348,13 +348,13 @@ export default function ThumbnailPopover({
 
               {/* Source View 2: Canva */}
               {imageSource === 'canva' && (
-                <div className="p-4 bg-stone-950/60 rounded-xl border border-stone-800 text-center space-y-3">
+                <div className="p-4 bg-white/60 rounded-xl border-[0.5px] border-line text-center space-y-3">
                   <div className="w-10 h-10 mx-auto rounded-xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-400">
                     <Palette className="w-5 h-5" />
                   </div>
                   <div>
-                    <h4 className="text-xs font-semibold text-white">Canva Design Studio</h4>
-                    <p className="text-[11px] text-stone-400 mt-0.5">
+                    <h4 className="text-[12px] font-semibold text-ink-800">Canva Design Studio</h4>
+                    <p className="text-[11px] text-ink-500 mt-0.5">
                       Create a custom 1:1 square sticker or block logo in Canva.
                     </p>
                   </div>
@@ -365,7 +365,7 @@ export default function ThumbnailPopover({
                         window.open('https://canva.com/create/logos/', '_blank', 'noopener,noreferrer');
                       }
                     }}
-                    className="w-full flex items-center justify-center gap-1.5 px-4 py-2 bg-sky-600 hover:bg-sky-500 text-white rounded-xl text-xs font-medium transition shadow"
+                    className="w-full flex items-center justify-center gap-1.5 px-4 py-2 bg-sky-600 hover:bg-sky-500 text-ink-800 rounded-xl text-xs font-medium transition shadow"
                   >
                     <ExternalLink className="w-3.5 h-3.5" />
                     Open Canva Studio
@@ -377,13 +377,13 @@ export default function ThumbnailPopover({
               {imageSource === 'giphy' && (
                 <div className="space-y-3">
                   <div className="relative">
-                    <Search className="w-3.5 h-3.5 text-stone-500 absolute left-3 top-1/2 -translate-y-1/2" />
+                    <Search className="w-3.5 h-3.5 text-ink-500 absolute left-3 top-1/2 -translate-y-1/2" />
                     <input
                       type="text"
                       placeholder="Search GIPHY stickers & animations..."
                       value={giphySearch}
                       onChange={(e) => setGiphySearch(e.target.value)}
-                      className="w-full bg-stone-950 border border-stone-800 rounded-xl pl-9 pr-3 py-2 text-xs text-white placeholder-stone-600 focus:outline-none focus:border-emerald-500"
+                      className="w-full bg-white border-[0.5px] border-line rounded-xl pl-9 pr-3 py-2 text-xs text-ink-800 placeholder-ink-500 focus:outline-none focus:border-brand-500"
                     />
                   </div>
                   <div className="grid grid-cols-3 gap-2">
@@ -392,7 +392,7 @@ export default function ThumbnailPopover({
                         key={gif.id}
                         type="button"
                         onClick={() => handleSelectPresetImage(gif.url)}
-                        className="group relative rounded-xl overflow-hidden border border-stone-800 hover:border-emerald-500 transition aspect-square"
+                        className="group relative rounded-xl overflow-hidden border-[0.5px] border-line hover:border-brand-500 transition aspect-square"
                       >
                         <img
                           src={gif.url}
@@ -400,7 +400,7 @@ export default function ThumbnailPopover({
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform"
                         />
                         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-                          <Check className="w-4 h-4 text-white" />
+                          <Check className="w-4 h-4 text-ink-800" />
                         </div>
                       </button>
                     ))}
@@ -410,12 +410,12 @@ export default function ThumbnailPopover({
 
               {/* Source View 4: AI Prompt Generator */}
               {imageSource === 'ai' && (
-                <div className="space-y-3 p-3 bg-stone-950/60 rounded-xl border border-stone-800">
+                <div className="space-y-3 p-3 bg-white/60 rounded-xl border-[0.5px] border-line">
                   <div>
-                    <label className="block text-[11px] font-semibold text-stone-300 mb-1">
+                    <label className="block text-[11px] font-semibold text-ink-600 mb-1">
                       AI Icon Generator Prompt
                     </label>
-                    <p className="text-[10px] text-stone-500 mb-2">
+                    <p className="text-[10px] text-ink-500 mb-2">
                       Describe the visual icon (e.g. &quot;Holographic neon sneaker&quot; or &quot;Cyberpunk cassette&quot;)
                     </p>
                     <div className="flex gap-2">
@@ -424,13 +424,13 @@ export default function ThumbnailPopover({
                         placeholder="e.g. Vintage cassette tape, Golden microphone..."
                         value={aiPrompt}
                         onChange={(e) => setAiPrompt(e.target.value)}
-                        className="flex-1 bg-stone-900 border border-stone-700 rounded-xl px-3 py-2 text-xs text-white placeholder-stone-600 focus:outline-none focus:border-emerald-500"
+                        className="flex-1 bg-white border border-ink-300 rounded-xl px-3 py-2 text-xs text-ink-800 placeholder-ink-500 focus:outline-none focus:border-brand-500"
                       />
                       <button
                         type="button"
                         onClick={handleGenerateAi}
                         disabled={isGeneratingAi || !aiPrompt.trim()}
-                        className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white rounded-xl text-xs font-medium transition flex items-center gap-1.5"
+                        className="px-3.5 py-2 bg-brand-600 hover:bg-brand-500 disabled:opacity-50 text-white rounded-xl text-xs font-medium transition flex items-center gap-1.5"
                       >
                         {isGeneratingAi ? (
                           <>
@@ -451,15 +451,15 @@ export default function ThumbnailPopover({
 
               {/* Current Preview */}
               {link.thumbnail && link.thumbnailType === 'image' && (
-                <div className="flex items-center gap-3 p-3 bg-stone-950/80 rounded-xl border border-stone-800">
+                <div className="flex items-center gap-3 p-3 bg-white/80 rounded-xl border-[0.5px] border-line">
                   <img
                     src={link.thumbnail}
                     alt="Current thumbnail"
-                    className="w-12 h-12 object-cover rounded-lg border border-stone-700"
+                    className="w-12 h-12 object-cover rounded-lg border border-ink-300"
                   />
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs font-medium text-white truncate">Active Thumbnail</p>
-                    <p className="text-[11px] text-stone-500">Rendered on block left side</p>
+                    <p className="text-xs font-medium text-ink-800 truncate">Active Thumbnail</p>
+                    <p className="text-[11px] text-ink-500">Rendered on block left side</p>
                   </div>
                   <button
                     onClick={handleRemove}
@@ -477,19 +477,19 @@ export default function ThumbnailPopover({
             <div className="space-y-4">
               {/* Search */}
               <div className="relative">
-                <Search className="w-3.5 h-3.5 text-stone-500 absolute left-3 top-1/2 -translate-y-1/2" />
+                <Search className="w-3.5 h-3.5 text-ink-500 absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
                   placeholder="Search vector icons..."
                   value={iconSearch}
                   onChange={(e) => setIconSearch(e.target.value)}
-                  className="w-full bg-stone-950 border border-stone-800 rounded-xl pl-9 pr-3 py-2 text-xs text-white placeholder-stone-600 focus:outline-none focus:border-emerald-500"
+                  className="w-full bg-white border-[0.5px] border-line rounded-xl pl-9 pr-3 py-2 text-xs text-ink-800 placeholder-ink-500 focus:outline-none focus:border-brand-500"
                 />
               </div>
 
               {/* Vector Icons Grid */}
               <div>
-                <p className="text-[11px] uppercase tracking-wider font-semibold text-stone-500 mb-2">
+                <p className="text-[11px] uppercase tracking-wider font-semibold text-ink-500 mb-2">
                   Vector Icons
                 </p>
                 <div className="grid grid-cols-5 gap-2">
@@ -502,8 +502,8 @@ export default function ThumbnailPopover({
                         onClick={() => handleSelectIcon(item.id)}
                         className={`flex flex-col items-center justify-center p-2.5 rounded-xl border transition ${
                           isSelected
-                            ? 'bg-emerald-600/20 border-emerald-500 text-emerald-400'
-                            : 'bg-stone-950/60 border-stone-800 text-stone-400 hover:text-white hover:border-stone-700'
+                            ? 'bg-brand-600/20 border-brand-500 text-brand-400'
+                            : 'bg-white/60 border-line text-ink-500 hover:text-ink-800 hover:border-ink-300'
                         }`}
                         title={item.label}
                       >
@@ -517,7 +517,7 @@ export default function ThumbnailPopover({
 
               {/* Popular Emojis */}
               <div>
-                <p className="text-[11px] uppercase tracking-wider font-semibold text-stone-500 mb-2">
+                <p className="text-[11px] uppercase tracking-wider font-semibold text-ink-500 mb-2">
                   Popular Emojis
                 </p>
                 <div className="grid grid-cols-8 gap-1.5">
@@ -527,8 +527,8 @@ export default function ThumbnailPopover({
                       onClick={() => handleSelectEmoji(emoji)}
                       className={`text-xl p-2 rounded-xl border transition ${
                         selectedEmoji === emoji
-                          ? 'bg-emerald-600/30 border-emerald-500 scale-105'
-                          : 'bg-stone-950/50 border-stone-800 hover:border-stone-700 hover:scale-105'
+                          ? 'bg-brand-600/30 border-brand-500 scale-105'
+                          : 'bg-white/50 border-line hover:border-ink-300 hover:scale-105'
                       }`}
                     >
                       {emoji}
@@ -542,18 +542,18 @@ export default function ThumbnailPopover({
           {/* TAB 3: NONE */}
           {activeTab === 'none' && (
             <div className="text-center py-8 space-y-3">
-              <div className="w-12 h-12 mx-auto rounded-full bg-stone-800/80 flex items-center justify-center text-stone-400">
+              <div className="w-12 h-12 mx-auto rounded-full bg-surface-2/80 flex items-center justify-center text-ink-500">
                 <EyeOff className="w-6 h-6" />
               </div>
               <div>
-                <p className="text-sm font-semibold text-stone-200">No thumbnail</p>
-                <p className="text-xs text-stone-400 max-w-xs mx-auto mt-1">
+                <p className="text-sm font-semibold text-ink-700">No thumbnail</p>
+                <p className="text-xs text-ink-500 max-w-xs mx-auto mt-1">
                   No thumbnail will be displayed for this link.
                 </p>
               </div>
               <button
                 onClick={handleRemove}
-                className="px-4 py-2 bg-stone-800 hover:bg-stone-700 text-white rounded-xl text-xs font-medium transition cursor-pointer"
+                className="px-4 py-2 bg-surface-2 hover:bg-surface-3 text-ink-800 rounded-xl text-xs font-medium transition cursor-pointer"
               >
                 Confirm Remove
               </button>

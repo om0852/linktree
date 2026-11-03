@@ -122,7 +122,7 @@ export default function StoryBubbleAvatar({
         )}
 
         {/* Avatar Image */}
-        <div className={`relative ${sizeClasses} ${shapeStyles.container} overflow-hidden border-2 border-[#CAD8CE] bg-[#52796F] shadow-md flex items-center justify-center transition-transform group-hover:scale-[1.02]`}>
+        <div className={`relative ${sizeClasses} ${shapeStyles.container} overflow-hidden border-2 border-line bg-brand-500 shadow-md flex items-center justify-center transition-transform group-hover:scale-[1.02]`}>
           {avatarUrl ? (
             <img 
               src={avatarUrl} 

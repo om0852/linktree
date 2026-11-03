@@ -1,9 +1,10 @@
-import { Inter, Fira_Code } from "next/font/google";
+import { Poppins, Fira_Code } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({
-  variable: "--font-inter",
+const poppins = Poppins({
+  variable: "--font-poppins",
   subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
   display: "swap",
 });
 
@@ -22,7 +23,7 @@ export default function RootLayout({ children }) {
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${firaCode.variable} h-full antialiased`}
+      className={`${poppins.variable} ${firaCode.variable} h-full antialiased`}
     >
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -36,7 +37,7 @@ export default function RootLayout({ children }) {
           href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
         />
       </head>
-      <body className="min-h-full flex flex-col bg-[#FFFEFA] text-[#28352F] font-sans antialiased">
+      <body className="min-h-full flex flex-col bg-canvas text-ink-700 font-sans antialiased">
         {children}
       </body>
     </html>

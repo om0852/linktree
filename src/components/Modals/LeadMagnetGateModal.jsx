@@ -88,15 +88,15 @@ export default function LeadMagnetGateModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#28352F]/65 backdrop-blur-md animate-fadeIn">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#00000A73] backdrop-blur-[5px] animate-fadeIn">
       <div 
-        className="relative w-full max-w-md rounded-2xl bg-[#FFFEFA] border border-[#CAD8CE] shadow-2xl p-6 sm:p-7 text-[#28352F] overflow-hidden"
+        className="relative w-full max-w-md rounded-2xl bg-white border-[0.5px] border-line shadow-modal p-6 sm:p-7 text-ink-700 overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-2 rounded-xl text-[#5C6B64] hover:text-[#28352F] hover:bg-[#F5F3ED] transition-colors"
+          className="absolute top-4 right-4 p-2 rounded-xl text-ink-500 hover:text-ink-700 hover:bg-surface-2 transition-colors"
           aria-label="Close modal"
         >
           <X size={18} />
@@ -106,20 +106,20 @@ export default function LeadMagnetGateModal({
           <div>
             {/* Header */}
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 rounded-xl bg-[#F5F3ED] border border-[#CAD8CE] flex items-center justify-center text-[#52796F] shrink-0">
-                <Lock size={22} className="text-[#52796F]" />
+              <div className="w-12 h-12 rounded-xl bg-surface-2 border-[0.5px] border-line flex items-center justify-center text-brand-500 shrink-0">
+                <Lock size={22} className="text-brand-500" />
               </div>
               <div>
-                <span className="text-[11px] font-semibold tracking-wider uppercase text-[#52796F] bg-[#E8EFEA] px-2.5 py-0.5 rounded-full border border-[#CAD8CE]">
+                <span className="text-[11px] font-semibold tracking-wider uppercase text-brand-500 bg-brand-50 px-2.5 py-0.5 rounded-full border-[0.5px] border-line">
                   {getAssetBadge()}
                 </span>
-                <h3 className="text-lg font-bold text-[#28352F] mt-1 leading-snug">
+                <h3 className="text-[14px] font-semibold text-ink-700 mt-1 leading-snug">
                   {link.title || 'Lock-to-Unlock Resource'}
                 </h3>
               </div>
             </div>
 
-            <p className="text-xs text-[#5C6B64] mb-5 leading-relaxed">
+            <p className="text-xs text-ink-500 mb-5 leading-relaxed">
               {leadMagnet.previewText || 'Enter your details below to instantly unlock and download this exclusive asset.'}
             </p>
 
@@ -132,49 +132,49 @@ export default function LeadMagnetGateModal({
 
             <form onSubmit={handleUnlock} className="space-y-3.5">
               <div>
-                <label className="block text-[11px] font-medium text-[#28352F] mb-1">
-                  Full Name <span className="text-[#5C6B64] font-normal">(Optional)</span>
+                <label className="block text-[11px] font-medium text-ink-700 mb-1">
+                  Full Name <span className="text-ink-500 font-normal">(Optional)</span>
                 </label>
                 <input
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="e.g. Alex Morgan"
-                  className="w-full px-3.5 py-2.5 text-xs bg-white border border-[#CAD8CE] rounded-xl text-[#28352F] placeholder-[#5C6B64]/50 focus:outline-none focus:border-[#52796F] transition-all"
+                  className="w-full px-3.5 py-2.5 text-xs bg-white border-[0.5px] border-line rounded-xl text-ink-700 placeholder-ink-500/50 focus:outline-none focus:border-brand-500 transition-all"
                 />
               </div>
 
               <div>
-                <label className="block text-[11px] font-medium text-[#28352F] mb-1">
-                  Email Address <span className="text-[#52796F]">*</span>
+                <label className="block text-[11px] font-medium text-ink-700 mb-1">
+                  Email Address <span className="text-brand-500">*</span>
                 </label>
                 <div className="relative">
-                  <Mail size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#5C6B64]" />
+                  <Mail size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-500" />
                   <input
                     type="email"
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="you@example.com"
-                    className="w-full pl-10 pr-3.5 py-2.5 text-xs bg-white border border-[#CAD8CE] rounded-xl text-[#28352F] placeholder-[#5C6B64]/50 focus:outline-none focus:border-[#52796F] transition-all"
+                    className="w-full pl-10 pr-3.5 py-2.5 text-xs bg-white border-[0.5px] border-line rounded-xl text-ink-700 placeholder-ink-500/50 focus:outline-none focus:border-brand-500 transition-all"
                   />
                 </div>
               </div>
 
               {leadMagnet.requireWhatsApp && (
                 <div>
-                  <label className="block text-[11px] font-medium text-[#28352F] mb-1">
-                    WhatsApp / Phone Number <span className="text-[#52796F]">*</span>
+                  <label className="block text-[11px] font-medium text-ink-700 mb-1">
+                    WhatsApp / Phone Number <span className="text-brand-500">*</span>
                   </label>
                   <div className="relative">
-                    <Smartphone size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#5C6B64]" />
+                    <Smartphone size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-500" />
                     <input
                       type="tel"
                       required
                       value={whatsApp}
                       onChange={(e) => setWhatsApp(e.target.value)}
                       placeholder="+1 (555) 019-2834"
-                      className="w-full pl-10 pr-3.5 py-2.5 text-xs bg-white border border-[#CAD8CE] rounded-xl text-[#28352F] placeholder-[#5C6B64]/50 focus:outline-none focus:border-[#52796F] transition-all"
+                      className="w-full pl-10 pr-3.5 py-2.5 text-xs bg-white border-[0.5px] border-line rounded-xl text-ink-700 placeholder-ink-500/50 focus:outline-none focus:border-brand-500 transition-all"
                     />
                   </div>
                 </div>
@@ -183,7 +183,7 @@ export default function LeadMagnetGateModal({
               <button
                 type="submit"
                 disabled={submitting}
-                className="w-full mt-2 py-3 px-4 rounded-xl bg-[#52796F] hover:bg-[#3D5C54] text-white font-bold text-xs flex items-center justify-center gap-2 shadow-sm active:scale-[0.99] transition-all disabled:opacity-50 cursor-pointer"
+                className="w-full mt-2 py-3 px-4 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-semibold text-xs flex items-center justify-center gap-2 active:scale-[0.99] transition-all disabled:opacity-50 cursor-pointer"
               >
                 {submitting ? (
                   <>
@@ -198,26 +198,26 @@ export default function LeadMagnetGateModal({
                 )}
               </button>
 
-              <p className="text-[10px] text-center text-[#5C6B64] pt-1">
+              <p className="text-[10px] text-center text-ink-500 pt-1">
                 🔒 Zero spam. Unsubscribe at any time with 1-click.
               </p>
             </form>
           </div>
         ) : (
           <div className="text-center py-3">
-            <div className="w-14 h-14 mx-auto mb-3 rounded-2xl bg-[#E8EFEA] border border-[#CAD8CE] text-[#52796F] flex items-center justify-center shadow-sm">
+            <div className="w-14 h-14 mx-auto mb-3 rounded-2xl bg-brand-50 border-[0.5px] border-line text-brand-500 flex items-center justify-center ">
               <CheckCircle2 size={32} />
             </div>
 
-            <span className="text-[11px] font-semibold uppercase tracking-wider text-[#52796F] bg-[#E8EFEA] px-2.5 py-0.5 rounded-full border border-[#CAD8CE]">
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-brand-500 bg-brand-50 px-2.5 py-0.5 rounded-full border-[0.5px] border-line">
               Unlocked & Ready
             </span>
 
-            <h3 className="text-lg font-bold text-[#28352F] mt-2 mb-1">
+            <h3 className="text-[14px] font-semibold text-ink-700 mt-2 mb-1">
               {unlockedData.assetTitle}
             </h3>
 
-            <p className="text-xs text-[#5C6B64] mb-6 max-w-xs mx-auto">
+            <p className="text-xs text-ink-500 mb-6 max-w-xs mx-auto">
               Your access link has been verified and registered. Click below to download or open your asset.
             </p>
 
@@ -227,7 +227,7 @@ export default function LeadMagnetGateModal({
                 target="_blank"
                 rel="noopener noreferrer"
                 download
-                className="w-full py-3 px-4 rounded-xl bg-[#52796F] hover:bg-[#3D5C54] text-white font-bold text-xs flex items-center justify-center gap-2 shadow-sm active:scale-[0.99] transition-all"
+                className="w-full py-3 px-4 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-semibold text-xs flex items-center justify-center gap-2 active:scale-[0.99] transition-all"
               >
                 <Download size={16} />
                 <span>Download Asset Now</span>
@@ -237,7 +237,7 @@ export default function LeadMagnetGateModal({
               <button
                 type="button"
                 onClick={onClose}
-                className="w-full py-2 text-xs text-[#5C6B64] hover:text-[#28352F] transition-colors cursor-pointer"
+                className="w-full py-2 text-xs text-ink-500 hover:text-ink-700 transition-colors cursor-pointer"
               >
                 Done
               </button>

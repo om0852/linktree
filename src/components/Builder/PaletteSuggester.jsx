@@ -38,20 +38,20 @@ export default function PaletteSuggester({ avatarUrl, currentTheme, onSelectThem
   }
 
   return (
-    <div className="p-4 rounded-xl bg-[#F5F3ED] border border-[#CAD8CE] shadow-xs">
+    <div className="p-4 rounded-xl bg-surface-2 border-[0.5px] border-line ">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-white border border-[#CAD8CE] text-[#52796F] flex items-center justify-center shrink-0">
+          <div className="w-8 h-8 rounded-lg bg-white border-[0.5px] border-line text-brand-500 flex items-center justify-center shrink-0">
             <Sparkles size={16} />
           </div>
           <div>
-            <h4 className="text-xs font-bold text-[#28352F] flex items-center gap-1.5">
+            <h4 className="text-[12px] font-semibold text-ink-700 flex items-center gap-1.5">
               AI Palette Extraction
-              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#CAD8CE]/70 text-[#28352F]">
+              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-brand-100/70 text-ink-700">
                 Auto-Detected
               </span>
             </h4>
-            <p className="text-[11px] text-[#5C6B64]">
+            <p className="text-[11px] text-ink-500">
               Extracted dominant colors from your avatar photo
             </p>
           </div>
@@ -62,7 +62,7 @@ export default function PaletteSuggester({ avatarUrl, currentTheme, onSelectThem
           {extractedColors.map((hex, i) => (
             <div
               key={i}
-              className="w-5 h-5 rounded-full border border-white shadow-xs"
+              className="w-5 h-5 rounded-full border border-white "
               style={{ backgroundColor: hex }}
               title={hex}
             />
@@ -83,8 +83,8 @@ export default function PaletteSuggester({ avatarUrl, currentTheme, onSelectThem
               }}
               className={`p-3 rounded-xl border text-left transition-all relative overflow-hidden group cursor-pointer ${
                 isSelected
-                  ? 'border-[#52796F] bg-white shadow-xs ring-2 ring-[#52796F]/20'
-                  : 'border-[#CAD8CE] bg-white/70 hover:bg-white'
+                  ? 'border-brand-500 bg-white ring-2 ring-brand-500/20'
+                  : 'border-line bg-white/70 hover:bg-white'
               }`}
             >
               <div
@@ -92,10 +92,10 @@ export default function PaletteSuggester({ avatarUrl, currentTheme, onSelectThem
                 style={{ background: theme.previewGradients }}
               />
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-[#28352F]">{theme.name}</span>
-                {isSelected && <Check size={14} className="text-[#52796F]" />}
+                <span className="text-xs font-semibold text-ink-700">{theme.name}</span>
+                {isSelected && <Check size={14} className="text-brand-500" />}
               </div>
-              <p className="text-[10px] text-[#5C6B64] mt-0.5 line-clamp-1">
+              <p className="text-[10px] text-ink-500 mt-0.5 line-clamp-1">
                 {theme.description}
               </p>
             </button>

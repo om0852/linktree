@@ -3,16 +3,16 @@
 import React from 'react';
 
 const ICON_SIZE_MAP = {
-  sm: 'p-1.5 min-w-[32px] min-h-[32px] rounded-md',
-  md: 'p-2 min-w-[38px] min-h-[38px] rounded-lg',
-  lg: 'p-2.5 min-w-[44px] min-h-[44px] rounded-xl',
+  sm: 'size-[28px] rounded-full',
+  md: 'size-[30px] rounded-full',
+  lg: 'size-[34px] rounded-full',
 };
 
 const ICON_VARIANT_MAP = {
-  default: 'text-[#5C6B64] hover:text-[#28352F] hover:bg-black/5',
-  bordered: 'bg-white border border-[#CAD8CE] text-[#5C6B64] hover:text-[#28352F] hover:border-[#52796F] shadow-xs',
-  sage: 'bg-[#52796F]/10 text-[#52796F] hover:bg-[#52796F]/20',
-  danger: 'text-[#5C6B64] hover:text-rose-600 hover:bg-rose-50',
+  default: 'text-ink-500 hover:text-ink-700 hover:bg-surface-2',
+  bordered: 'bg-white border-[0.5px] border-line text-ink-500 hover:text-ink-700 hover:bg-surface-2',
+  sage: 'bg-surface-2 text-ink-500 hover:bg-brand-500/10 hover:text-brand-500',
+  danger: 'text-ink-500 hover:text-danger hover:bg-danger/10',
 };
 
 export default function IconButton({
@@ -37,10 +37,11 @@ export default function IconButton({
       onClick={onClick}
       disabled={disabled}
       title={title}
-      className={`inline-flex items-center justify-center transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${sizeClass} ${variantClass} ${className}`}
+      aria-label={props['aria-label'] || title}
+      className={`inline-flex items-center justify-center transition-colors duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400/40 disabled:opacity-40 disabled:cursor-not-allowed ${sizeClass} ${variantClass} ${className}`}
       {...props}
     >
-      {ActiveIcon ? <ActiveIcon className="w-4 h-4 shrink-0" /> : children}
+      {ActiveIcon ? <ActiveIcon className="size-[16px] shrink-0" strokeWidth={1.5} /> : children}
     </button>
   );
 }

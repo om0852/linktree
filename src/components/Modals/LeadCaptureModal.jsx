@@ -181,13 +181,13 @@ export default function LeadCaptureModal({ profile, onClose, onLeadSubmitted }) 
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div 
-        className="modal-content p-6 sm:p-7 max-w-md w-full relative border border-[#CAD8CE] bg-[#FFFEFA] shadow-xl rounded-2xl animate-in fade-in zoom-in-95 duration-150"
+        className="modal-content p-6 sm:p-7 max-w-md w-full relative border-[0.5px] border-line bg-white shadow-modal rounded-2xl animate-in fade-in zoom-in-95 duration-150"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-2 rounded-full text-[#5C6B64] hover:text-[#28352F] hover:bg-[#F5F3ED] transition-all cursor-pointer"
+          className="absolute top-4 right-4 p-2 rounded-full text-ink-500 hover:text-ink-700 hover:bg-surface-2 transition-all cursor-pointer"
         >
           <X className="w-4 h-4" />
         </button>
@@ -195,16 +195,16 @@ export default function LeadCaptureModal({ profile, onClose, onLeadSubmitted }) 
         {isSuccess ? (
           /* Success Screen */
           <div className="text-center py-6 space-y-3 animate-fade-in">
-            <div className="w-14 h-14 rounded-full bg-[#52796F]/10 text-[#52796F] border border-[#52796F]/30 flex items-center justify-center mx-auto shadow-sm">
-              <CheckCircle2 className="w-8 h-8 text-[#52796F]" />
+            <div className="w-14 h-14 rounded-full bg-brand-500/10 text-brand-500 border border-brand-500/30 flex items-center justify-center mx-auto ">
+              <CheckCircle2 className="w-8 h-8 text-brand-500" />
             </div>
-            <h3 className="font-sans text-xl font-bold text-[#28352F]">Contact Info Sent!</h3>
-            <p className="text-xs text-[#5C6B64] max-w-xs mx-auto leading-relaxed">
+            <h3 className="text-[14px] font-sans font-semibold text-ink-700">Contact Info Sent!</h3>
+            <p className="text-xs text-ink-500 max-w-xs mx-auto leading-relaxed">
               {config.successMessage || 'Thank you! Your details have been delivered to @' + profile.username + '.'}
             </p>
             {config.syncToGoogleContacts && (
-              <p className="text-[11px] font-mono text-[#52796F] flex items-center justify-center gap-1">
-                <Sparkles className="w-3 h-3 text-[#52796F]" /> Synced to Gmail Contacts
+              <p className="text-[11px] font-mono text-brand-500 flex items-center justify-center gap-1">
+                <Sparkles className="w-3 h-3 text-brand-500" /> Synced to Gmail Contacts
               </p>
             )}
           </div>
@@ -212,27 +212,27 @@ export default function LeadCaptureModal({ profile, onClose, onLeadSubmitted }) 
           /* Form Screen */
           <div>
             {/* Header with Creator Avatar */}
-            <div className="flex items-center gap-3.5 mb-5 pb-4 border-b border-[#E0DCD3]">
-              <div className="w-12 h-12 rounded-full p-0.5 border border-[#CAD8CE] shrink-0 shadow-xs">
+            <div className="flex items-center gap-3.5 mb-5 pb-4 border-b-[0.5px] border-line">
+              <div className="w-12 h-12 rounded-full p-0.5 border-[0.5px] border-line shrink-0 ">
                 <img
                   src={
                     profile?.avatar && typeof profile.avatar === 'string' && profile.avatar.trim() !== ''
                       ? profile.avatar.trim()
-                      : `https://ui-avatars.com/api/?name=${encodeURIComponent(profile?.name || profile?.title || 'Creator')}&background=52796F&color=FFFEFA&bold=true&size=256`
+                      : `https://ui-avatars.com/api/?name=${encodeURIComponent(profile?.name || profile?.title || 'Creator')}&background=16A34A&color=FFFFFF&bold=true&size=256`
                   }
                   alt={profile?.title || profile?.name || 'Creator'}
                   className="w-full h-full object-cover rounded-full"
                   onError={(e) => {
                     e.currentTarget.onerror = null;
-                    e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(profile?.name || profile?.title || 'Creator')}&background=52796F&color=FFFEFA&bold=true&size=256`;
+                    e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(profile?.name || profile?.title || 'Creator')}&background=16A34A&color=FFFFFF&bold=true&size=256`;
                   }}
                 />
               </div>
               <div className="flex-1 pr-4">
-                <h3 className="font-sans text-base font-semibold text-[#28352F] leading-tight">
+                <h3 className="text-[14px] font-sans font-semibold text-ink-700">
                   {config.title || "Let's Connect"}
                 </h3>
-                <p className="text-xs text-[#5C6B64] mt-0.5 line-clamp-2">
+                <p className="text-xs text-ink-500 mt-0.5 line-clamp-2">
                   {config.subtitle || `Drop your contact details to reach ${profile.name || profile.title}`}
                 </p>
               </div>
@@ -251,8 +251,8 @@ export default function LeadCaptureModal({ profile, onClose, onLeadSubmitted }) 
               {fields.name?.enabled && (
                 <div>
                   <div className="flex justify-between items-center mb-1">
-                    <label className="text-[11px] font-semibold text-[#28352F] flex items-center gap-1.5">
-                      <User className="w-3 h-3 text-[#52796F]" />
+                    <label className="text-[11px] font-semibold text-ink-700 flex items-center gap-1.5">
+                      <User className="w-3 h-3 text-brand-500" />
                       {fields.name.label || 'Full Name'}
                     </label>
                     {fields.name.required && (
@@ -278,8 +278,8 @@ export default function LeadCaptureModal({ profile, onClose, onLeadSubmitted }) 
               {fields.phone?.enabled && (
                 <div>
                   <div className="flex justify-between items-center mb-1">
-                    <label className="text-[11px] font-semibold text-[#28352F] flex items-center gap-1.5">
-                      <Phone className="w-3 h-3 text-[#52796F]" />
+                    <label className="text-[11px] font-semibold text-ink-700 flex items-center gap-1.5">
+                      <Phone className="w-3 h-3 text-brand-500" />
                       {(fields.phone.label && !fields.phone.label.toLowerCase().includes('contact') && !fields.phone.label.toLowerCase().includes('whatsapp')) ? fields.phone.label : 'Phone Number'}
                     </label>
                     {fields.phone.required && (
@@ -298,15 +298,15 @@ export default function LeadCaptureModal({ profile, onClose, onLeadSubmitted }) 
                   {errors.phone && (
                     <p className="text-[10px] text-rose-600 mt-1">{errors.phone}</p>
                   )}
-                  <label className="flex items-center gap-2 mt-2 text-xs text-[#5C6B64] cursor-pointer select-none">
+                  <label className="flex items-center gap-2 mt-2 text-xs text-ink-500 cursor-pointer select-none">
                     <input
                       type="checkbox"
                       name="isWhatsApp"
                       checked={Boolean(formData.isWhatsApp)}
                       onChange={(e) => setFormData((prev) => ({ ...prev, isWhatsApp: e.target.checked }))}
-                      className="w-3.5 h-3.5 rounded border-[#CAD8CE] text-[#52796F] focus:ring-[#52796F] accent-[#52796F]"
+                      className="w-3.5 h-3.5 rounded border-line text-brand-500 focus:ring-brand-500 accent-brand-500"
                     />
-                    <span className="text-[#28352F] text-[11px] font-medium">
+                    <span className="text-ink-700 text-[11px] font-medium">
                       This provided number is also available on WhatsApp
                     </span>
                   </label>
@@ -317,8 +317,8 @@ export default function LeadCaptureModal({ profile, onClose, onLeadSubmitted }) 
               {fields.email?.enabled && (
                 <div>
                   <div className="flex justify-between items-center mb-1">
-                    <label className="text-[11px] font-semibold text-[#28352F] flex items-center gap-1.5">
-                      <Mail className="w-3 h-3 text-[#52796F]" />
+                    <label className="text-[11px] font-semibold text-ink-700 flex items-center gap-1.5">
+                      <Mail className="w-3 h-3 text-brand-500" />
                       {fields.email.label || 'Email Address'}
                     </label>
                     {fields.email.required && (
@@ -344,8 +344,8 @@ export default function LeadCaptureModal({ profile, onClose, onLeadSubmitted }) 
               {fields.company?.enabled && (
                 <div>
                   <div className="flex justify-between items-center mb-1">
-                    <label className="text-[11px] font-semibold text-[#28352F] flex items-center gap-1.5">
-                      <Building2 className="w-3 h-3 text-[#52796F]" />
+                    <label className="text-[11px] font-semibold text-ink-700 flex items-center gap-1.5">
+                      <Building2 className="w-3 h-3 text-brand-500" />
                       {fields.company.label || 'Company / Brand'}
                     </label>
                     {fields.company.required && (
@@ -368,8 +368,8 @@ export default function LeadCaptureModal({ profile, onClose, onLeadSubmitted }) 
               {fields.note?.enabled && (
                 <div>
                   <div className="flex justify-between items-center mb-1">
-                    <label className="text-[11px] font-semibold text-[#28352F] flex items-center gap-1.5">
-                      <MessageSquare className="w-3 h-3 text-[#52796F]" />
+                    <label className="text-[11px] font-semibold text-ink-700 flex items-center gap-1.5">
+                      <MessageSquare className="w-3 h-3 text-brand-500" />
                       {fields.note.label || 'Message / Reason for Contact'}
                     </label>
                     {fields.note.required && (
@@ -393,7 +393,7 @@ export default function LeadCaptureModal({ profile, onClose, onLeadSubmitted }) 
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="tb-btn tb-btn-primary w-full py-2.5 justify-center text-xs font-semibold rounded-sm shadow-sm cursor-pointer"
+                  className="tb-btn tb-btn-primary w-full py-2.5 justify-center text-xs font-semibold rounded-sm cursor-pointer"
                 >
                   {isSubmitting ? (
                     <>
@@ -408,8 +408,8 @@ export default function LeadCaptureModal({ profile, onClose, onLeadSubmitted }) 
               </div>
 
               {/* Privacy Notice */}
-              <p className="text-[10px] text-[#5C6B64] text-center flex items-center justify-center gap-1">
-                <Lock className="w-2.5 h-2.5 text-[#52796F]" /> Your information is privately shared with @{profile.username}
+              <p className="text-[10px] text-ink-500 text-center flex items-center justify-center gap-1">
+                <Lock className="w-2.5 h-2.5 text-brand-500" /> Your information is privately shared with @{profile.username}
               </p>
             </form>
           </div>

@@ -40,27 +40,27 @@ export default function QRCodeModal({ profile, onClose }) {
 
   return (
     <div className="modal-overlay">
-      <div className="modal-content p-6 max-w-sm w-full text-center relative border border-[#CAD8CE] bg-[#FFFEFA] shadow-2xl rounded-2xl">
+      <div className="modal-content p-6 max-w-sm w-full text-center relative border-[0.5px] border-line bg-white shadow-modal rounded-2xl">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-1.5 rounded-full text-[#5C6B64] hover:text-[#28352F] hover:bg-[#F5F3ED] transition-all cursor-pointer"
+          className="absolute top-4 right-4 p-1.5 rounded-full text-ink-500 hover:text-ink-700 hover:bg-surface-2 transition-all cursor-pointer"
         >
           <X className="w-4 h-4" />
         </button>
 
-        <div className="w-12 h-12 rounded-full bg-[#52796F]/10 text-[#52796F] border border-[#52796F]/20 flex items-center justify-center mx-auto mb-3">
+        <div className="w-12 h-12 rounded-full bg-brand-500/10 text-brand-500 border border-brand-500/20 flex items-center justify-center mx-auto mb-3">
           <QrCode className="w-6 h-6" />
         </div>
 
-        <h3 className="font-sans text-base font-semibold text-[#28352F]">Direct Scan QR Code</h3>
-        <p className="text-xs text-[#5C6B64] mt-0.5">Share with in-person audiences, print on merch or business cards</p>
+        <h3 className="text-[14px] font-sans font-semibold text-ink-700">Direct Scan QR Code</h3>
+        <p className="text-xs text-ink-500 mt-0.5">Share with in-person audiences, print on merch or business cards</p>
 
         {/* QR Canvas Box */}
-        <div className="my-5 p-4 rounded-xl bg-white shadow-md inline-block mx-auto border-2 border-[#CAD8CE]">
+        <div className="my-5 p-4 rounded-xl bg-white inline-block mx-auto border-2 border-line">
           {qrUrl && typeof qrUrl === 'string' && qrUrl.trim() !== '' ? (
             <img src={qrUrl} alt="Bio QR Code" className="w-48 h-48 mx-auto" />
           ) : (
-            <div className="w-48 h-48 flex items-center justify-center text-xs text-[#5C6B64]">
+            <div className="w-48 h-48 flex items-center justify-center text-xs text-ink-500">
               Generating...
             </div>
           )}
@@ -69,16 +69,16 @@ export default function QRCodeModal({ profile, onClose }) {
         <div className="space-y-2">
           <button
             onClick={handleDownload}
-            className="w-full py-2.5 rounded-sm bg-[#52796F] hover:bg-[#3D5C54] text-white font-semibold text-xs shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer"
+            className="w-full py-2.5 rounded-sm bg-brand-500 hover:bg-brand-600 text-white font-semibold text-xs transition-all flex items-center justify-center gap-2 cursor-pointer"
           >
             <Download className="w-4 h-4" /> Download High-Res PNG
           </button>
 
           <button
             onClick={handleCopyLink}
-            className="w-full py-2.5 rounded-sm bg-[#F5F3ED] border border-[#CAD8CE] hover:bg-[#EAE7DE] text-[#28352F] font-semibold text-xs transition-all flex items-center justify-center gap-2 cursor-pointer"
+            className="w-full py-2.5 rounded-sm bg-surface-2 border-[0.5px] border-line hover:bg-surface-3 text-ink-700 font-semibold text-xs transition-all flex items-center justify-center gap-2 cursor-pointer"
           >
-            {copied ? <Check className="w-4 h-4 text-[#52796F]" /> : <Copy className="w-4 h-4" />}
+            {copied ? <Check className="w-4 h-4 text-brand-500" /> : <Copy className="w-4 h-4" />}
             {copied ? 'Profile Link Copied!' : 'Copy Bio URL'}
           </button>
         </div>

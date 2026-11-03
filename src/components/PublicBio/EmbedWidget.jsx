@@ -13,13 +13,13 @@ export default function EmbedWidget({ embed, title = '' }) {
   const { platform, embedId } = embed;
 
   return (
-    <div className="w-full mt-2.5 pt-2.5 border-t border-[#CAD8CE]/60 overflow-hidden transition-all duration-300">
+    <div className="w-full mt-2.5 pt-2.5 border-t border-line/60 overflow-hidden transition-all duration-300">
       <div className="flex items-center justify-between mb-2 px-1">
-        <div className="flex items-center gap-1.5 text-[11px] font-semibold text-[#5C6B64]">
+        <div className="flex items-center gap-1.5 text-[11px] font-semibold text-ink-500">
           {platform === 'spotify' || platform === 'apple_music' ? (
-            <Music size={13} className="text-[#52796F]" />
+            <Music size={13} className="text-brand-500" />
           ) : (
-            <Video size={13} className="text-[#52796F]" />
+            <Video size={13} className="text-brand-500" />
           )}
           <span className="capitalize">{platform.replace('_', ' ')} Preview</span>
         </div>
@@ -29,7 +29,7 @@ export default function EmbedWidget({ embed, title = '' }) {
             e.stopPropagation();
             setExpanded(!expanded);
           }}
-          className="text-[#5C6B64] hover:text-[#28352F] p-1 rounded-md transition-colors"
+          className="text-ink-500 hover:text-ink-700 p-1 rounded-md transition-colors"
           title={expanded ? 'Collapse preview' : 'Expand preview'}
         >
           {expanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
@@ -37,7 +37,7 @@ export default function EmbedWidget({ embed, title = '' }) {
       </div>
 
       {expanded && (
-        <div className="w-full rounded-xl overflow-hidden bg-[#F5F3ED] border border-[#CAD8CE] shadow-xs animate-fadeIn">
+        <div className="w-full rounded-xl overflow-hidden bg-surface-2 border border-line shadow-xs animate-fadeIn">
           {platform === 'spotify' && (
             <iframe
               src={`https://open.spotify.com/embed/track/${embedId}?utm_source=generator&theme=0`}

@@ -3,24 +3,11 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { 
-  LayoutGrid, 
-  UserCheck, 
-  Calendar, 
-  BarChart3, 
-  Share2, 
-  Zap, 
-  Globe, 
-  ShieldCheck, 
-  Sparkles,
-  Sliders,
-  Menu,
-  X
-} from 'lucide-react';
+import { X } from 'lucide-react';
 
 import { SIDEBAR_NAV_ITEMS } from '@/constants/navigation';
 
-export default function AtelierSidebar({ mobileOpen, onToggleMobile, onOpenConfig }) {
+export default function AtelierSidebar({ mobileOpen, onToggleMobile }) {
   const pathname = usePathname();
 
   const isItemActive = (item) => {
@@ -32,80 +19,66 @@ export default function AtelierSidebar({ mobileOpen, onToggleMobile, onOpenConfi
 
   return (
     <>
-      {/* Mobile Backdrop */}
+      {/* Mobile backdrop */}
       {mobileOpen && (
-        <div 
+        <div
           onClick={onToggleMobile}
-          className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 lg:hidden"
+          className="fixed inset-0 z-40 bg-black/40 backdrop-blur-[2px] lg:hidden"
         />
       )}
 
-      {/* Main Atelier Left Sidebar */}
-      <aside className={`fixed left-0 top-0 h-full w-64 bg-[#F5F3ED] border-r border-[#E0DCD3]/70 z-50 flex flex-col justify-between py-3 shadow-sm transition-transform duration-200 ${
-        mobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
-      }`}>
-        {/* Top Node Header & Navigation */}
-        <div className="flex flex-col gap-2">
-          {/* Header Title & Version */}
-          <div className="px-4 py-1 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="h-2.5 w-2.5 rounded-full bg-[#52796F] shadow-[0_0_8px_rgba(82,121,111,0.5)]"></div>
-              <span className="text-base text-[#28352F] font-bold tracking-tight">
-                TreeInBio
-              </span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <span className="text-xs text-[#52796F] bg-[#52796F]/10 px-2 py-0.5 rounded-md font-semibold">Studio</span>
-              {onToggleMobile && (
-                <button 
-                  onClick={onToggleMobile}
-                  className="lg:hidden p-1.5 text-[#5C6B64] hover:text-[#28352F] rounded-lg"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              )}
-            </div>
-          </div>
-
-          {/* Navigation Links */}
-          <nav className="flex flex-col gap-1.5 px-3 mt-2">
-            {SIDEBAR_NAV_ITEMS.map((item) => {
-              const active = isItemActive(item);
-              const Icon = item.icon;
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={() => onToggleMobile && onToggleMobile(false)}
-                  className={`group flex items-center gap-3 px-3.5 py-2.5 rounded-lg min-h-[44px] transition-all text-left ${
-                    active
-                      ? 'bg-white text-[#28352F] shadow-[inset_3px_0_0_0_#52796F] border border-[#CAD8CE]/70 font-semibold'
-                      : 'text-[#5C6B64] hover:text-[#28352F] hover:bg-white/70 font-medium'
-                  }`}
-                >
-                  <Icon className={`w-4 h-4 shrink-0 transition-colors ${
-                    active ? 'text-[#52796F]' : 'text-[#5C6B64] group-hover:text-[#52796F]'
-                  }`} />
-                  <div className="flex flex-col leading-tight min-w-0">
-                    <span className={`text-sm tracking-tight truncate ${
-                      active ? 'font-semibold text-[#28352F]' : 'font-medium'
-                    }`}>
-                      {item.label}
-                    </span>
-                    <span className="font-mono text-xs text-[#5C6B64]/80 truncate mt-0.5">
-                      {item.sub}
-                    </span>
-                  </div>
-                </Link>
-              );
-            })}
-          </nav>
+      {/* Single floating navigation card (design system §4.1) */}
+      <aside
+        className={`fixed left-[10px] top-[10px] z-50 flex h-[calc(100vh-20px)] w-[260px] flex-col rounded-lg bg-white py-[15px] transition-transform duration-200 ${
+          mobileOpen ? 'translate-x-0' : '-translate-x-[calc(100%+20px)] lg:translate-x-0'
+        }`}
+      >
+        {/* Brand row */}
+        <div className="mx-[13px] flex h-[24px] items-center justify-between">
+          <Link href="/" className="flex items-center gap-[8px]">
+            <span className="grid size-[20px] place-items-center rounded-sm bg-brand-500 text-[11px] font-semibold text-white">
+              T
+            </span>
+            <span className="text-[16px] font-semibold text-ink-900">TreeInBio</span>
+          </Link>
+          {onToggleMobile && (
+            <button
+              onClick={onToggleMobile}
+              aria-label="Close navigation"
+              className="grid size-[30px] place-items-center rounded-full text-ink-500 hover:bg-surface-2 hover:text-ink-600 lg:hidden"
+            >
+              <X className="size-[16px]" strokeWidth={1.5} />
+            </button>
+          )}
         </div>
 
-        {/* Bottom Clean Footer */}
-        <div className="px-4 py-3 border-t border-[#CAD8CE]/50 flex items-center justify-between text-[#5C6B64]">
-          <span className="font-mono text-xs font-medium">TreeInBio Atelier</span>
-          <span className="font-mono text-xs">v1.0</span>
+        {/* Navigation */}
+        <nav className="thin-scroll mr-[3px] mt-[15px] flex-1 overflow-y-auto pl-[13px] pr-[4px]">
+          {SIDEBAR_NAV_ITEMS.map((item) => {
+            const active = isItemActive(item);
+            const Icon = item.icon;
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                title={item.sub}
+                onClick={() => onToggleMobile && onToggleMobile(false)}
+                className={`nav-item mb-[10px] ${active ? 'nav-item-active font-medium' : ''}`}
+              >
+                <Icon
+                  className={`size-[20px] shrink-0 ${active ? 'text-brand-500' : 'text-ink-900'}`}
+                  strokeWidth={1.5}
+                />
+                <span className="truncate">{item.label}</span>
+              </Link>
+            );
+          })}
+        </nav>
+
+        {/* Footer */}
+        <div className="mx-[13px] mt-auto border-t-[0.5px] border-line px-[7px] pt-[10px]">
+          <p className="text-[12px] text-ink-700">TreeInBio Studio</p>
+          <p className="text-[10px] text-ink-500">v1.0</p>
         </div>
       </aside>
     </>

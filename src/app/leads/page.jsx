@@ -233,13 +233,13 @@ export default function LeadsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FFFEFA] text-[#28352F]">
+    <div className="min-h-screen bg-canvas text-ink-700">
       <AtelierSidebar 
         mobileOpen={mobileOpen} 
         onToggleMobile={() => setMobileOpen(!mobileOpen)} 
       />
 
-      <div className="lg:pl-64 flex flex-col min-h-screen">
+      <div className="lg:pl-[280px] flex flex-col min-h-screen">
         <AtelierHeader
           currentProfile={currentProfile}
           authUser={authUser}
@@ -257,23 +257,23 @@ export default function LeadsPage() {
         />
 
         {/* Main Workspace */}
-        <main className="flex-1 pt-16 sm:pt-20 px-5 sm:px-8 lg:px-10 pb-12 w-full max-w-7xl mx-auto flex flex-col gap-4 sm:gap-5">
+        <main className="flex-1 mt-[74px] mx-[10px] mb-[10px] lg:ml-0 min-w-0 rounded-lg bg-white p-[15px] flex flex-col gap-[15px]">
         {/* Banner Alert Feedback */}
         {feedback && (
-          <div className={`p-3 rounded-lg border flex items-center justify-between text-xs font-medium shadow-xs ${
+          <div className={`p-3 rounded-lg border flex items-center justify-between text-xs font-medium ${
             feedback.type === 'success'
-              ? 'bg-[#CAD8CE]/40 border-[#52796F] text-[#28352F]'
+              ? 'bg-brand-100/40 border-brand-500 text-ink-700'
               : feedback.type === 'error'
               ? 'bg-rose-50 border-rose-400 text-rose-900'
-              : 'bg-[#F5F3ED] border-[#CAD8CE] text-[#5C6B64]'
+              : 'bg-surface-2 border-line text-ink-500'
           }`}>
             <div className="flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-[#52796F]" />
+              <CheckCircle2 className="w-4 h-4 text-brand-500" />
               <span>{feedback.text}</span>
             </div>
             <button 
               onClick={() => setFeedback(null)}
-              className="text-[#5C6B64] hover:text-[#28352F] font-mono text-[0.65rem]"
+              className="text-ink-500 hover:text-ink-700 font-mono text-[0.65rem]"
             >
               Dismiss
             </button>
@@ -281,23 +281,23 @@ export default function LeadsPage() {
         )}
 
         {/* Page Title & Metrics Suite */}
-        <div className="bg-[#F5F3ED] border border-[#CAD8CE]/80 rounded-xl p-4 sm:p-5 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-3.5 sm:gap-4">
+        <div className="bg-surface-2 border-[0.5px] border-line/80 rounded-xl p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-3.5 sm:gap-4">
           <div className="flex items-center gap-3.5">
-            <div className="w-10 h-10 rounded-lg bg-white border border-[#CAD8CE] flex items-center justify-center text-[#52796F] shadow-xs shrink-0">
+            <div className="w-10 h-10 rounded-lg bg-white border-[0.5px] border-line flex items-center justify-center text-brand-500 shrink-0">
               <Users className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center gap-2 flex-wrap">
-                <h1 className="font-sans font-bold text-lg sm:text-xl text-[#28352F] tracking-tight">
+                <h1 className="text-[16px] font-sans font-semibold text-ink-700">
                   Lead Capture &amp; Contacts CRM
                 </h1>
                 {username && (
-                  <span className="px-2 py-0.5 bg-[#CAD8CE]/70 text-[#28352F] font-mono text-xs font-semibold rounded">
+                  <span className="px-2 py-0.5 bg-brand-100/70 text-ink-700 font-mono text-xs font-semibold rounded">
                     @{username}
                   </span>
                 )}
               </div>
-              <p className="text-xs text-[#5C6B64] mt-0.5 leading-normal">
+              <p className="text-xs text-ink-500 mt-0.5 leading-normal">
                 Every visitor who submits the contact exchange dialog on your bio is automatically captured and synced.
               </p>
             </div>
@@ -309,7 +309,7 @@ export default function LeadsPage() {
               variant="bordered"
               onClick={() => setRefreshIndex((n) => n + 1)}
               title="Refresh Leads"
-              className={loading ? 'animate-spin text-[#52796F]' : ''}
+              className={loading ? 'animate-spin text-brand-500' : ''}
             />
             <Button
               variant="outline"
@@ -323,25 +323,25 @@ export default function LeadsPage() {
         </div>
 
         {/* Auto-Sync Configuration Bar */}
-        <div className="bg-[#F5F3ED] border border-[#CAD8CE] rounded-xl p-3.5 sm:p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xs">
+        <div className="bg-surface-2 border-[0.5px] border-line rounded-xl p-3.5 sm:p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 ">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-lg bg-white border border-[#CAD8CE] flex items-center justify-center text-[#52796F] shrink-0">
-              <Sparkles className="w-4 h-4 text-emerald-600" />
+            <div className="w-9 h-9 rounded-lg bg-white border-[0.5px] border-line flex items-center justify-center text-brand-500 shrink-0">
+              <Sparkles className="w-4 h-4 text-brand-600" />
             </div>
             <div>
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-xs sm:text-sm font-bold text-[#28352F]">
+                <span className="text-xs sm:text-sm font-semibold text-ink-700">
                   Auto-Sync Contacts to Google Contacts &amp; Gmail
                 </span>
                 <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-semibold ${
                   currentProfile.leadCapture?.syncToGoogleContacts !== false
-                    ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
+                    ? 'bg-brand-100 text-brand-800 border border-brand-300'
                     : 'bg-stone-200 text-stone-700'
                 }`}>
                   {currentProfile.leadCapture?.syncToGoogleContacts !== false ? 'ENABLED' : 'DISABLED'}
                 </span>
               </div>
-              <p className="text-[11px] text-[#5C6B64] mt-0.5">
+              <p className="text-[11px] text-ink-500 mt-0.5">
                 Automatically push visitor contact submissions into your connected Google Contacts address book.
               </p>
             </div>
@@ -354,15 +354,15 @@ export default function LeadsPage() {
                 checked={currentProfile.leadCapture?.syncToGoogleContacts !== false}
                 onChange={(e) => handleToggleAutoSync(e.target.checked)}
                 disabled={savingAutoSync}
-                className="w-4 h-4 rounded text-[#52796F] focus:ring-[#52796F] accent-[#52796F] cursor-pointer"
+                className="w-4 h-4 rounded text-brand-500 focus:ring-brand-500 accent-brand-500 cursor-pointer"
               />
-              <span className="text-xs font-semibold text-[#28352F]">
+              <span className="text-xs font-semibold text-ink-700">
                 {savingAutoSync ? 'Saving...' : 'Enable Auto-Sync'}
               </span>
             </label>
             <Link
               href="/connectors"
-              className="text-xs font-semibold text-[#52796F] hover:text-[#28352F] underline font-mono ml-2"
+              className="text-xs font-semibold text-brand-500 hover:text-ink-700 underline font-mono ml-2"
             >
               Connectors Hub ↗
             </Link>
@@ -371,28 +371,28 @@ export default function LeadsPage() {
 
         {/* 4 Metric Badges */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-          <div className="p-3.5 sm:p-4 bg-white border border-[#CAD8CE]/80 rounded-xl shadow-xs flex flex-col gap-1">
-            <span className="text-xs font-semibold uppercase tracking-wider text-[#5C6B64]">Total Captured Leads</span>
-            <span className="font-sans font-bold text-xl sm:text-2xl text-[#28352F] tracking-tight">{stats.total}</span>
-            <span className="font-mono text-xs text-[#52796F]">100% Verified Origin</span>
+          <div className="p-3.5 sm:p-4 bg-white border-[0.5px] border-line/80 rounded-xl flex flex-col gap-1">
+            <span className="text-xs font-semibold uppercase tracking-wider text-ink-500">Total Captured Leads</span>
+            <span className="font-sans font-semibold text-xl sm:text-2xl text-ink-700 tracking-tight">{stats.total}</span>
+            <span className="font-mono text-xs text-brand-500">100% Verified Origin</span>
           </div>
 
-          <div className="p-3.5 sm:p-4 bg-white border border-[#CAD8CE]/80 rounded-xl shadow-xs flex flex-col gap-1">
-            <span className="text-xs font-semibold uppercase tracking-wider text-[#5C6B64]">Phone Numbers</span>
-            <span className="font-sans font-bold text-xl sm:text-2xl text-[#28352F] tracking-tight">{stats.withPhone}</span>
-            <span className="font-mono text-xs text-[#52796F]">WhatsApp / SMS Ready</span>
+          <div className="p-3.5 sm:p-4 bg-white border-[0.5px] border-line/80 rounded-xl flex flex-col gap-1">
+            <span className="text-xs font-semibold uppercase tracking-wider text-ink-500">Phone Numbers</span>
+            <span className="font-sans font-semibold text-xl sm:text-2xl text-ink-700 tracking-tight">{stats.withPhone}</span>
+            <span className="font-mono text-xs text-brand-500">WhatsApp / SMS Ready</span>
           </div>
 
-          <div className="p-3.5 sm:p-4 bg-white border border-[#CAD8CE]/80 rounded-xl shadow-xs flex flex-col gap-1">
-            <span className="text-xs font-semibold uppercase tracking-wider text-[#5C6B64]">Verified Emails</span>
-            <span className="font-sans font-bold text-xl sm:text-2xl text-[#28352F] tracking-tight">{stats.withEmail}</span>
-            <span className="font-mono text-xs text-[#52796F]">RFC 5322 Compliant</span>
+          <div className="p-3.5 sm:p-4 bg-white border-[0.5px] border-line/80 rounded-xl flex flex-col gap-1">
+            <span className="text-xs font-semibold uppercase tracking-wider text-ink-500">Verified Emails</span>
+            <span className="font-sans font-semibold text-xl sm:text-2xl text-ink-700 tracking-tight">{stats.withEmail}</span>
+            <span className="font-mono text-xs text-brand-500">RFC 5322 Compliant</span>
           </div>
 
-          <div className="p-3.5 sm:p-4 bg-white border border-[#CAD8CE]/80 rounded-xl shadow-xs flex flex-col gap-1">
-            <span className="text-xs font-semibold uppercase tracking-wider text-[#5C6B64]">Google Contacts Sync</span>
-            <span className="font-sans font-bold text-xl sm:text-2xl text-[#52796F] tracking-tight">{stats.syncedToGoogle}</span>
-            <span className="font-mono text-xs text-[#5C6B64]">Gmail Auto-Dispatched</span>
+          <div className="p-3.5 sm:p-4 bg-white border-[0.5px] border-line/80 rounded-xl flex flex-col gap-1">
+            <span className="text-xs font-semibold uppercase tracking-wider text-ink-500">Google Contacts Sync</span>
+            <span className="font-sans font-semibold text-xl sm:text-2xl text-brand-500 tracking-tight">{stats.syncedToGoogle}</span>
+            <span className="font-mono text-xs text-ink-500">Gmail Auto-Dispatched</span>
           </div>
         </div>
 
@@ -436,18 +436,18 @@ export default function LeadsPage() {
         {/* Leads Cards Container */}
         {loading && leads.length === 0 ? (
           <div className="p-16 text-center flex flex-col items-center justify-center gap-3">
-            <Loader2 className="w-7 h-7 animate-spin text-[#52796F]" />
-            <p className="text-xs font-mono text-[#5C6B64]">Loading contact submissions...</p>
+            <Loader2 className="w-7 h-7 animate-spin text-brand-500" />
+            <p className="text-xs font-mono text-ink-500">Loading contact submissions...</p>
           </div>
         ) : leads.length === 0 ? (
-          <div className="bg-white border border-[#CAD8CE]/80 rounded-xl p-8 sm:p-10 text-center flex flex-col items-center justify-center gap-3.5 shadow-xs my-1">
-            <div className="w-12 h-12 rounded-xl bg-[#F5F3ED] border border-[#CAD8CE] flex items-center justify-center text-[#52796F] shadow-xs">
+          <div className="bg-white border-[0.5px] border-line/80 rounded-xl p-8 sm:p-10 text-center flex flex-col items-center justify-center gap-3.5 my-1">
+            <div className="w-12 h-12 rounded-xl bg-surface-2 border-[0.5px] border-line flex items-center justify-center text-brand-500 ">
               <Users className="w-6 h-6" />
             </div>
             <div className="max-w-md space-y-1">
-              <h3 className="font-sans font-semibold text-base text-[#28352F]">No Captured Leads Yet</h3>
-              <p className="text-xs text-[#5C6B64] leading-normal">
-                When visitors open your public bio {username ? <>at <span className="font-mono text-[#52796F]">/{username}</span></> : ''} and submit their contact details, they will appear here instantly.
+              <h3 className="text-[14px] font-sans font-semibold text-ink-700">No Captured Leads Yet</h3>
+              <p className="text-xs text-ink-500 leading-normal">
+                When visitors open your public bio {username ? <>at <span className="font-mono text-brand-500">/{username}</span></> : ''} and submit their contact details, they will appear here instantly.
               </p>
             </div>
             {username && (
@@ -455,7 +455,7 @@ export default function LeadsPage() {
                 href={`/${username}`}
                 target="_blank"
                 rel="noreferrer"
-                className="flex items-center gap-1.5 px-3.5 py-1.5 bg-[#52796F] text-white text-xs font-medium rounded-lg hover:bg-[#3D5C54] transition-all shadow-xs"
+                className="flex items-center gap-1.5 px-3.5 py-1.5 bg-brand-500 text-white text-xs font-medium rounded-lg hover:bg-brand-600 transition-all "
               >
                 <span>Test Contact Form on Live Bio</span>
                 <ExternalLink className="w-3.5 h-3.5" />
@@ -463,14 +463,14 @@ export default function LeadsPage() {
             )}
           </div>
         ) : filteredLeads.length === 0 ? (
-          <div className="bg-white border border-[#CAD8CE]/80 rounded-xl p-8 text-center flex flex-col items-center justify-center gap-2 shadow-xs my-1">
-            <p className="text-sm font-semibold text-[#28352F]">No leads match your active filter</p>
-            <p className="text-xs text-[#5C6B64]">
+          <div className="bg-white border-[0.5px] border-line/80 rounded-xl p-8 text-center flex flex-col items-center justify-center gap-2 my-1">
+            <p className="text-sm font-semibold text-ink-700">No leads match your active filter</p>
+            <p className="text-xs text-ink-500">
               {statusFilter !== 'all' ? `No ${statusFilter} leads found.` : 'No leads match your search query.'}
             </p>
             <button
               onClick={() => { setStatusFilter('all'); setSearchQuery(''); }}
-              className="mt-1 text-xs font-semibold text-[#52796F] hover:underline cursor-pointer"
+              className="mt-1 text-xs font-semibold text-brand-500 hover:underline cursor-pointer"
             >
               Reset filters
             </button>
@@ -484,24 +484,24 @@ export default function LeadsPage() {
               return (
                 <div
                   key={lead._id}
-                  className="p-3 bg-white border border-[#CAD8CE]/80 rounded flex flex-col md:flex-row md:items-center justify-between gap-3 hover:border-[#52796F] transition-all group shadow-xs"
+                  className="p-3 bg-white border-[0.5px] border-line/80 rounded flex flex-col md:flex-row md:items-center justify-between gap-3 hover:border-brand-500 transition-all group "
                 >
                   <div className="flex items-start gap-3 min-w-0">
-                    <div className="w-9 h-9 rounded bg-[#F5F3ED] border border-[#CAD8CE] flex items-center justify-center text-[#52796F] font-bold text-sm shrink-0">
+                    <div className="w-9 h-9 rounded bg-surface-2 border-[0.5px] border-line flex items-center justify-center text-brand-500 font-semibold text-sm shrink-0">
                       {(lead.fullName || 'U').charAt(0).toUpperCase()}
                     </div>
                     <div className="flex flex-col min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className="font-bold text-xs text-[#28352F]">
+                        <span className="font-semibold text-xs text-ink-700">
                           {lead.fullName || 'Anonymous Contact'}
                         </span>
                         {lead.company && (
-                          <span className="px-1.5 py-0.2 bg-[#F5F3ED] border border-[#CAD8CE] text-[#5C6B64] text-[0.62rem] font-medium rounded flex items-center gap-1">
-                            <Building2 className="w-2.5 h-2.5 text-[#52796F]" />
+                          <span className="px-1.5 py-0.2 bg-surface-2 border-[0.5px] border-line text-ink-500 text-[0.62rem] font-medium rounded flex items-center gap-1">
+                            <Building2 className="w-2.5 h-2.5 text-brand-500" />
                             {lead.company}
                           </span>
                         )}
-                        <span className="font-mono text-[0.62rem] text-[#5C6B64]/70">
+                        <span className="font-mono text-[0.62rem] text-ink-500/70">
                           {new Date(lead.createdAt).toLocaleDateString()} at{' '}
                           {new Date(lead.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                         </span>
@@ -510,16 +510,16 @@ export default function LeadsPage() {
                       {/* Contact Badges: Phone, Email, Note */}
                       <div className="flex items-center gap-2 mt-1.5 flex-wrap">
                         {lead.email && (
-                          <div className="flex items-center gap-1 text-[0.6875rem] font-mono text-[#28352F] bg-[#F5F3ED] px-2 py-0.5 rounded border border-[#CAD8CE]/60">
-                            <Mail className="w-3 h-3 text-[#52796F]" />
+                          <div className="flex items-center gap-1 text-[0.6875rem] font-mono text-ink-700 bg-surface-2 px-2 py-0.5 rounded border-[0.5px] border-line/60">
+                            <Mail className="w-3 h-3 text-brand-500" />
                             <span>{lead.email}</span>
                             <button
                               onClick={() => handleCopy(lead.email, `email_${lead._id}`)}
-                              className="text-[#5C6B64] hover:text-[#28352F] ml-0.5"
+                              className="text-ink-500 hover:text-ink-700 ml-0.5"
                               title="Copy Email"
                             >
                               {copiedKey === `email_${lead._id}` ? (
-                                <Check className="w-3 h-3 text-emerald-600" />
+                                <Check className="w-3 h-3 text-brand-600" />
                               ) : (
                                 <Copy className="w-3 h-3" />
                               )}
@@ -528,21 +528,21 @@ export default function LeadsPage() {
                         )}
 
                         {lead.phone && (
-                          <div className="flex items-center gap-1.5 text-[0.6875rem] font-mono text-[#28352F] bg-[#F5F3ED] px-2 py-0.5 rounded border border-[#CAD8CE]/60">
-                            <Phone className="w-3 h-3 text-[#52796F]" />
+                          <div className="flex items-center gap-1.5 text-[0.6875rem] font-mono text-ink-700 bg-surface-2 px-2 py-0.5 rounded border-[0.5px] border-line/60">
+                            <Phone className="w-3 h-3 text-brand-500" />
                             <span>{lead.phone}</span>
                             {lead.isWhatsApp && (
-                              <span className="inline-flex items-center px-1 py-0.2 text-[9px] font-semibold text-emerald-800 bg-emerald-100 rounded border border-emerald-300" title="Available on WhatsApp">
+                              <span className="inline-flex items-center px-1 py-0.2 text-[9px] font-semibold text-brand-800 bg-brand-100 rounded border border-brand-300" title="Available on WhatsApp">
                                 WhatsApp
                               </span>
                             )}
                             <button
                               onClick={() => handleCopy(lead.phone, `phone_${lead._id}`)}
-                              className="text-[#5C6B64] hover:text-[#28352F] ml-0.5"
+                              className="text-ink-500 hover:text-ink-700 ml-0.5"
                               title="Copy Phone"
                             >
                               {copiedKey === `phone_${lead._id}` ? (
-                                <Check className="w-3 h-3 text-emerald-600" />
+                                <Check className="w-3 h-3 text-brand-600" />
                               ) : (
                                 <Copy className="w-3 h-3" />
                               )}
@@ -551,8 +551,8 @@ export default function LeadsPage() {
                         )}
 
                         {lead.notes && (
-                          <div className="flex items-center gap-1 text-[0.6875rem] text-[#5C6B64] bg-[#CAD8CE]/30 px-2 py-0.5 rounded italic truncate max-w-xs">
-                            <MessageSquare className="w-2.5 h-2.5 text-[#52796F] shrink-0" />
+                          <div className="flex items-center gap-1 text-[0.6875rem] text-ink-500 bg-brand-100/30 px-2 py-0.5 rounded italic truncate max-w-xs">
+                            <MessageSquare className="w-2.5 h-2.5 text-brand-500 shrink-0" />
                             <span className="truncate">&ldquo;{lead.notes}&rdquo;</span>
                           </div>
                         )}
@@ -561,23 +561,23 @@ export default function LeadsPage() {
                   </div>
 
                   {/* Actions & Sync Status */}
-                  <div className="flex items-center gap-2 shrink-0 justify-end pt-2 md:pt-0 border-t md:border-t-0 border-[#E0DCD3]">
+                  <div className="flex items-center gap-2 shrink-0 justify-end pt-2 md:pt-0 border-t md:border-t-0 border-line">
                     {isSynced ? (
-                      <span className="flex items-center gap-1 px-2 py-0.5 bg-[#CAD8CE]/50 text-[#28352F] text-[0.65rem] font-mono font-bold rounded border border-[#52796F]/20">
-                        <CheckCircle2 className="w-3 h-3 text-[#52796F]" />
+                      <span className="flex items-center gap-1 px-2 py-0.5 bg-brand-100/50 text-ink-700 text-[0.65rem] font-mono font-semibold rounded border border-brand-500/20">
+                        <CheckCircle2 className="w-3 h-3 text-brand-500" />
                         <span>Google Synced</span>
                       </span>
                     ) : (
                       <button
                         onClick={() => handleSyncLead(lead)}
                         disabled={isSyncing}
-                        className="flex items-center gap-1 px-2.5 py-1 bg-white border border-[#CAD8CE] hover:border-[#52796F] text-[#28352F] text-xs font-semibold rounded shadow-xs transition-all cursor-pointer"
+                        className="flex items-center gap-1 px-2.5 py-1 bg-white border-[0.5px] border-line hover:border-brand-500 text-ink-700 text-xs font-semibold rounded transition-all cursor-pointer"
                         title="Sync Contact to Google Contacts & Gmail"
                       >
                         {isSyncing ? (
-                          <Loader2 className="w-3 h-3 animate-spin text-[#52796F]" />
+                          <Loader2 className="w-3 h-3 animate-spin text-brand-500" />
                         ) : (
-                          <Sparkles className="w-3 h-3 text-[#52796F]" />
+                          <Sparkles className="w-3 h-3 text-brand-500" />
                         )}
                         <span>Sync to Google</span>
                       </button>
@@ -585,7 +585,7 @@ export default function LeadsPage() {
 
                     <button
                       onClick={() => handleDeleteLead(lead._id)}
-                      className="p-1.5 text-[#5C6B64] hover:text-rose-600 transition-colors"
+                      className="p-1.5 text-ink-500 hover:text-rose-600 transition-colors"
                       title="Delete Lead"
                     >
                       <Trash2 className="w-3.5 h-3.5" />

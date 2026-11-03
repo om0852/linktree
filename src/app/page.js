@@ -618,7 +618,7 @@ export default function AtelierStudioPage() {
     const isGradient = preset.bg?.includes('gradient');
     const wallpaperVal = preset.bg?.startsWith('bg-[#') 
       ? preset.bg.slice(4, -1) 
-      : (preset.bg?.startsWith('bg-') ? preset.bg : '#FFFEFA');
+      : (preset.bg?.startsWith('bg-') ? preset.bg : '#FFFFFF');
     const wallpaper = {
       type: isGradient ? 'gradient' : 'fill',
       value: isGradient ? '' : wallpaperVal,
@@ -636,7 +636,7 @@ export default function AtelierStudioPage() {
       designSettings: {
         ...(prev.designSettings || {}),
         wallpaper,
-        buttonColor: preset.primary || '#52796F',
+        buttonColor: preset.primary || '#16A34A',
         buttonTextColor: '#FFFFFF',
         buttonStyle: preset.cardBg?.includes('/10') || preset.cardBg?.includes('/20') || preset.id === 'dark-glass' 
           ? 'glass' 
@@ -1023,19 +1023,19 @@ export default function AtelierStudioPage() {
   const activeLinks = (currentProfile.links || []).filter((l) => !l.disabled);
 
   return (
-    <div className="bg-[#FFFEFA] text-[#28352F] antialiased selection:bg-[#CAD8CE] selection:text-[#28352F] min-h-screen">
+    <div className="bg-canvas text-ink-700 antialiased min-h-screen">
       {/* High-Visibility Modern Toast Notification */}
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-[9999] max-w-sm w-full animate-fadeIn shadow-2xl transition-all">
+        <div className="fixed bottom-6 right-6 z-[9999] max-w-sm w-full animate-fadeIn shadow-modal transition-all">
           <div className={`p-4 rounded-xl border flex items-start gap-3 text-xs sm:text-sm font-medium ${
             toastMessage.type === 'success'
-              ? 'bg-[#28352F] border-[#52796F] text-[#FFFEFA]'
+              ? 'bg-ink-900 border-brand-500 text-white'
               : toastMessage.type === 'info'
-              ? 'bg-[#28352F] border-[#CAD8CE] text-white'
+              ? 'bg-ink-900 border-line text-white'
               : 'bg-rose-950 border-rose-500 text-rose-100'
           }`}>
             {toastMessage.type === 'success' ? (
-              <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
+              <CheckCircle2 className="w-5 h-5 text-brand-400 shrink-0 mt-0.5" />
             ) : toastMessage.type === 'info' ? (
               <Sparkles className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
             ) : (
@@ -1048,7 +1048,7 @@ export default function AtelierStudioPage() {
                   href={toastMessage.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 text-emerald-400 hover:text-emerald-300 underline mt-1.5 font-mono text-xs"
+                  className="inline-flex items-center gap-1 text-brand-400 hover:text-brand-300 underline mt-1.5 font-mono text-xs"
                 >
                   <span>Open Live Bio</span>
                   <ExternalLink className="w-3 h-3" />
@@ -1074,7 +1074,7 @@ export default function AtelierStudioPage() {
       />
 
       {/* Main Content Workspace Container */}
-      <div className="lg:pl-64 min-h-screen bg-[#FFFEFA] flex flex-col">
+      <div className="lg:pl-[280px] min-h-screen bg-canvas flex flex-col">
         {/* TreeInBio Top Header */}
         <AtelierHeader
           currentProfile={currentProfile}
@@ -1111,29 +1111,29 @@ export default function AtelierStudioPage() {
         />
 
         {/* Main Studio Viewport */}
-        <main className="pt-20 sm:pt-24 px-4 sm:px-6 lg:px-8 pb-12 max-w-[1440px] mx-auto w-full flex flex-col gap-6">
+        <main className="flex-1 mt-[74px] mx-[10px] mb-[10px] lg:ml-0 min-w-0 rounded-lg bg-white p-[15px] flex flex-col gap-[15px]">
           {/* Top Bio Optimization Insights Banner */}
           {!rankerDismissed && (
-            <div className="bg-[#F5F3ED] border border-[#CAD8CE]/80 rounded-2xl p-4 sm:p-5 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4 relative overflow-hidden">
-              <div className="absolute -right-16 -top-16 w-44 h-44 bg-[#CAD8CE]/30 rounded-full blur-2xl pointer-events-none"></div>
+            <div className="bg-surface-2 border-[0.5px] border-line/80 rounded-2xl p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 relative overflow-hidden">
+              <div className="absolute -right-16 -top-16 w-44 h-44 bg-brand-100/30 rounded-full blur-2xl pointer-events-none"></div>
               
               <div className="flex items-center gap-3.5 relative z-10">
-                <div className="w-10 h-10 rounded-xl bg-white border border-[#CAD8CE] flex items-center justify-center text-[#52796F] shadow-xs shrink-0">
-                  <Sparkles className="w-5 h-5 text-[#52796F]" />
+                <div className="w-10 h-10 rounded-xl bg-white border-[0.5px] border-line flex items-center justify-center text-brand-500 shrink-0">
+                  <Sparkles className="w-5 h-5 text-brand-500" />
                 </div>
                 <div className="flex flex-col gap-1">
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold text-[#52796F] uppercase tracking-wider font-mono">
+                    <span className="text-xs font-semibold text-brand-500 uppercase tracking-wider font-mono">
                       Bio Optimization Insights
                     </span>
                     <Badge variant="mint" size="xs">
                       PERFORMANCE TIP
                     </Badge>
                   </div>
-                  <p className="text-xs sm:text-sm text-[#28352F] flex items-center gap-2 flex-wrap">
+                  <p className="text-xs sm:text-sm text-ink-700 flex items-center gap-2 flex-wrap">
                     <span>Engagement Score:</span>
-                    <span className="font-bold text-[#28352F] font-mono">{ctrData.score}%</span>
-                    <span className="text-[#5C6B64] font-mono">→ 89.5% target</span>
+                    <span className="font-semibold text-ink-700 font-mono">{ctrData.score}%</span>
+                    <span className="text-ink-500 font-mono">→ 89.5% target</span>
                     <Badge variant="sage" size="xs">
                       +{Math.max(0, (89.5 - ctrData.score)).toFixed(1)}% Boost Opportunity
                     </Badge>
@@ -1166,7 +1166,7 @@ export default function AtelierStudioPage() {
           <div className="flex flex-col gap-3 pb-1">
             {/* Row 1: Tab Switchers Segmented Group & URL Shortcut */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div className="inline-flex items-center p-1 bg-[#F5F3ED] border border-[#CAD8CE] rounded-xl gap-1 shadow-2xs self-start overflow-x-auto max-w-full">
+              <div className="inline-flex items-center p-1 bg-surface-2 border-[0.5px] border-line rounded-xl gap-1 shadow-2xs self-start overflow-x-auto max-w-full">
                 <TabButton
                   active={activeTab === 'links'}
                   icon={Share2}
@@ -1193,9 +1193,9 @@ export default function AtelierStudioPage() {
               </div>
 
               {/* URL Shortcut Badge */}
-              <div className="flex items-center gap-2 bg-[#F5F3ED] border border-[#CAD8CE] px-3.5 py-1.5 rounded-xl shadow-xs self-start sm:self-auto shrink-0 min-h-[38px]">
-                <span className="font-mono text-xs text-[#5C6B64]">treeinbio.me/</span>
-                <span className="font-mono text-xs sm:text-sm text-[#28352F] font-bold">
+              <div className="flex items-center gap-2 bg-surface-2 border-[0.5px] border-line px-3.5 py-1.5 rounded-xl self-start sm:self-auto shrink-0 min-h-[38px]">
+                <span className="font-mono text-xs text-ink-500">treeinbio.me/</span>
+                <span className="font-mono text-xs sm:text-sm text-ink-700 font-semibold">
                   {currentProfile.username}
                 </span>
                 <IconButton
@@ -1203,7 +1203,7 @@ export default function AtelierStudioPage() {
                   size="sm"
                   onClick={handleCopyBioUrl}
                   title="Copy Bio URL"
-                  className={copiedBioUrl ? 'text-emerald-600' : 'text-[#52796F]'}
+                  className={copiedBioUrl ? 'text-brand-600' : 'text-brand-500'}
                 />
               </div>
             </div>
@@ -1216,7 +1216,7 @@ export default function AtelierStudioPage() {
                   size="sm"
                   leftIcon={Plus}
                   onClick={() => setShowMarketplace(true)}
-                  className="bg-[#28352F] hover:bg-[#1C2723] text-white shadow-xs ring-1 ring-[#52796F]/30"
+                  className="bg-ink-900 hover:bg-ink-900 text-white ring-1 ring-brand-500/30"
                 >
                   Add to Bio
                 </Button>
@@ -1296,10 +1296,10 @@ export default function AtelierStudioPage() {
                   {(isAddingLink || editingLinkId) && (
                     <form
                       onSubmit={handleSaveLinkForm}
-                      className="bg-[#F5F3ED] border-2 border-[#52796F] rounded-xl p-4 sm:p-5 shadow-md flex flex-col gap-3.5 animate-fadeIn"
+                      className="bg-surface-2 border-2 border-brand-500 rounded-xl p-4 sm:p-5 flex flex-col gap-3.5 animate-fadeIn"
                     >
-                      <div className="flex items-center justify-between pb-2 border-b border-[#CAD8CE]">
-                        <span className="font-sans font-bold text-sm text-[#28352F]">
+                      <div className="flex items-center justify-between pb-2 border-b-[0.5px] border-line">
+                        <span className="font-sans font-semibold text-sm text-ink-700">
                           {editingLinkId ? 'Edit Link' : 'Add New Link'}
                         </span>
                         <Button
@@ -1385,7 +1385,7 @@ export default function AtelierStudioPage() {
                               placeholder="e.g. $29.99"
                               value={linkForm.price || ''}
                               onChange={(e) => setLinkForm({ ...linkForm, price: e.target.value })}
-                              className="font-mono font-bold"
+                              className="font-mono font-semibold"
                             />
                           </div>
                         )}
@@ -1420,30 +1420,30 @@ export default function AtelierStudioPage() {
                       </div>
 
                       {/* Power Feature Collapsible Accordions (Anti-Bloat Progressive Disclosure) */}
-                      <div className="flex flex-col gap-1.5 pt-1 border-t border-[#CAD8CE]/70">
+                      <div className="flex flex-col gap-1.5 pt-1 border-t-[0.5px] border-line/70">
                         {/* 1. Lead Magnet Lock to Unlock Accordion */}
-                        <div className="rounded-lg border border-[#CAD8CE] bg-white overflow-hidden shadow-xs">
+                        <div className="rounded-lg border-[0.5px] border-line bg-white overflow-hidden ">
                           <button
                             type="button"
                             onClick={() => setOpenLinkAccordion(openLinkAccordion === 'magnet' ? null : 'magnet')}
-                            className="w-full px-2.5 py-1.5 flex items-center justify-between text-xs text-[#28352F] hover:bg-[#F5F3ED] transition-colors"
+                            className="w-full px-2.5 py-1.5 flex items-center justify-between text-xs text-ink-700 hover:bg-surface-2 transition-colors"
                           >
                             <div className="flex items-center gap-1.5 font-semibold">
-                              <Lock size={13} className={linkForm.leadMagnet?.enabled ? 'text-amber-600' : 'text-[#5C6B64]'} />
+                              <Lock size={13} className={linkForm.leadMagnet?.enabled ? 'text-amber-600' : 'text-ink-500'} />
                               <span>Lead Magnet &ldquo;Lock to Unlock&rdquo;</span>
                               {linkForm.leadMagnet?.enabled && (
-                                <span className="text-[9px] px-1.5 py-0.2 rounded-full bg-amber-100 text-amber-800 font-bold">
+                                <span className="text-[9px] px-1.5 py-0.2 rounded-full bg-amber-100 text-amber-800 font-semibold">
                                   ACTIVE LOCK
                                 </span>
                               )}
                             </div>
-                            <span className="text-[10px] text-[#5C6B64] font-mono">
+                            <span className="text-[10px] text-ink-500 font-mono">
                               {openLinkAccordion === 'magnet' ? '▲ Hide' : '▼ Configure'}
                             </span>
                           </button>
 
                           {openLinkAccordion === 'magnet' && (
-                            <div className="p-2.5 bg-[#F5F3ED]/70 border-t border-[#CAD8CE] flex flex-col gap-2 text-xs">
+                            <div className="p-2.5 bg-surface-2/70 border-t-[0.5px] border-line flex flex-col gap-2 text-xs">
                               <label className="flex items-center gap-2 cursor-pointer">
                                 <input
                                   type="checkbox"
@@ -1452,15 +1452,15 @@ export default function AtelierStudioPage() {
                                     ...linkForm,
                                     leadMagnet: { ...(linkForm.leadMagnet || {}), enabled: e.target.checked }
                                   })}
-                                  className="rounded border-[#CAD8CE] text-[#52796F] focus:ring-[#52796F]"
+                                  className="rounded border-line text-brand-500 focus:ring-brand-500"
                                 />
-                                <span className="font-semibold text-[#28352F]">
+                                <span className="font-semibold text-ink-700">
                                   Require Email or WhatsApp to unlock this download
                                 </span>
                               </label>
 
                               {linkForm.leadMagnet?.enabled && (
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 pt-3 border-t border-[#CAD8CE]/50">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 pt-3 border-t-[0.5px] border-line/50">
                                   <div>
                                     <Label htmlFor="magnet-asset-url" required>Asset Download URL</Label>
                                     <Input
@@ -1537,9 +1537,9 @@ export default function AtelierStudioPage() {
                                           ...linkForm,
                                           leadMagnet: { ...(linkForm.leadMagnet || {}), requireEmail: e.target.checked }
                                         })}
-                                        className="rounded border-[#CAD8CE] text-[#52796F]"
+                                        className="rounded border-line text-brand-500"
                                       />
-                                      <span className="text-[11px] text-[#28352F]">Require Email Address</span>
+                                      <span className="text-[11px] text-ink-700">Require Email Address</span>
                                     </label>
 
                                     <label className="flex items-center gap-1.5 cursor-pointer">
@@ -1550,9 +1550,9 @@ export default function AtelierStudioPage() {
                                           ...linkForm,
                                           leadMagnet: { ...(linkForm.leadMagnet || {}), requireWhatsApp: e.target.checked }
                                         })}
-                                        className="rounded border-[#CAD8CE] text-[#52796F]"
+                                        className="rounded border-line text-brand-500"
                                       />
-                                      <span className="text-[11px] text-[#28352F]">Require WhatsApp / Phone</span>
+                                      <span className="text-[11px] text-ink-700">Require WhatsApp / Phone</span>
                                     </label>
                                   </div>
                                 </div>
@@ -1562,28 +1562,28 @@ export default function AtelierStudioPage() {
                         </div>
 
                         {/* 2. In-Page Media Player Preview Accordion */}
-                        <div className="rounded-lg border border-[#CAD8CE] bg-white overflow-hidden shadow-xs">
+                        <div className="rounded-lg border-[0.5px] border-line bg-white overflow-hidden ">
                           <button
                             type="button"
                             onClick={() => setOpenLinkAccordion(openLinkAccordion === 'embed' ? null : 'embed')}
-                            className="w-full px-2.5 py-1.5 flex items-center justify-between text-xs text-[#28352F] hover:bg-[#F5F3ED] transition-colors"
+                            className="w-full px-2.5 py-1.5 flex items-center justify-between text-xs text-ink-700 hover:bg-surface-2 transition-colors"
                           >
                             <div className="flex items-center gap-1.5 font-semibold">
-                              <Music size={13} className={linkForm.embed?.enabled ? 'text-emerald-600' : 'text-[#5C6B64]'} />
+                              <Music size={13} className={linkForm.embed?.enabled ? 'text-brand-600' : 'text-ink-500'} />
                               <span>In-Page Media Preview (Zero Tab-Switching)</span>
                               {linkForm.embed?.enabled && (
-                                <span className="text-[9px] px-1.5 py-0.2 rounded-full bg-emerald-100 text-emerald-800 font-bold uppercase">
+                                <span className="text-[9px] px-1.5 py-0.2 rounded-full bg-brand-100 text-brand-800 font-semibold uppercase">
                                   {linkForm.embed.platform}
                                 </span>
                               )}
                             </div>
-                            <span className="text-[10px] text-[#5C6B64] font-mono">
+                            <span className="text-[10px] text-ink-500 font-mono">
                               {openLinkAccordion === 'embed' ? '▲ Hide' : '▼ Configure'}
                             </span>
                           </button>
 
                           {openLinkAccordion === 'embed' && (
-                            <div className="p-2.5 bg-[#F5F3ED]/70 border-t border-[#CAD8CE] flex flex-col gap-2 text-xs">
+                            <div className="p-2.5 bg-surface-2/70 border-t-[0.5px] border-line flex flex-col gap-2 text-xs">
                               <div className="flex items-center justify-between">
                                 <label className="flex items-center gap-2 cursor-pointer">
                                   <input
@@ -1593,9 +1593,9 @@ export default function AtelierStudioPage() {
                                       ...linkForm,
                                       embed: { ...(linkForm.embed || {}), enabled: e.target.checked }
                                     })}
-                                    className="rounded border-[#CAD8CE] text-[#52796F]"
+                                    className="rounded border-line text-brand-500"
                                   />
-                                  <span className="font-semibold text-[#28352F]">
+                                  <span className="font-semibold text-ink-700">
                                     Play audio or watch video inline directly on bio
                                   </span>
                                 </label>
@@ -1615,14 +1615,14 @@ export default function AtelierStudioPage() {
                                       });
                                     }
                                   }}
-                                  className="text-[10px] font-semibold text-[#52796F] hover:underline flex items-center gap-1"
+                                  className="text-[10px] font-semibold text-brand-500 hover:underline flex items-center gap-1"
                                 >
                                   <Sparkles size={11} /> Auto-Detect from URL
                                 </button>
                               </div>
 
                               {linkForm.embed?.enabled && (
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 pt-3 border-t border-[#CAD8CE]/50">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 pt-3 border-t-[0.5px] border-line/50">
                                   <div>
                                     <Label htmlFor="embed-platform">Platform</Label>
                                     <Select
@@ -1663,28 +1663,28 @@ export default function AtelierStudioPage() {
                         </div>
 
                         {/* 3. Time-Sensitive Flash Links Accordion */}
-                        <div className="rounded-lg border border-[#CAD8CE] bg-white overflow-hidden shadow-xs">
+                        <div className="rounded-lg border-[0.5px] border-line bg-white overflow-hidden ">
                           <button
                             type="button"
                             onClick={() => setOpenLinkAccordion(openLinkAccordion === 'schedule' ? null : 'schedule')}
-                            className="w-full px-2.5 py-1.5 flex items-center justify-between text-xs text-[#28352F] hover:bg-[#F5F3ED] transition-colors"
+                            className="w-full px-2.5 py-1.5 flex items-center justify-between text-xs text-ink-700 hover:bg-surface-2 transition-colors"
                           >
                             <div className="flex items-center gap-1.5 font-semibold">
-                              <Clock size={13} className={linkForm.schedule?.enabled ? 'text-blue-600' : 'text-[#5C6B64]'} />
+                              <Clock size={13} className={linkForm.schedule?.enabled ? 'text-blue-600' : 'text-ink-500'} />
                               <span>Time-Sensitive Flash Link (Countdown Badge)</span>
                               {linkForm.schedule?.enabled && (
-                                <span className="text-[9px] px-1.5 py-0.2 rounded-full bg-blue-100 text-blue-800 font-bold">
+                                <span className="text-[9px] px-1.5 py-0.2 rounded-full bg-blue-100 text-blue-800 font-semibold">
                                   SCHEDULED
                                 </span>
                               )}
                             </div>
-                            <span className="text-[10px] text-[#5C6B64] font-mono">
+                            <span className="text-[10px] text-ink-500 font-mono">
                               {openLinkAccordion === 'schedule' ? '▲ Hide' : '▼ Configure'}
                             </span>
                           </button>
 
                           {openLinkAccordion === 'schedule' && (
-                            <div className="p-3 bg-[#F5F3ED]/70 border-t border-[#CAD8CE] flex flex-col gap-2.5 text-xs">
+                            <div className="p-3 bg-surface-2/70 border-t-[0.5px] border-line flex flex-col gap-2.5 text-xs">
                               <label className="flex items-center gap-2 cursor-pointer">
                                 <input
                                   type="checkbox"
@@ -1693,15 +1693,15 @@ export default function AtelierStudioPage() {
                                     ...linkForm,
                                     schedule: { ...(linkForm.schedule || {}), enabled: e.target.checked }
                                   })}
-                                  className="rounded border-[#CAD8CE] text-[#52796F]"
+                                  className="rounded border-line text-brand-500"
                                 />
-                                <span className="font-semibold text-[#28352F]">
+                                <span className="font-semibold text-ink-700">
                                   Auto-show / auto-hide link with active countdown timer
                                 </span>
                               </label>
 
                               {linkForm.schedule?.enabled && (
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 pt-2 border-t border-[#CAD8CE]/50">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 pt-2 border-t-[0.5px] border-line/50">
                                   <div>
                                     <Label htmlFor="schedule-starts">Starts At (Optional)</Label>
                                     <Input
@@ -1736,28 +1736,28 @@ export default function AtelierStudioPage() {
                         </div>
 
                         {/* 4. Country & Geo-Targeting Rules Accordion */}
-                        <div className="rounded-lg border border-[#CAD8CE] bg-white overflow-hidden shadow-xs">
+                        <div className="rounded-lg border-[0.5px] border-line bg-white overflow-hidden ">
                           <button
                             type="button"
                             onClick={() => setOpenLinkAccordion(openLinkAccordion === 'geo' ? null : 'geo')}
-                            className="w-full px-2.5 py-1.5 flex items-center justify-between text-xs text-[#28352F] hover:bg-[#F5F3ED] transition-colors cursor-pointer"
+                            className="w-full px-2.5 py-1.5 flex items-center justify-between text-xs text-ink-700 hover:bg-surface-2 transition-colors cursor-pointer"
                           >
                             <div className="flex items-center gap-1.5 font-semibold">
-                              <Globe size={13} className={linkForm.geoTargeting?.enabled ? 'text-teal-600' : 'text-[#5C6B64]'} />
+                              <Globe size={13} className={linkForm.geoTargeting?.enabled ? 'text-teal-600' : 'text-ink-500'} />
                               <span>Country &amp; Geo-Targeting Rules</span>
                               {linkForm.geoTargeting?.enabled && (
-                                <span className="text-[9px] px-1.5 py-0.2 rounded-full bg-teal-100 text-teal-800 font-bold uppercase">
+                                <span className="text-[9px] px-1.5 py-0.2 rounded-full bg-teal-100 text-teal-800 font-semibold uppercase">
                                   {linkForm.geoTargeting.countries?.length || 0} Countries
                                 </span>
                               )}
                             </div>
-                            <span className="text-[10px] text-[#5C6B64] font-mono">
+                            <span className="text-[10px] text-ink-500 font-mono">
                               {openLinkAccordion === 'geo' ? '▲ Hide' : '▼ Configure'}
                             </span>
                           </button>
 
                           {openLinkAccordion === 'geo' && (
-                            <div className="p-3 bg-[#F5F3ED]/70 border-t border-[#CAD8CE] flex flex-col gap-2.5 text-xs">
+                            <div className="p-3 bg-surface-2/70 border-t-[0.5px] border-line flex flex-col gap-2.5 text-xs">
                               <label className="flex items-center gap-2 cursor-pointer">
                                 <input
                                   type="checkbox"
@@ -1766,15 +1766,15 @@ export default function AtelierStudioPage() {
                                     ...linkForm,
                                     geoTargeting: { ...(linkForm.geoTargeting || {}), enabled: e.target.checked }
                                   })}
-                                  className="rounded border-[#CAD8CE] text-[#52796F]"
+                                  className="rounded border-line text-brand-500"
                                 />
-                                <span className="font-semibold text-[#28352F]">
+                                <span className="font-semibold text-ink-700">
                                   Show or hide this link based on visitor&rsquo;s country
                                 </span>
                               </label>
 
                               {linkForm.geoTargeting?.enabled && (
-                                <div className="space-y-3 pt-2 border-t border-[#CAD8CE]/50">
+                                <div className="space-y-3 pt-2 border-t-[0.5px] border-line/50">
                                   <div>
                                     <Label htmlFor="geo-mode">Targeting Rule</Label>
                                     <Select
@@ -1823,20 +1823,20 @@ export default function AtelierStudioPage() {
                                             }}
                                             className={`px-2 py-1.5 rounded-lg border text-left text-xs flex items-center justify-between transition-all cursor-pointer ${
                                               isSelected
-                                                ? 'bg-[#52796F] text-white border-[#3D5C54] font-semibold shadow-xs'
-                                                : 'bg-white text-[#28352F] border-[#CAD8CE] hover:bg-[#F5F3ED]'
+                                                ? 'bg-brand-500 text-white border-brand-600 font-semibold '
+                                                : 'bg-white text-ink-700 border-line hover:bg-surface-2'
                                             }`}
                                           >
                                             <span className="flex items-center gap-1.5">
                                               <span>{country.flag}</span>
                                               <span className="truncate">{country.name}</span>
                                             </span>
-                                            {isSelected && <span className="font-bold">✓</span>}
+                                            {isSelected && <span className="font-semibold">✓</span>}
                                           </button>
                                         );
                                       })}
                                     </div>
-                                    <p className="text-[10px] text-[#5C6B64] mt-1.5">
+                                    <p className="text-[10px] text-ink-500 mt-1.5">
                                       💡 Test this live by clicking <strong>&ldquo;View as...&rdquo;</strong> in the preview toolbar!
                                     </p>
                                   </div>
@@ -1849,7 +1849,7 @@ export default function AtelierStudioPage() {
 
                       <div className="flex items-center justify-between pt-1">
                         <div className="flex items-center gap-2">
-                          <Label htmlFor="link-icon-select" className="mb-0 text-xs font-bold uppercase text-[#5C6B64]">Icon:</Label>
+                          <Label htmlFor="link-icon-select" className="mb-0 text-xs font-semibold uppercase text-ink-500">Icon:</Label>
                           <div className="w-36">
                             <Select
                               id="link-icon-select"
@@ -1881,12 +1881,12 @@ export default function AtelierStudioPage() {
                   {(isAddingCollection || editingCollectionId) && (
                     <form
                       onSubmit={handleSaveCollection}
-                      className="bg-[#F5F3ED] border-2 border-[#52796F] rounded-xl p-4 sm:p-5 shadow-md flex flex-col gap-3.5 animate-fadeIn"
+                      className="bg-surface-2 border-2 border-brand-500 rounded-xl p-4 sm:p-5 flex flex-col gap-3.5 animate-fadeIn"
                     >
-                      <div className="flex items-center justify-between pb-2 border-b border-[#CAD8CE]">
+                      <div className="flex items-center justify-between pb-2 border-b-[0.5px] border-line">
                         <div className="flex items-center gap-2">
-                          <Folder className="w-4 h-4 text-[#52796F]" />
-                          <span className="font-sans font-bold text-sm text-[#28352F]">
+                          <Folder className="w-4 h-4 text-brand-500" />
+                          <span className="font-sans font-semibold text-sm text-ink-700">
                             {editingCollectionId ? 'Edit Collection' : 'Create New Collection (Folder)'}
                           </span>
                         </div>
@@ -1931,7 +1931,7 @@ export default function AtelierStudioPage() {
 
                         {/* Quick One-Click Carousel Presets */}
                         <div className="md:col-span-2 flex items-center gap-1.5 flex-wrap pt-1">
-                          <span className="text-[11px] text-[#5C6B64] font-medium mr-1">Quick Carousel Presets:</span>
+                          <span className="text-[11px] text-ink-500 font-medium mr-1">Quick Carousel Presets:</span>
                           <button
                             type="button"
                             onClick={() => setCollectionForm({
@@ -1939,7 +1939,7 @@ export default function AtelierStudioPage() {
                               viewMode: 'carousel',
                               type: 'instagram'
                             })}
-                            className="px-2.5 py-1 rounded-md text-[11px] font-semibold bg-pink-50 hover:bg-pink-100 text-pink-700 border border-pink-200 cursor-pointer transition-colors flex items-center gap-1 shadow-xs"
+                            className="px-2.5 py-1 rounded-md text-[11px] font-semibold bg-pink-50 hover:bg-pink-100 text-pink-700 border border-pink-200 cursor-pointer transition-colors flex items-center gap-1 "
                           >
                             📸 Instagram Reels Carousel
                           </button>
@@ -1950,7 +1950,7 @@ export default function AtelierStudioPage() {
                               viewMode: 'carousel',
                               type: 'youtube'
                             })}
-                            className="px-2.5 py-1 rounded-md text-[11px] font-semibold bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 cursor-pointer transition-colors flex items-center gap-1 shadow-xs"
+                            className="px-2.5 py-1 rounded-md text-[11px] font-semibold bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 cursor-pointer transition-colors flex items-center gap-1 "
                           >
                             ▶️ YouTube Videos Carousel
                           </button>
@@ -1961,7 +1961,7 @@ export default function AtelierStudioPage() {
                               viewMode: 'carousel',
                               type: 'products'
                             })}
-                            className="px-2.5 py-1 rounded-md text-[11px] font-semibold bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 cursor-pointer transition-colors flex items-center gap-1 shadow-xs"
+                            className="px-2.5 py-1 rounded-md text-[11px] font-semibold bg-brand-50 hover:bg-brand-100 text-brand-800 border border-brand-200 cursor-pointer transition-colors flex items-center gap-1 "
                           >
                             🛍️ Amaze Store Carousel
                           </button>
@@ -1969,7 +1969,7 @@ export default function AtelierStudioPage() {
                       </div>
 
                       <div className="flex items-center justify-between pt-1">
-                        <span className="text-[11px] text-[#5C6B64]">
+                        <span className="text-[11px] text-ink-500">
                           Group related links together on your profile with a custom view mode.
                         </span>
                         <Button
@@ -1985,11 +1985,11 @@ export default function AtelierStudioPage() {
 
                   {/* Collections Management Banner if any exist */}
                   {(currentProfile.collections || []).length > 0 && (
-                    <div className="bg-white border border-[#CAD8CE]/80 rounded-2xl p-4 sm:p-5 shadow-xs flex flex-col gap-3">
-                      <div className="flex items-center justify-between pb-2.5 border-b border-[#E0DCD3]/80">
+                    <div className="bg-white border-[0.5px] border-line/80 rounded-2xl p-4 sm:p-5 flex flex-col gap-3">
+                      <div className="flex items-center justify-between pb-2.5 border-b-[0.5px] border-line/80">
                         <div className="flex items-center gap-2">
-                          <Folder className="w-4 h-4 text-[#52796F]" />
-                          <h3 className="font-sans font-bold text-sm text-[#28352F]">Active Collections</h3>
+                          <Folder className="w-4 h-4 text-brand-500" />
+                          <h3 className="text-[14px] font-sans font-semibold text-ink-700">Active Collections</h3>
                           <Badge variant="sage" size="xs">
                             {(currentProfile.collections || []).length}
                           </Badge>
@@ -2003,7 +2003,7 @@ export default function AtelierStudioPage() {
                             setEditingCollectionId(null);
                             setCollectionForm({ title: '', viewMode: 'list' });
                           }}
-                          className="text-[#52796F]"
+                          className="text-brand-500"
                         >
                           New Collection
                         </Button>
@@ -2015,24 +2015,24 @@ export default function AtelierStudioPage() {
                           return (
                             <div
                               key={col.id}
-                              className="p-3 rounded-xl bg-[#F5F3ED]/80 border border-[#CAD8CE] flex flex-col justify-between gap-2.5"
+                              className="p-3 rounded-xl bg-surface-2/80 border-[0.5px] border-line flex flex-col justify-between gap-2.5"
                             >
                               <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2 min-w-0">
-                                  <div className="w-7 h-7 rounded-lg bg-white border border-[#CAD8CE] flex items-center justify-center text-[#52796F] shrink-0 font-bold">
+                                  <div className="w-7 h-7 rounded-lg bg-white border-[0.5px] border-line flex items-center justify-center text-brand-500 shrink-0 font-semibold">
                                     <Folder className="w-3.5 h-3.5" />
                                   </div>
                                   <div className="min-w-0">
-                                    <span className="font-bold text-xs sm:text-sm text-[#28352F] block truncate">
+                                    <span className="font-semibold text-xs sm:text-sm text-ink-700 block truncate">
                                       {col.title}
                                     </span>
-                                    <span className="text-[10px] text-[#5C6B64] font-mono">
+                                    <span className="text-[10px] text-ink-500 font-mono">
                                       {linksInCol.length} link{linksInCol.length === 1 ? '' : 's'} assigned
                                     </span>
                                   </div>
                                 </div>
 
-                                <div className="flex items-center gap-1 text-[#5C6B64]">
+                                <div className="flex items-center gap-1 text-ink-500">
                                   <button
                                     type="button"
                                     onClick={() => {
@@ -2043,7 +2043,7 @@ export default function AtelierStudioPage() {
                                       });
                                       setIsAddingCollection(false);
                                     }}
-                                    className="p-1 hover:text-[#28352F] hover:bg-white rounded transition-colors"
+                                    className="p-1 hover:text-ink-700 hover:bg-white rounded transition-colors"
                                     title="Edit Collection"
                                   >
                                     <Edit3 className="w-3.5 h-3.5" />
@@ -2060,8 +2060,8 @@ export default function AtelierStudioPage() {
                               </div>
 
                               {/* View Mode Switcher Pills */}
-                              <div className="flex items-center gap-1.5 pt-1.5 border-t border-[#CAD8CE]/50">
-                                <span className="text-[10px] text-[#5C6B64] font-medium mr-1">View:</span>
+                              <div className="flex items-center gap-1.5 pt-1.5 border-t-[0.5px] border-line/50">
+                                <span className="text-[10px] text-ink-500 font-medium mr-1">View:</span>
                                 {[
                                   { id: 'list', label: 'List' },
                                   { id: 'grid', label: 'Grid' },
@@ -2071,10 +2071,10 @@ export default function AtelierStudioPage() {
                                     key={mode.id}
                                     type="button"
                                     onClick={() => handleUpdateCollectionViewMode(col.id, mode.id)}
-                                    className={`px-2 py-0.5 rounded text-[10px] font-bold transition-all cursor-pointer ${
+                                    className={`px-2 py-0.5 rounded text-[10px] font-semibold transition-all cursor-pointer ${
                                       (col.viewMode || 'list') === mode.id
-                                        ? 'bg-[#52796F] text-white shadow-xs'
-                                        : 'bg-white text-[#5C6B64] border border-[#CAD8CE] hover:text-[#28352F]'
+                                        ? 'bg-brand-500 text-white '
+                                        : 'bg-white text-ink-500 border-[0.5px] border-line hover:text-ink-700'
                                     }`}
                                   >
                                     {mode.label}
@@ -2089,17 +2089,17 @@ export default function AtelierStudioPage() {
                   )}
 
                   {/* Links & Content Section */}
-                  <div className="bg-white border border-[#CAD8CE]/80 rounded-2xl p-5 sm:p-6 shadow-xs flex flex-col gap-5">
+                  <div className="bg-white border-[0.5px] border-line/80 rounded-2xl p-5 sm:p-6 flex flex-col gap-5">
                     {/* Content Sub-Tabs: Links | Shop */}
-                    <div className="flex items-center justify-between pb-3.5 border-b border-[#E0DCD3]/80 flex-wrap gap-3">
-                      <div className="inline-flex items-center p-1 bg-[#F5F3ED] border border-[#CAD8CE] rounded-xl gap-1 shadow-2xs">
+                    <div className="flex items-center justify-between pb-3.5 border-b-[0.5px] border-line/80 flex-wrap gap-3">
+                      <div className="inline-flex items-center p-1 bg-surface-2 border-[0.5px] border-line rounded-xl gap-1 shadow-2xs">
                         <button
                           type="button"
                           onClick={() => handleContentSubTabSwitch('links')}
-                          className={`px-3.5 py-1.5 rounded-lg text-xs font-bold flex items-center gap-2 transition-all cursor-pointer ${
+                          className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-2 transition-all cursor-pointer ${
                             contentSubTab === 'links'
-                              ? 'bg-[#52796F] text-white shadow-xs'
-                              : 'text-[#5C6B64] hover:text-[#28352F]'
+                              ? 'bg-brand-500 text-white '
+                              : 'text-ink-500 hover:text-ink-700'
                           }`}
                         >
                           <Share2 className="w-3.5 h-3.5" />
@@ -2108,17 +2108,17 @@ export default function AtelierStudioPage() {
                         <button
                           type="button"
                           onClick={() => handleContentSubTabSwitch('shop')}
-                          className={`px-3.5 py-1.5 rounded-lg text-xs font-bold flex items-center gap-2 transition-all cursor-pointer ${
+                          className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-2 transition-all cursor-pointer ${
                             contentSubTab === 'shop'
-                              ? 'bg-[#52796F] text-white shadow-xs'
-                              : 'text-[#5C6B64] hover:text-[#28352F]'
+                              ? 'bg-brand-500 text-white '
+                              : 'text-ink-500 hover:text-ink-700'
                           }`}
                         >
                           <ShoppingBag className="w-3.5 h-3.5" />
                           <span>Shop</span>
                           {(currentProfile.shop?.products || []).length > 0 && (
                             <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono ${
-                              contentSubTab === 'shop' ? 'bg-white/20 text-white' : 'bg-[#CAD8CE] text-[#28352F]'
+                              contentSubTab === 'shop' ? 'bg-white/20 text-white' : 'bg-brand-100 text-ink-700'
                             }`}>
                               {(currentProfile.shop?.products || []).length}
                             </span>
@@ -2127,19 +2127,19 @@ export default function AtelierStudioPage() {
                       </div>
 
                       {contentSubTab === 'links' ? (
-                        <div className="inline-flex items-center p-0.5 bg-[#F5F3ED] border border-[#CAD8CE] rounded-lg text-xs font-semibold">
+                        <div className="inline-flex items-center p-0.5 bg-surface-2 border-[0.5px] border-line rounded-lg text-xs font-semibold">
                           <button
                             type="button"
                             onClick={() => setLinkFilterTab('active')}
                             className={`px-3 py-1 rounded-md transition-all cursor-pointer flex items-center gap-1.5 ${
                               linkFilterTab === 'active'
-                                ? 'bg-[#52796F] text-white shadow-xs'
-                                : 'text-[#5C6B64] hover:text-[#28352F]'
+                                ? 'bg-brand-500 text-white '
+                                : 'text-ink-500 hover:text-ink-700'
                             }`}
                           >
                             <span>Active Links</span>
                             <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono ${
-                              linkFilterTab === 'active' ? 'bg-white/20 text-white' : 'bg-[#CAD8CE]/50 text-[#28352F]'
+                              linkFilterTab === 'active' ? 'bg-white/20 text-white' : 'bg-brand-100/50 text-ink-700'
                             }`}>
                               {(currentProfile.links || []).filter(l => !l.isArchived).length}
                             </span>
@@ -2150,14 +2150,14 @@ export default function AtelierStudioPage() {
                             onClick={() => setLinkFilterTab('archived')}
                             className={`px-3 py-1 rounded-md transition-all cursor-pointer flex items-center gap-1.5 ${
                               linkFilterTab === 'archived'
-                                ? 'bg-[#52796F] text-white shadow-xs'
-                                : 'text-[#5C6B64] hover:text-[#28352F]'
+                                ? 'bg-brand-500 text-white '
+                                : 'text-ink-500 hover:text-ink-700'
                             }`}
                           >
                             <Archive className="w-3.5 h-3.5" />
                             <span>Archived</span>
                             <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono ${
-                              linkFilterTab === 'archived' ? 'bg-white/20 text-white' : 'bg-[#CAD8CE]/50 text-[#28352F]'
+                              linkFilterTab === 'archived' ? 'bg-white/20 text-white' : 'bg-brand-100/50 text-ink-700'
                             }`}>
                               {(currentProfile.links || []).filter(l => l.isArchived).length}
                             </span>
@@ -2169,7 +2169,7 @@ export default function AtelierStudioPage() {
                           size="xs"
                           leftIcon={Plus}
                           onClick={() => setShowAddProductModal(true)}
-                          className="bg-[#52796F] text-white"
+                          className="bg-brand-500 text-white"
                         >
                           Add Product
                         </Button>
@@ -2181,26 +2181,26 @@ export default function AtelierStudioPage() {
                       <div className="flex flex-col gap-2.5">
                         {/* Interactive Lead Capture & Contact Form Builder Card */}
                         {currentProfile.leadCapture?.enabled !== false && (
-                          <div className="p-3.5 sm:p-4 rounded-xl bg-[#E8EFEA]/60 border border-[#52796F]/40 hover:border-[#52796F] flex items-center justify-between gap-3 shadow-xs transition-all">
+                          <div className="p-3.5 sm:p-4 rounded-xl bg-brand-50/60 border border-brand-500/40 hover:border-brand-500 flex items-center justify-between gap-3 transition-all">
                             <div className="flex items-center gap-3 min-w-0 flex-1">
-                              <div className="w-10 h-10 rounded-lg bg-[#52796F] text-white flex items-center justify-center shrink-0 shadow-xs">
+                              <div className="w-10 h-10 rounded-lg bg-brand-500 text-white flex items-center justify-center shrink-0 ">
                                 <Contact className="w-5 h-5" />
                               </div>
                               <div className="min-w-0 flex-1">
                                 <div className="flex items-center gap-2 flex-wrap">
-                                  <h4 className="font-bold text-xs sm:text-sm text-[#28352F] truncate">
+                                  <h4 className="text-[12px] font-semibold text-ink-700 truncate">
                                     {currentProfile.leadCapture?.title || "Let's Connect"}
                                   </h4>
-                                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#CAD8CE] text-[#28352F]">
+                                  <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-brand-100 text-ink-700">
                                     Lead Capture Form
                                   </span>
                                   {currentProfile.leadCapture?.syncToGoogleContacts !== false && (
-                                    <span className="text-[10px] font-mono text-emerald-700 flex items-center gap-0.5">
+                                    <span className="text-[10px] font-mono text-brand-700 flex items-center gap-0.5">
                                       <Sparkles className="w-2.5 h-2.5" /> CRM Synced
                                     </span>
                                   )}
                                 </div>
-                                <p className="text-[11px] text-[#5C6B64] truncate mt-0.5">
+                                <p className="text-[11px] text-ink-500 truncate mt-0.5">
                                   {currentProfile.leadCapture?.subtitle || "Captures visitor contact info and automatically syncs to leads"}
                                 </p>
                               </div>
@@ -2210,15 +2210,15 @@ export default function AtelierStudioPage() {
                               <button
                                 type="button"
                                 onClick={() => setShowLeadModal(true)}
-                                className="px-2.5 py-1.5 rounded-lg bg-white hover:bg-[#F5F3ED] border border-[#CAD8CE] text-xs font-semibold text-[#28352F] flex items-center gap-1.5 transition-colors cursor-pointer"
+                                className="px-2.5 py-1.5 rounded-lg bg-white hover:bg-surface-2 border-[0.5px] border-line text-xs font-semibold text-ink-700 flex items-center gap-1.5 transition-colors cursor-pointer"
                                 title="Preview and test contact form"
                               >
-                                <ExternalLink className="w-3.5 h-3.5 text-[#52796F]" />
+                                <ExternalLink className="w-3.5 h-3.5 text-brand-500" />
                                 <span className="hidden sm:inline">Preview Form</span>
                               </button>
                               <Link
                                 href="/leads"
-                                className="px-2.5 py-1.5 rounded-lg bg-[#52796F] hover:bg-[#3D5C54] text-white text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
+                                className="px-2.5 py-1.5 rounded-lg bg-brand-500 hover:bg-brand-600 text-white text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
                                 title="View captured leads in CRM"
                               >
                                 <span>Leads</span>
@@ -2238,9 +2238,9 @@ export default function AtelierStudioPage() {
                         )}
 
                         {(currentProfile.links || []).filter(l => !l.isArchived).length === 0 ? (
-                          <div className="p-8 text-center border-2 border-dashed border-[#CAD8CE] rounded-xl flex flex-col items-center justify-center gap-2 text-[#5C6B64]">
-                            <Plus className="w-8 h-8 text-[#52796F]/60" />
-                            <p className="text-sm font-semibold text-[#28352F]">No active links yet</p>
+                          <div className="p-8 text-center border-2 border-dashed border-line rounded-xl flex flex-col items-center justify-center gap-2 text-ink-500">
+                            <Plus className="w-8 h-8 text-brand-500/60" />
+                            <p className="text-sm font-semibold text-ink-700">No active links yet</p>
                             <p className="text-xs">Click &ldquo;+ Add to Bio&rdquo; or &ldquo;Add Link&rdquo; above to get started.</p>
                             <Button
                               variant="outline"
@@ -2260,21 +2260,21 @@ export default function AtelierStudioPage() {
                             return (
                               <div
                                 key={link.id || idx}
-                                className={`p-3.5 sm:p-4 rounded-xl flex items-center justify-between gap-3 transition-all group shadow-xs ${
+                                className={`p-3.5 sm:p-4 rounded-xl flex items-center justify-between gap-3 transition-all group ${
                                   link.disabled
                                     ? 'bg-stone-50 border border-stone-200 opacity-60'
                                     : idx === 0
-                                    ? 'bg-[#F5F3ED] border border-[#52796F]/40 hover:border-[#52796F]'
-                                    : 'bg-white border border-[#CAD8CE]/80 hover:border-[#52796F]'
+                                    ? 'bg-surface-2 border border-brand-500/40 hover:border-brand-500'
+                                    : 'bg-white border-[0.5px] border-line/80 hover:border-brand-500'
                                 }`}
                               >
                                 {/* Left: Move Arrows + Icon + Inline Title & Details */}
                                 <div className="flex items-center gap-3 min-w-0 flex-1">
-                                  <div className="flex flex-col text-[#5C6B64] group-hover:text-[#28352F] shrink-0">
+                                  <div className="flex flex-col text-ink-500 group-hover:text-ink-700 shrink-0">
                                     <button
                                       onClick={() => handleMoveLink(idx, 'up')}
                                       disabled={idx === 0}
-                                      className="hover:text-[#52796F] disabled:opacity-20 cursor-pointer p-0.5"
+                                      className="hover:text-brand-500 disabled:opacity-20 cursor-pointer p-0.5"
                                       title="Move Up"
                                     >
                                       ▲
@@ -2282,7 +2282,7 @@ export default function AtelierStudioPage() {
                                     <button
                                       onClick={() => handleMoveLink(idx, 'down')}
                                       disabled={idx === (currentProfile.links || []).filter(l => !l.isArchived).length - 1}
-                                      className="hover:text-[#52796F] disabled:opacity-20 cursor-pointer p-0.5"
+                                      className="hover:text-brand-500 disabled:opacity-20 cursor-pointer p-0.5"
                                       title="Move Down"
                                     >
                                       ▼
@@ -2295,8 +2295,8 @@ export default function AtelierStudioPage() {
                                       setActiveThumbnailLink(link);
                                       setShowThumbnailModal(true);
                                     }}
-                                    className={`w-10 h-10 rounded-lg border flex items-center justify-center shrink-0 font-bold relative group/thumb cursor-pointer transition-all overflow-hidden ${
-                                      idx === 0 ? 'bg-white border-[#CAD8CE] text-[#52796F]' : 'bg-[#F5F3ED] border-[#CAD8CE] text-[#52796F]'
+                                    className={`w-10 h-10 rounded-lg border flex items-center justify-center shrink-0 font-semibold relative group/thumb cursor-pointer transition-all overflow-hidden ${
+                                      idx === 0 ? 'bg-white border-line text-brand-500' : 'bg-surface-2 border-line text-brand-500'
                                     }`}
                                     title="Click to add or customize thumbnail"
                                   >
@@ -2309,7 +2309,7 @@ export default function AtelierStudioPage() {
                                         {iconSymbol}
                                       </span>
                                     )}
-                                    <div className="absolute inset-0 bg-[#52796F] text-white opacity-0 group-hover/thumb:opacity-100 flex items-center justify-center transition-opacity rounded-lg">
+                                    <div className="absolute inset-0 bg-brand-500 text-white opacity-0 group-hover/thumb:opacity-100 flex items-center justify-center transition-opacity rounded-lg">
                                       <ImagePlus className="w-4 h-4" />
                                     </div>
                                   </button>
@@ -2329,15 +2329,15 @@ export default function AtelierStudioPage() {
                                               if (e.key === 'Enter') handleSaveInlineTitle(link.id);
                                               if (e.key === 'Escape') handleCancelInlineTitle();
                                             }}
-                                            className="w-full px-2.5 py-1 text-sm font-bold text-[#28352F] bg-white border-2 border-[#52796F] rounded-lg focus:outline-none pr-14 shadow-inner"
+                                            className="w-full px-2.5 py-1 text-sm font-semibold text-ink-700 bg-white border-2 border-brand-500 rounded-lg focus:outline-none pr-14 shadow-inner"
                                             placeholder="Link title (max 35 chars)"
                                           />
-                                          <span className={`absolute right-2 top-1/2 -translate-y-1/2 text-[10px] font-mono font-bold ${
+                                          <span className={`absolute right-2 top-1/2 -translate-y-1/2 text-[10px] font-mono font-semibold ${
                                             inlineTitleDraft.length >= 35
-                                              ? 'text-red-500 font-extrabold'
+                                              ? 'text-red-500 font-semibold'
                                               : inlineTitleDraft.length > 25
                                               ? 'text-amber-600'
-                                              : 'text-[#5C6B64]'
+                                              : 'text-ink-500'
                                           }`}>
                                             {inlineTitleDraft.length}/35
                                           </span>
@@ -2345,7 +2345,7 @@ export default function AtelierStudioPage() {
                                         <button
                                           type="button"
                                           onClick={() => handleSaveInlineTitle(link.id)}
-                                          className="p-1 rounded-md bg-[#52796F] text-white hover:bg-[#3D5C54] transition-colors"
+                                          className="p-1 rounded-md bg-brand-500 text-white hover:bg-brand-600 transition-colors"
                                           title="Save title"
                                         >
                                           <Check size={14} />
@@ -2353,7 +2353,7 @@ export default function AtelierStudioPage() {
                                         <button
                                           type="button"
                                           onClick={handleCancelInlineTitle}
-                                          className="p-1 rounded-md bg-[#CAD8CE] text-[#28352F] hover:bg-stone-300 transition-colors"
+                                          className="p-1 rounded-md bg-brand-100 text-ink-700 hover:bg-stone-300 transition-colors"
                                           title="Cancel"
                                         >
                                           <X size={14} />
@@ -2363,7 +2363,7 @@ export default function AtelierStudioPage() {
                                       <div className="flex items-center gap-2 flex-wrap">
                                         <span 
                                           onDoubleClick={() => handleStartInlineEdit(link)}
-                                          className="text-sm font-bold text-[#28352F] truncate max-w-[200px] sm:max-w-[280px] hover:text-[#52796F] cursor-pointer"
+                                          className="text-sm font-semibold text-ink-700 truncate max-w-[200px] sm:max-w-[280px] hover:text-brand-500 cursor-pointer"
                                           title="Double click or click pencil to edit title inline"
                                         >
                                           {link.title}
@@ -2371,23 +2371,23 @@ export default function AtelierStudioPage() {
                                         <button
                                           type="button"
                                           onClick={() => handleStartInlineEdit(link)}
-                                          className="opacity-0 group-hover:opacity-100 text-[#5C6B64] hover:text-[#52796F] transition-opacity p-0.5"
+                                          className="opacity-0 group-hover:opacity-100 text-ink-500 hover:text-brand-500 transition-opacity p-0.5"
                                           title="Edit Title Inline"
                                         >
                                           <Edit3 size={12} />
                                         </button>
                                         {link.badge && (
-                                          <span className={`px-2 py-0.5 text-xs font-bold uppercase rounded-md ${
+                                          <span className={`px-2 py-0.5 text-xs font-semibold uppercase rounded-md ${
                                             idx === 0
-                                              ? 'bg-[#CAD8CE] text-[#28352F]'
-                                              : 'bg-[#F5F3ED] border border-[#CAD8CE] text-[#5C6B64]'
+                                              ? 'bg-brand-100 text-ink-700'
+                                              : 'bg-surface-2 border-[0.5px] border-line text-ink-500'
                                           }`}>
                                             {link.badge}
                                           </span>
                                         )}
                                         {link.geoTargeting?.enabled && (
                                           <span 
-                                            className="px-1.5 py-0.5 text-[10px] font-mono font-bold rounded-md bg-teal-50 border border-teal-300 text-teal-800 flex items-center gap-1"
+                                            className="px-1.5 py-0.5 text-[10px] font-mono font-semibold rounded-md bg-teal-50 border border-teal-300 text-teal-800 flex items-center gap-1"
                                             title={`Geo-Targeted: ${(link.geoTargeting.countries || []).join(', ') || 'Configured'}`}
                                           >
                                             <span>🌍</span>
@@ -2398,7 +2398,7 @@ export default function AtelierStudioPage() {
                                           <select
                                             value={link.collectionId || ''}
                                             onChange={(e) => handleAssignLinkToCollection(link.id, e.target.value)}
-                                            className="text-[10px] font-bold bg-[#F5F3ED] hover:bg-[#EAE7DE] border border-[#CAD8CE] rounded px-1.5 py-0.5 text-[#52796F] cursor-pointer transition-colors focus:outline-none focus:border-[#52796F]"
+                                            className="text-[10px] font-semibold bg-surface-2 hover:bg-surface-3 border-[0.5px] border-line rounded px-1.5 py-0.5 text-brand-500 cursor-pointer transition-colors focus:outline-none focus:border-brand-500"
                                             title="Assign or reassign link to a collection"
                                           >
                                             <option value="">📁 No Collection</option>
@@ -2411,7 +2411,7 @@ export default function AtelierStudioPage() {
                                         )}
                                       </div>
                                     )}
-                                    <span className="text-xs font-mono text-[#5C6B64] truncate">
+                                    <span className="text-xs font-mono text-ink-500 truncate">
                                       {link.subtitle || link.url || 'No URL destination'} • {link.clicks || 0} clicks
                                     </span>
                                   </div>
@@ -2420,10 +2420,10 @@ export default function AtelierStudioPage() {
                                 {/* Right: Real Clicks + Switch + Action Buttons (Edit, Archive, Delete) */}
                                 <div className="flex items-center gap-2 sm:gap-3 shrink-0">
                                   <div className="flex flex-col items-end leading-tight hidden xs:flex">
-                                    <span className="text-sm font-bold font-mono text-[#52796F]">
+                                    <span className="text-sm font-semibold font-mono text-brand-500">
                                       {link.clicks || 0} clicks
                                     </span>
-                                    <span className="text-[0.65rem] font-mono text-[#5C6B64]">
+                                    <span className="text-[0.65rem] font-mono text-ink-500">
                                       {link.clicks > 0 ? 'Active Traffic' : 'Ready for clicks'}
                                     </span>
                                   </div>
@@ -2438,7 +2438,7 @@ export default function AtelierStudioPage() {
                                   <button
                                     type="button"
                                     onClick={() => handleStartEditLink(link)}
-                                    className="p-1.5 hover:text-[#28352F] hover:bg-[#F5F3ED] rounded-lg cursor-pointer transition-colors text-[#5C6B64]"
+                                    className="p-1.5 hover:text-ink-700 hover:bg-surface-2 rounded-lg cursor-pointer transition-colors text-ink-500"
                                     title="Edit Link Settings"
                                   >
                                     <span className="material-symbols-outlined text-base">tune</span>
@@ -2452,7 +2452,7 @@ export default function AtelierStudioPage() {
                                         e.stopPropagation();
                                         setActiveLinkMenuId(activeLinkMenuId === link.id ? null : link.id);
                                       }}
-                                      className="p-1.5 hover:text-[#28352F] hover:bg-[#F5F3ED] rounded-lg cursor-pointer transition-colors text-[#5C6B64]"
+                                      className="p-1.5 hover:text-ink-700 hover:bg-surface-2 rounded-lg cursor-pointer transition-colors text-ink-500"
                                       title="More block actions"
                                     >
                                       <MoreVertical className="w-4 h-4" />
@@ -2460,7 +2460,7 @@ export default function AtelierStudioPage() {
 
                                     {activeLinkMenuId === link.id && (
                                       <div 
-                                        className="absolute right-0 top-full mt-1 w-52 bg-white rounded-xl shadow-xl border border-[#CAD8CE] py-1.5 z-40 animate-in fade-in zoom-in-95 duration-150"
+                                        className="absolute right-0 top-full mt-1 w-52 bg-white rounded-xl shadow-modal border-[0.5px] border-line py-1.5 z-40 animate-in fade-in zoom-in-95 duration-150"
                                         onClick={(e) => e.stopPropagation()}
                                       >
                                         {/* 1. Edit title inline */}
@@ -2470,16 +2470,16 @@ export default function AtelierStudioPage() {
                                             setActiveLinkMenuId(null);
                                             handleStartInlineEdit(link);
                                           }}
-                                          className="w-full text-left px-3.5 py-2 text-xs font-semibold text-[#28352F] hover:bg-[#F5F3ED] flex items-center gap-2.5 transition-colors cursor-pointer"
+                                          className="w-full text-left px-3.5 py-2 text-xs font-semibold text-ink-700 hover:bg-surface-2 flex items-center gap-2.5 transition-colors cursor-pointer"
                                         >
-                                          <Edit3 className="w-3.5 h-3.5 text-[#52796F]" />
+                                          <Edit3 className="w-3.5 h-3.5 text-brand-500" />
                                           <span>Edit Title (X/35)</span>
                                         </button>
 
                                         {/* 2. Move to collection */}
-                                        <div className="px-3.5 py-1.5 border-t border-b border-[#CAD8CE]/40 my-1 bg-[#F5F3ED]/40">
-                                          <label className="block text-[10px] font-bold text-[#5C6B64] uppercase tracking-wider mb-1 flex items-center gap-1.5">
-                                            <Folder className="w-3 h-3 text-[#52796F]" /> Move to Collection
+                                        <div className="px-3.5 py-1.5 border-t border-b-[0.5px] border-line/40 my-1 bg-surface-2/40">
+                                          <label className="block text-[10px] font-semibold text-ink-500 uppercase tracking-wider mb-1 flex items-center gap-1.5">
+                                            <Folder className="w-3 h-3 text-brand-500" /> Move to Collection
                                           </label>
                                           <select
                                             value={link.collectionId || ''}
@@ -2487,7 +2487,7 @@ export default function AtelierStudioPage() {
                                               handleAssignLinkToCollection(link.id, e.target.value);
                                               setActiveLinkMenuId(null);
                                             }}
-                                            className="w-full text-[11px] font-bold bg-white border border-[#CAD8CE] rounded-lg px-2 py-1 text-[#28352F] focus:outline-none focus:border-[#52796F]"
+                                            className="w-full text-[11px] font-semibold bg-white border-[0.5px] border-line rounded-lg px-2 py-1 text-ink-700 focus:outline-none focus:border-brand-500"
                                           >
                                             <option value="">📁 Root (No Collection)</option>
                                             {(currentProfile.collections || []).map((c) => (
@@ -2505,11 +2505,11 @@ export default function AtelierStudioPage() {
                                             handleToggleLink(link.id);
                                             setActiveLinkMenuId(null);
                                           }}
-                                          className="w-full text-left px-3.5 py-2 text-xs font-semibold text-[#28352F] hover:bg-[#F5F3ED] flex items-center gap-2.5 transition-colors cursor-pointer"
+                                          className="w-full text-left px-3.5 py-2 text-xs font-semibold text-ink-700 hover:bg-surface-2 flex items-center gap-2.5 transition-colors cursor-pointer"
                                         >
                                           {link.disabled ? (
                                             <>
-                                              <Eye className="w-3.5 h-3.5 text-emerald-600" />
+                                              <Eye className="w-3.5 h-3.5 text-brand-600" />
                                               <span>Unhide Block</span>
                                             </>
                                           ) : (
@@ -2521,7 +2521,7 @@ export default function AtelierStudioPage() {
                                         </button>
 
                                         {/* 4. Delete / Archive */}
-                                        <div className="border-t border-[#CAD8CE]/60 my-1 pt-1">
+                                        <div className="border-t-[0.5px] border-line/60 my-1 pt-1">
                                           <button
                                             type="button"
                                             onClick={() => {
@@ -2561,9 +2561,9 @@ export default function AtelierStudioPage() {
                     {linkFilterTab === 'archived' && (
                       <div className="flex flex-col gap-2.5">
                         {(currentProfile.links || []).filter(l => l.isArchived).length === 0 ? (
-                          <div className="p-8 text-center border-2 border-dashed border-[#CAD8CE] rounded-xl flex flex-col items-center justify-center gap-2 text-[#5C6B64]">
-                            <Archive className="w-8 h-8 text-[#5C6B64]/50" />
-                            <p className="text-sm font-semibold text-[#28352F]">No archived links</p>
+                          <div className="p-8 text-center border-2 border-dashed border-line rounded-xl flex flex-col items-center justify-center gap-2 text-ink-500">
+                            <Archive className="w-8 h-8 text-ink-500/50" />
+                            <p className="text-sm font-semibold text-ink-700">No archived links</p>
                             <p className="text-xs max-w-sm">
                               Archiving a link hides it from your public bio without losing its historical click metrics and traffic stats.
                             </p>
@@ -2572,7 +2572,7 @@ export default function AtelierStudioPage() {
                           (currentProfile.links || []).filter(l => l.isArchived).map((link) => (
                             <div
                               key={link.id}
-                              className="p-3.5 sm:p-4 rounded-xl flex items-center justify-between gap-3 bg-stone-50 border border-stone-200 shadow-xs"
+                              className="p-3.5 sm:p-4 rounded-xl flex items-center justify-between gap-3 bg-stone-50 border border-stone-200 "
                             >
                               <div className="flex items-center gap-3 min-w-0">
                                 <div className="w-10 h-10 rounded-lg bg-stone-200/80 border border-stone-300 flex items-center justify-center shrink-0 text-stone-500">
@@ -2580,10 +2580,10 @@ export default function AtelierStudioPage() {
                                 </div>
                                 <div className="flex flex-col min-w-0">
                                   <div className="flex items-center gap-2">
-                                    <span className="text-sm font-bold text-stone-700 truncate line-through">
+                                    <span className="text-sm font-semibold text-stone-700 truncate line-through">
                                       {link.title}
                                     </span>
-                                    <span className="px-1.5 py-0.2 rounded text-[10px] font-mono font-bold bg-amber-100 text-amber-800">
+                                    <span className="px-1.5 py-0.2 rounded text-[10px] font-mono font-semibold bg-amber-100 text-amber-800">
                                       ARCHIVED
                                     </span>
                                   </div>
@@ -2597,7 +2597,7 @@ export default function AtelierStudioPage() {
                                 <button
                                   type="button"
                                   onClick={() => handleRestoreLink(link.id)}
-                                  className="px-3 py-1.5 rounded-lg bg-[#52796F] hover:bg-[#3D5C54] text-white font-semibold text-xs flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer"
+                                  className="px-3 py-1.5 rounded-lg bg-brand-500 hover:bg-brand-600 text-white font-semibold text-xs flex items-center gap-1.5 transition-colors cursor-pointer"
                                   title="Restore Link to Active Bio"
                                 >
                                   <RotateCcw className="w-3.5 h-3.5" />
@@ -2624,27 +2624,27 @@ export default function AtelierStudioPage() {
                         {/* Publish your Shop Visibility Banner */}
                         <div className={`p-4 rounded-xl border flex items-center justify-between gap-4 transition-all ${
                           currentProfile.shop?.published
-                            ? 'bg-emerald-50/80 border-emerald-300'
-                            : 'bg-[#F5F3ED] border-[#CAD8CE]'
+                            ? 'bg-brand-50/80 border-brand-300'
+                            : 'bg-surface-2 border-line'
                         }`}>
                           <div className="flex items-center gap-3 min-w-0">
                             <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
-                              currentProfile.shop?.published ? 'bg-[#52796F] text-white shadow-sm' : 'bg-[#CAD8CE] text-[#5C6B64]'
+                              currentProfile.shop?.published ? 'bg-brand-500 text-white ' : 'bg-brand-100 text-ink-500'
                             }`}>
                               <ShoppingBag className="w-5 h-5" />
                             </div>
                             <div>
                               <div className="flex items-center gap-2">
-                                <h3 className="font-bold text-sm text-[#28352F]">Publish your Shop</h3>
-                                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                                <h3 className="text-[14px] font-semibold text-ink-700">Publish your Shop</h3>
+                                <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
                                   currentProfile.shop?.published
-                                    ? 'bg-emerald-600 text-white'
+                                    ? 'bg-brand-600 text-white'
                                     : 'bg-stone-200 text-stone-600'
                                 }`}>
                                   {currentProfile.shop?.published ? 'Live on Bio' : 'Hidden'}
                                 </span>
                               </div>
-                              <p className="text-xs text-[#5C6B64] mt-0.5">
+                              <p className="text-xs text-ink-500 mt-0.5">
                                 Display a dedicated storefront tab on your live TreeInBio page.
                               </p>
                             </div>
@@ -2657,7 +2657,7 @@ export default function AtelierStudioPage() {
 
                         {/* Top Store Action */}
                         <div className="flex items-center justify-between">
-                          <span className="font-bold text-xs text-[#28352F] uppercase tracking-wider">
+                          <span className="font-semibold text-xs text-ink-700 uppercase tracking-wider">
                             Products ({(currentProfile.shop?.products || []).length})
                           </span>
                           <Button
@@ -2665,7 +2665,7 @@ export default function AtelierStudioPage() {
                             size="xs"
                             leftIcon={Plus}
                             onClick={() => setShowAddProductModal(true)}
-                            className="bg-[#52796F] text-white"
+                            className="bg-brand-500 text-white"
                           >
                             Add Product
                           </Button>
@@ -2685,12 +2685,12 @@ export default function AtelierStudioPage() {
                             ))}
                           </div>
                         ) : (currentProfile.shop?.products || []).length === 0 ? (
-                          <div className="p-10 text-center border-2 border-dashed border-[#CAD8CE] rounded-xl flex flex-col items-center justify-center gap-3 text-[#5C6B64]">
-                            <div className="w-12 h-12 rounded-full bg-[#F5F3ED] flex items-center justify-center text-[#52796F]">
+                          <div className="p-10 text-center border-2 border-dashed border-line rounded-xl flex flex-col items-center justify-center gap-3 text-ink-500">
+                            <div className="w-12 h-12 rounded-full bg-surface-2 flex items-center justify-center text-brand-500">
                               <ShoppingBag className="w-6 h-6" />
                             </div>
                             <div>
-                              <p className="text-sm font-bold text-[#28352F]">Your Shop is Empty</p>
+                              <p className="text-sm font-semibold text-ink-700">Your Shop is Empty</p>
                               <p className="text-xs max-w-sm mt-1">
                                 Sell digital downloads, merchandise, courses, or paste external store links with 1-click automatic metadata fetching.
                               </p>
@@ -2700,7 +2700,7 @@ export default function AtelierStudioPage() {
                               size="sm"
                               leftIcon={Plus}
                               onClick={() => setShowAddProductModal(true)}
-                              className="mt-1 bg-[#52796F] text-white"
+                              className="mt-1 bg-brand-500 text-white"
                             >
                               Add Your First Product
                             </Button>
@@ -2710,7 +2710,7 @@ export default function AtelierStudioPage() {
                             {(currentProfile.shop?.products || []).map((product) => (
                               <div
                                 key={product.id}
-                                className="p-3 rounded-xl border border-[#CAD8CE] bg-[#F5F3ED]/40 hover:bg-[#F5F3ED] hover:border-[#52796F]/50 transition-all flex flex-col justify-between gap-3 group shadow-xs"
+                                className="p-3 rounded-xl border-[0.5px] border-line bg-surface-2/40 hover:bg-surface-2 hover:border-brand-500/50 transition-all flex flex-col justify-between gap-3 group "
                               >
                                 <div>
                                   {product.image ? (
@@ -2718,36 +2718,36 @@ export default function AtelierStudioPage() {
                                       <img src={product.image} alt={product.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
                                     </div>
                                   ) : (
-                                    <div className="w-full h-28 rounded-lg bg-[#CAD8CE]/40 flex items-center justify-center text-[#52796F] mb-2.5">
+                                    <div className="w-full h-28 rounded-lg bg-brand-100/40 flex items-center justify-center text-brand-500 mb-2.5">
                                       <ShoppingBag className="w-8 h-8" />
                                     </div>
                                   )}
                                   <div className="flex items-start justify-between gap-2">
-                                    <h4 className="font-bold text-xs sm:text-sm text-[#28352F] line-clamp-2 leading-tight">
+                                    <h4 className="text-[12px] font-semibold text-ink-700 line-clamp-2">
                                       {product.title}
                                     </h4>
-                                    <span className="font-mono font-bold text-xs px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800 shrink-0">
+                                    <span className="font-mono font-semibold text-xs px-2 py-0.5 rounded-md bg-brand-100 text-brand-800 shrink-0">
                                       {product.currency === 'USD' ? '$' : product.currency === 'EUR' ? '€' : product.currency === 'GBP' ? '£' : product.currency === 'INR' ? '₹' : ''}
                                       {product.price}
                                     </span>
                                   </div>
                                   {product.description && (
-                                    <p className="text-xs text-[#5C6B64] line-clamp-2 mt-1">
+                                    <p className="text-xs text-ink-500 line-clamp-2 mt-1">
                                       {product.description}
                                     </p>
                                   )}
                                   {product.collection && (
-                                    <span className="text-[10px] text-[#5C6B64] font-medium block mt-1">
+                                    <span className="text-[10px] text-ink-500 font-medium block mt-1">
                                       📁 {product.collection}
                                     </span>
                                   )}
                                 </div>
-                                <div className="flex items-center justify-between pt-2 border-t border-[#CAD8CE]/50 text-xs">
+                                <div className="flex items-center justify-between pt-2 border-t-[0.5px] border-line/50 text-xs">
                                   <a
                                     href={product.url}
                                     target="_blank"
                                     rel="noreferrer"
-                                    className="text-[11px] text-[#52796F] hover:underline flex items-center gap-1 font-semibold truncate max-w-[140px]"
+                                    className="text-[11px] text-brand-500 hover:underline flex items-center gap-1 font-semibold truncate max-w-[140px]"
                                   >
                                     <span>Store Link</span>
                                     <ExternalLink className="w-3 h-3" />
@@ -2774,11 +2774,11 @@ export default function AtelierStudioPage() {
               {/* Tab 2: Style & Platinum Editor */}
               {activeTab === 'style' && (
                 <>
-                  <div className="bg-white border border-[#CAD8CE]/80 rounded-2xl p-5 sm:p-6 shadow-xs flex flex-col gap-5">
-                  <div className="flex items-center justify-between pb-3 border-b border-[#E0DCD3] flex-wrap gap-2">
+                  <div className="bg-white border-[0.5px] border-line/80 rounded-2xl p-5 sm:p-6 flex flex-col gap-5">
+                  <div className="flex items-center justify-between pb-3 border-b-[0.5px] border-line flex-wrap gap-2">
                     <div className="flex items-center gap-2">
-                      <Sliders className="w-5 h-5 text-[#52796F]" />
-                      <h3 className="font-sans font-bold text-base text-[#28352F]">
+                      <Sliders className="w-5 h-5 text-brand-500" />
+                      <h3 className="text-[14px] font-sans font-semibold text-ink-700">
                         Persona Brand &amp; Typography Identity
                       </h3>
                     </div>
@@ -2788,7 +2788,7 @@ export default function AtelierStudioPage() {
                         size="xs"
                         leftIcon={Dices}
                         onClick={handleThemeShuffle}
-                        className="bg-[#F5F3ED] hover:bg-[#CAD8CE]/50 text-[#28352F] font-bold shadow-2xs border-[#CAD8CE]"
+                        className="bg-surface-2 hover:bg-brand-100/50 text-ink-700 font-semibold shadow-2xs border-line"
                       >
                         🎲 Theme Shuffle
                       </Button>
@@ -2821,14 +2821,14 @@ export default function AtelierStudioPage() {
                     </div>
 
                     <div>
-                      <div className="p-3.5 rounded-xl bg-[#F5F3ED] border border-[#CAD8CE] flex flex-col gap-2.5">
+                      <div className="p-3.5 rounded-xl bg-surface-2 border-[0.5px] border-line flex flex-col gap-2.5">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
-                            <Type className="w-4 h-4 text-[#52796F]" />
-                            <span className="font-bold text-xs sm:text-sm text-[#28352F]">
+                            <Type className="w-4 h-4 text-brand-500" />
+                            <span className="font-semibold text-xs sm:text-sm text-ink-700">
                               Alternative Title Font
                             </span>
-                            <span className="text-[10px] text-emerald-700 bg-emerald-100 font-bold px-1.5 py-0.2 rounded">
+                            <span className="text-[10px] text-brand-700 bg-brand-100 font-semibold px-1.5 py-0.2 rounded">
                               48 Free Fonts
                             </span>
                           </div>
@@ -2836,13 +2836,13 @@ export default function AtelierStudioPage() {
                             variant="outline"
                             size="xs"
                             onClick={() => setShowTitleFontModal(true)}
-                            className="text-xs font-semibold bg-white border-[#CAD8CE] text-[#52796F] hover:border-[#52796F]"
+                            className="text-xs font-semibold bg-white border-line text-brand-500 hover:border-brand-500"
                           >
                             {getTitleFontName(currentProfile.alternativeTitleFont) ? getTitleFontName(currentProfile.alternativeTitleFont) : 'Choose Font'}
                           </Button>
                         </div>
                         {getTitleFontName(currentProfile.alternativeTitleFont) && (
-                          <div className="flex items-center justify-between pt-2 border-t border-[#CAD8CE]/60 text-xs">
+                          <div className="flex items-center justify-between pt-2 border-t-[0.5px] border-line/60 text-xs">
                             <span className="text-stone-600 font-medium truncate" style={{ fontFamily: getTitleFontName(currentProfile.alternativeTitleFont) }}>
                               Active: {getTitleFontName(currentProfile.alternativeTitleFont)} (Preview Style)
                             </span>
@@ -2859,14 +2859,14 @@ export default function AtelierStudioPage() {
                     </div>
 
                     {/* Phase 2: Brand Logo Title Option */}
-                    <div className="md:col-span-2 p-3.5 rounded-xl bg-[#F5F3ED] border border-[#CAD8CE] flex flex-col gap-2.5">
+                    <div className="md:col-span-2 p-3.5 rounded-xl bg-surface-2 border-[0.5px] border-line flex flex-col gap-2.5">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                          <Store className="w-4 h-4 text-[#52796F]" />
-                          <span className="font-bold text-xs sm:text-sm text-[#28352F]">
+                          <Store className="w-4 h-4 text-brand-500" />
+                          <span className="font-semibold text-xs sm:text-sm text-ink-700">
                             Brand Logo Title
                           </span>
-                          <span className="text-[10px] text-[#5C6B64]">
+                          <span className="text-[10px] text-ink-500">
                             (Display brand logo image instead of text name)
                           </span>
                         </div>
@@ -2883,7 +2883,7 @@ export default function AtelierStudioPage() {
                       </div>
 
                       {currentProfile.titleLogo?.enabled && (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2 border-t border-[#CAD8CE]/60">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2 border-t-[0.5px] border-line/60">
                           <div>
                             <Label htmlFor="title-logo-url" required>Logo Image URL (PNG / SVG with transparent background)</Label>
                             <Input
@@ -2934,7 +2934,7 @@ export default function AtelierStudioPage() {
                             const randomBio = recs[Math.floor(Math.random() * recs.length)];
                             setCurrentProfile({ ...currentProfile, bio: randomBio });
                           }}
-                          className="text-xs font-mono text-[#52796F] hover:underline flex items-center gap-1.5 cursor-pointer font-medium"
+                          className="text-xs font-mono text-brand-500 hover:underline flex items-center gap-1.5 cursor-pointer font-medium"
                         >
                           <Sparkles className="w-3.5 h-3.5" />
                           <span>AI Suggest Bio</span>
@@ -2946,7 +2946,7 @@ export default function AtelierStudioPage() {
                         value={currentProfile.bio || ''}
                         onChange={(e) => setCurrentProfile({ ...currentProfile, bio: e.target.value })}
                         placeholder="Tell visitors about yourself..."
-                        className="w-full px-3.5 py-2.5 bg-white border border-[#CAD8CE] rounded-lg text-sm text-[#28352F] placeholder-[#5C6B64]/60 focus:outline-none focus:border-[#52796F] focus:ring-2 focus:ring-[#52796F]/15 transition-all shadow-xs leading-relaxed"
+                        className="w-full px-3.5 py-2.5 bg-white border-[0.5px] border-line rounded-lg text-sm text-ink-700 placeholder-ink-500/60 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/15 transition-all leading-relaxed"
                       />
                     </div>
 
@@ -2965,10 +2965,10 @@ export default function AtelierStudioPage() {
                     {/* Phase 2: Avatar Masks (Cutout & Shapes) */}
                     <div className="md:col-span-2 flex flex-col gap-2">
                       <div className="flex items-center justify-between">
-                        <Label className="mb-0 font-bold text-xs uppercase text-[#5C6B64]">
+                        <Label className="mb-0 font-semibold text-xs uppercase text-ink-500">
                           Avatar Mask Shape (Geometry &amp; Cutout)
                         </Label>
-                        <span className="text-[11px] font-mono text-[#52796F] font-semibold">
+                        <span className="text-[11px] font-mono text-brand-500 font-semibold">
                           Active: {currentProfile.avatarShape || 'circle'}
                         </span>
                       </div>
@@ -2982,12 +2982,12 @@ export default function AtelierStudioPage() {
                               onClick={() => setCurrentProfile({ ...currentProfile, avatarShape: shape.id })}
                               className={`p-2.5 rounded-xl border flex flex-col items-center justify-center gap-1.5 transition-all cursor-pointer ${
                                 isSelected
-                                  ? 'bg-[#52796F] text-white border-[#3D5C54] shadow-xs'
-                                  : 'bg-[#F5F3ED] text-[#28352F] border-[#CAD8CE] hover:bg-white hover:border-[#52796F]'
+                                  ? 'bg-brand-500 text-white border-brand-600 '
+                                  : 'bg-surface-2 text-ink-700 border-line hover:bg-white hover:border-brand-500'
                               }`}
                             >
                               {/* Shape Icon Miniature Silhouette */}
-                              <div className={`w-7 h-7 border-2 ${isSelected ? 'border-white bg-white/20' : 'border-[#52796F] bg-white'} ${
+                              <div className={`w-7 h-7 border-2 ${isSelected ? 'border-white bg-white/20' : 'border-brand-500 bg-white'} ${
                                 shape.id === 'circle' ? 'rounded-full' :
                                 shape.id === 'rounded' ? 'rounded-lg' :
                                 shape.id === 'squircle' ? 'rounded-[30%]' :
@@ -2996,7 +2996,7 @@ export default function AtelierStudioPage() {
                                 shape.id === 'diamond' ? 'rotate-45 scale-75 rounded-xs' :
                                 'border-dashed rounded-none'
                               }`} />
-                              <span className="text-[10px] font-bold truncate max-w-full">{shape.name}</span>
+                              <span className="text-[10px] font-semibold truncate max-w-full">{shape.name}</span>
                             </button>
                           );
                         })}
@@ -3042,7 +3042,7 @@ export default function AtelierStudioPage() {
                           placeholder="https://... (1200x400 landscape banner recommended)"
                           className="font-mono"
                         />
-                        <p className="text-[11px] text-[#5C6B64] mt-1">
+                        <p className="text-[11px] text-ink-500 mt-1">
                           Displays a panoramic cover banner behind your avatar at the very top of your profile.
                         </p>
                       </div>
@@ -3086,11 +3086,11 @@ export default function AtelierStudioPage() {
                     </div>
 
                     {/* Phase 2: Expanded Theme Preset Library (18 Presets) */}
-                    <div className="md:col-span-2 pt-4 border-t border-[#CAD8CE] flex flex-col gap-3">
+                    <div className="md:col-span-2 pt-4 border-t-[0.5px] border-line flex flex-col gap-3">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                          <span className="material-symbols-outlined text-[#52796F] text-lg">palette</span>
-                          <h4 className="font-bold text-xs sm:text-sm text-[#28352F]">
+                          <span className="material-symbols-outlined text-brand-500 text-lg">palette</span>
+                          <h4 className="text-[12px] font-semibold text-ink-700">
                             Curated Theme Presets Library
                           </h4>
                           <Badge variant="mint" size="xs">18 Presets</Badge>
@@ -3100,7 +3100,7 @@ export default function AtelierStudioPage() {
                           size="xs"
                           leftIcon={Dices}
                           onClick={handleThemeShuffle}
-                          className="text-xs font-bold text-[#52796F]"
+                          className="text-xs font-semibold text-brand-500"
                         >
                           🎲 Shuffle Random
                         </Button>
@@ -3116,8 +3116,8 @@ export default function AtelierStudioPage() {
                               onClick={() => handleApplyThemePreset(preset)}
                               className={`p-2.5 rounded-xl border text-left flex flex-col justify-between gap-2 transition-all cursor-pointer ${
                                 isSelected
-                                  ? 'border-2 border-[#52796F] bg-white ring-2 ring-[#52796F]/20 shadow-md'
-                                  : 'border-[#CAD8CE] bg-[#F5F3ED] hover:bg-white hover:border-[#52796F]/50'
+                                  ? 'border-2 border-brand-500 bg-white ring-2 ring-brand-500/20 '
+                                  : 'border-line bg-surface-2 hover:bg-white hover:border-brand-500/50'
                               }`}
                             >
                               {/* Color Swatch Trio */}
@@ -3128,10 +3128,10 @@ export default function AtelierStudioPage() {
                               </div>
                               <div>
                                 <div className="flex items-center justify-between">
-                                  <span className="text-xs font-bold text-[#28352F] block truncate">{preset.name}</span>
-                                  {isSelected && <span className="text-[10px] text-emerald-600 font-bold">✓</span>}
+                                  <span className="text-xs font-semibold text-ink-700 block truncate">{preset.name}</span>
+                                  {isSelected && <span className="text-[10px] text-brand-600 font-semibold">✓</span>}
                                 </div>
-                                <span className="text-[9px] text-[#5C6B64] font-medium block truncate">{preset.tag}</span>
+                                <span className="text-[9px] text-ink-500 font-medium block truncate">{preset.tag}</span>
                               </div>
                             </button>
                           );
@@ -3140,17 +3140,17 @@ export default function AtelierStudioPage() {
                     </div>
 
                     {/* Story Bubble Greeting Video Section */}
-                    <div className="md:col-span-2 p-4 rounded-xl bg-[#F5F3ED] border border-[#CAD8CE] flex flex-col gap-3 mt-1">
+                    <div className="md:col-span-2 p-4 rounded-xl bg-surface-2 border-[0.5px] border-line flex flex-col gap-3 mt-1">
                       <div className="flex items-center justify-between gap-3">
                         <div className="flex items-center gap-3">
                           <div className="w-9 h-9 rounded-lg bg-gradient-to-tr from-amber-500 to-rose-500 text-white flex items-center justify-center shrink-0">
                             <Video className="w-4.5 h-4.5" />
                           </div>
                           <div>
-                            <h4 className="text-sm font-bold text-[#28352F]">
+                            <h4 className="text-[12px] font-semibold text-ink-700">
                               Instagram/TikTok Story Bubble Avatar
                             </h4>
-                            <p className="text-xs text-[#5C6B64]">
+                            <p className="text-xs text-ink-500">
                               Pulsing gradient ring opening vertical video greeting when clicked
                             </p>
                           </div>
@@ -3169,7 +3169,7 @@ export default function AtelierStudioPage() {
                       </div>
 
                       {currentProfile.storyBubble?.enabled && (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 pt-3 border-t border-[#CAD8CE]/70 text-xs sm:text-sm">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 pt-3 border-t-[0.5px] border-line/70 text-xs sm:text-sm">
                           <div>
                             <Label htmlFor="story-video-url" required>Greeting Video URL (MP4 / WebM)</Label>
                             <Input
@@ -3210,29 +3210,29 @@ export default function AtelierStudioPage() {
                 </div>
 
                 {/* Design Tab: Drill-Down Slide Navigation Engine */}
-                <div className="bg-white border border-[#CAD8CE]/80 rounded-2xl p-5 sm:p-6 shadow-xs flex flex-col gap-5">
+                <div className="bg-white border-[0.5px] border-line/80 rounded-2xl p-5 sm:p-6 flex flex-col gap-5">
                   {/* Header: Back navigation when in sub-menu or Root title */}
-                  <div className="flex items-center justify-between pb-3.5 border-b border-[#E0DCD3]/80">
+                  <div className="flex items-center justify-between pb-3.5 border-b-[0.5px] border-line/80">
                     <div className="flex items-center gap-2">
                       {designSubMenu !== 'root' ? (
                         <button
                           type="button"
                           onClick={() => setDesignSubMenu('root')}
-                          className="flex items-center gap-1.5 text-xs font-bold text-[#52796F] hover:text-[#3D5C54] px-2 py-1 rounded-lg hover:bg-[#F5F3ED] transition-colors"
+                          className="flex items-center gap-1.5 text-xs font-semibold text-brand-500 hover:text-brand-600 px-2 py-1 rounded-lg hover:bg-surface-2 transition-colors"
                         >
                           <ChevronLeft className="w-4 h-4" />
                           <span>Design</span>
                         </button>
                       ) : (
                         <div className="flex items-center gap-2">
-                          <Palette className="w-5 h-5 text-[#52796F]" />
-                          <h3 className="font-sans font-bold text-base text-[#28352F]">
+                          <Palette className="w-5 h-5 text-brand-500" />
+                          <h3 className="text-[14px] font-sans font-semibold text-ink-700">
                             Design &amp; Studio Customization
                           </h3>
                         </div>
                       )}
                       {designSubMenu !== 'root' && (
-                        <span className="text-sm font-bold text-[#28352F] capitalize">
+                        <span className="text-sm font-semibold text-ink-700 capitalize">
                           / {designSubMenu}
                         </span>
                       )}
@@ -3244,7 +3244,7 @@ export default function AtelierStudioPage() {
                         size="xs"
                         leftIcon={Dices}
                         onClick={handleThemeShuffle}
-                        className="text-xs font-bold text-[#52796F]"
+                        className="text-xs font-semibold text-brand-500"
                       >
                         🎲 Shuffle Random
                       </Button>
@@ -3311,26 +3311,26 @@ export default function AtelierStudioPage() {
                             key={cat.id}
                             type="button"
                             onClick={() => setDesignSubMenu(cat.id)}
-                            className="p-4 rounded-xl border border-[#CAD8CE] bg-[#F5F3ED]/60 hover:bg-[#F5F3ED] hover:border-[#52796F] text-left flex items-center justify-between gap-3 group transition-all cursor-pointer shadow-2xs"
+                            className="p-4 rounded-xl border-[0.5px] border-line bg-surface-2/60 hover:bg-surface-2 hover:border-brand-500 text-left flex items-center justify-between gap-3 group transition-all cursor-pointer shadow-2xs"
                           >
                             <div className="flex items-center gap-3 min-w-0">
-                              <div className="w-10 h-10 rounded-xl bg-white border border-[#CAD8CE] flex items-center justify-center text-[#52796F] group-hover:scale-105 transition-transform shrink-0">
+                              <div className="w-10 h-10 rounded-xl bg-white border-[0.5px] border-line flex items-center justify-center text-brand-500 group-hover:scale-105 transition-transform shrink-0">
                                 <IconComp className="w-5 h-5" />
                               </div>
                               <div className="min-w-0">
-                                <h4 className="font-bold text-sm text-[#28352F] group-hover:text-[#52796F] transition-colors truncate">
+                                <h4 className="text-[12px] font-semibold text-ink-700 group-hover:text-brand-500 transition-colors truncate">
                                   {cat.title}
                                 </h4>
-                                <p className="text-xs text-[#5C6B64] line-clamp-1 mt-0.5">
+                                <p className="text-xs text-ink-500 line-clamp-1 mt-0.5">
                                   {cat.desc}
                                 </p>
                               </div>
                             </div>
                             <div className="flex items-center gap-2 shrink-0">
-                              <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-md bg-white border border-[#CAD8CE] text-[#52796F] capitalize">
+                              <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-md bg-white border-[0.5px] border-line text-brand-500 capitalize">
                                 {cat.badge}
                               </span>
-                              <ChevronRight className="w-4 h-4 text-[#5C6B64] group-hover:text-[#52796F] transition-colors" />
+                              <ChevronRight className="w-4 h-4 text-ink-500 group-hover:text-brand-500 transition-colors" />
                             </div>
                           </button>
                         );
@@ -3344,7 +3344,7 @@ export default function AtelierStudioPage() {
                       {/* Section A: Customizable Presets */}
                       <div>
                         <div className="flex items-center justify-between mb-2.5">
-                          <h4 className="font-bold text-xs uppercase tracking-wider text-[#5C6B64]">
+                          <h4 className="text-[12px] font-semibold uppercase tracking-wider text-ink-500">
                             Customizable Theme Presets (18)
                           </h4>
                         </div>
@@ -3358,8 +3358,8 @@ export default function AtelierStudioPage() {
                                 onClick={() => handleApplyThemePreset(preset)}
                                 className={`p-2.5 rounded-xl border text-left flex flex-col justify-between gap-2 transition-all cursor-pointer ${
                                   isSelected
-                                    ? 'border-2 border-[#52796F] bg-white ring-2 ring-[#52796F]/20 shadow-md'
-                                    : 'border-[#CAD8CE] bg-[#F5F3ED] hover:bg-white hover:border-[#52796F]/50'
+                                    ? 'border-2 border-brand-500 bg-white ring-2 ring-brand-500/20 '
+                                    : 'border-line bg-surface-2 hover:bg-white hover:border-brand-500/50'
                                 }`}
                               >
                                 <div className="flex items-center gap-1">
@@ -3369,10 +3369,10 @@ export default function AtelierStudioPage() {
                                 </div>
                                 <div>
                                   <div className="flex items-center justify-between">
-                                    <span className="text-xs font-bold text-[#28352F] block truncate">{preset.name}</span>
-                                    {isSelected && <span className="text-[10px] text-emerald-600 font-bold">✓</span>}
+                                    <span className="text-xs font-semibold text-ink-700 block truncate">{preset.name}</span>
+                                    {isSelected && <span className="text-[10px] text-brand-600 font-semibold">✓</span>}
                                   </div>
-                                  <span className="text-[9px] text-[#5C6B64] font-medium block truncate">{preset.tag}</span>
+                                  <span className="text-[9px] text-ink-500 font-medium block truncate">{preset.tag}</span>
                                 </div>
                               </button>
                             );
@@ -3381,9 +3381,9 @@ export default function AtelierStudioPage() {
                       </div>
 
                       {/* Section B: Curated Creator Themes */}
-                      <div className="pt-4 border-t border-[#CAD8CE]">
+                      <div className="pt-4 border-t-[0.5px] border-line">
                         <div className="flex items-center justify-between mb-2.5">
-                          <h4 className="font-bold text-xs uppercase tracking-wider text-[#5C6B64] flex items-center gap-1.5">
+                          <h4 className="text-[12px] font-semibold uppercase tracking-wider text-ink-500 flex items-center gap-1.5">
                             <Sparkles className="w-3.5 h-3.5 text-amber-500" />
                             <span>Curated Creator Themes (100% Free)</span>
                           </h4>
@@ -3398,19 +3398,19 @@ export default function AtelierStudioPage() {
                                 onClick={() => handleApplyThemePreset(theme)}
                                 className={`p-3 rounded-xl border text-left flex flex-col justify-between gap-2.5 transition-all cursor-pointer ${
                                   isSelected
-                                    ? 'border-2 border-[#52796F] bg-white ring-2 ring-[#52796F]/20 shadow-md'
-                                    : 'border-[#CAD8CE] bg-[#F5F3ED] hover:bg-white hover:border-[#52796F]/50'
+                                    ? 'border-2 border-brand-500 bg-white ring-2 ring-brand-500/20 '
+                                    : 'border-line bg-surface-2 hover:bg-white hover:border-brand-500/50'
                                 }`}
                               >
                                 <div className="flex items-center justify-between">
-                                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#CAD8CE]/50 text-[#28352F]">
+                                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-brand-100/50 text-ink-700">
                                     {theme.creator}
                                   </span>
-                                  {isSelected && <span className="text-xs text-emerald-600 font-bold">✓ Active</span>}
+                                  {isSelected && <span className="text-xs text-brand-600 font-semibold">✓ Active</span>}
                                 </div>
                                 <div>
-                                  <h5 className="font-bold text-xs text-[#28352F]">{theme.name}</h5>
-                                  <span className="text-[10px] text-[#5C6B64]">{theme.tag}</span>
+                                  <h5 className="font-semibold text-xs text-ink-700">{theme.name}</h5>
+                                  <span className="text-[10px] text-ink-500">{theme.tag}</span>
                                 </div>
                                 <div className="flex items-center gap-1.5">
                                   <span className="w-5 h-5 rounded-md border border-black/10" style={{ backgroundColor: theme.primary }} />
@@ -3448,10 +3448,10 @@ export default function AtelierStudioPage() {
                                     },
                                   }));
                                 }}
-                                className={`p-3 rounded-xl border text-center capitalize text-xs font-bold transition-all ${
+                                className={`p-3 rounded-xl border text-center capitalize text-xs font-semibold transition-all ${
                                   isSelected
-                                    ? 'bg-[#52796F] text-white border-[#3D5C54] shadow-xs'
-                                    : 'bg-[#F5F3ED] text-[#28352F] border-[#CAD8CE] hover:bg-white'
+                                    ? 'bg-brand-500 text-white border-brand-600 '
+                                    : 'bg-surface-2 text-ink-700 border-line hover:bg-white'
                                 }`}
                               >
                                 {wType}
@@ -3463,13 +3463,13 @@ export default function AtelierStudioPage() {
 
                       {/* Dynamic Input based on active wallpaper type */}
                       {(currentProfile.designSettings?.wallpaper?.type || 'fill') === 'fill' && (
-                        <div className="p-4 rounded-xl bg-[#F5F3ED] border border-[#CAD8CE] space-y-2">
+                        <div className="p-4 rounded-xl bg-surface-2 border-[0.5px] border-line space-y-2">
                           <Label htmlFor="wallpaper-fill">Fill Background Color</Label>
                           <div className="flex items-center gap-3">
                             <input
                               id="wallpaper-fill"
                               type="color"
-                              value={currentProfile.designSettings?.wallpaper?.value || '#FFFEFA'}
+                              value={currentProfile.designSettings?.wallpaper?.value || '#FFFFFF'}
                               onChange={(e) => {
                                 const val = e.target.value;
                                 setCurrentProfile((prev) => ({
@@ -3484,11 +3484,11 @@ export default function AtelierStudioPage() {
                                   },
                                 }));
                               }}
-                              className="w-10 h-10 rounded-lg cursor-pointer border border-[#CAD8CE]"
+                              className="w-10 h-10 rounded-lg cursor-pointer border-[0.5px] border-line"
                             />
                             <input
                               type="text"
-                              value={currentProfile.designSettings?.wallpaper?.value || '#FFFEFA'}
+                              value={currentProfile.designSettings?.wallpaper?.value || '#FFFFFF'}
                               onChange={(e) => {
                                 const val = e.target.value;
                                 setCurrentProfile((prev) => ({
@@ -3503,14 +3503,14 @@ export default function AtelierStudioPage() {
                                   },
                                 }));
                               }}
-                              className="font-mono text-xs px-3 py-2 bg-white border border-[#CAD8CE] rounded-lg"
+                              className="font-mono text-xs px-3 py-2 bg-white border-[0.5px] border-line rounded-lg"
                             />
                           </div>
                         </div>
                       )}
 
                       {(currentProfile.designSettings?.wallpaper?.type === 'gradient') && (
-                        <div className="p-4 rounded-xl bg-[#F5F3ED] border border-[#CAD8CE] space-y-2">
+                        <div className="p-4 rounded-xl bg-surface-2 border-[0.5px] border-line space-y-2">
                           <Label htmlFor="wallpaper-gradient">CSS Gradient String</Label>
                           <Input
                             id="wallpaper-gradient"
@@ -3536,7 +3536,7 @@ export default function AtelierStudioPage() {
                       )}
 
                       {(currentProfile.designSettings?.wallpaper?.type === 'blur' || currentProfile.designSettings?.wallpaper?.type === 'image') && (
-                        <div className="p-4 rounded-xl bg-[#F5F3ED] border border-[#CAD8CE] space-y-2">
+                        <div className="p-4 rounded-xl bg-surface-2 border-[0.5px] border-line space-y-2">
                           <Label htmlFor="wallpaper-image">Background Image URL</Label>
                           <Input
                             id="wallpaper-image"
@@ -3563,7 +3563,7 @@ export default function AtelierStudioPage() {
                       )}
 
                       {(currentProfile.designSettings?.wallpaper?.type === 'video') && (
-                        <div className="p-4 rounded-xl bg-[#F5F3ED] border border-[#CAD8CE] space-y-2">
+                        <div className="p-4 rounded-xl bg-surface-2 border-[0.5px] border-line space-y-2">
                           <Label htmlFor="wallpaper-video">Background Video URL (MP4 / WebM)</Label>
                           <Input
                             id="wallpaper-video"
@@ -3612,10 +3612,10 @@ export default function AtelierStudioPage() {
                                     },
                                   }));
                                 }}
-                                className={`p-3 rounded-xl border capitalize text-xs font-bold transition-all ${
+                                className={`p-3 rounded-xl border capitalize text-xs font-semibold transition-all ${
                                   isSelected
-                                    ? 'bg-[#52796F] text-white border-[#3D5C54] shadow-xs'
-                                    : 'bg-[#F5F3ED] text-[#28352F] border-[#CAD8CE] hover:bg-white'
+                                    ? 'bg-brand-500 text-white border-brand-600 '
+                                    : 'bg-surface-2 text-ink-700 border-line hover:bg-white'
                                 }`}
                               >
                                 {st}
@@ -3651,8 +3651,8 @@ export default function AtelierStudioPage() {
                                 }}
                                 className={`p-2.5 rounded-xl border text-center text-xs font-semibold transition-all ${
                                   isSelected
-                                    ? 'bg-[#52796F] text-white border-[#3D5C54] shadow-xs'
-                                    : 'bg-[#F5F3ED] text-[#28352F] border-[#CAD8CE] hover:bg-white'
+                                    ? 'bg-brand-500 text-white border-brand-600 '
+                                    : 'bg-surface-2 text-ink-700 border-line hover:bg-white'
                                 }`}
                               >
                                 {rnd.label}
@@ -3689,8 +3689,8 @@ export default function AtelierStudioPage() {
                                   }}
                                   className={`p-2.5 rounded-xl border text-center text-xs font-semibold transition-all ${
                                     isSelected
-                                      ? 'bg-[#52796F] text-white border-[#3D5C54] shadow-xs'
-                                      : 'bg-[#F5F3ED] text-[#28352F] border-[#CAD8CE] hover:bg-white'
+                                      ? 'bg-brand-500 text-white border-brand-600 '
+                                      : 'bg-surface-2 text-ink-700 border-line hover:bg-white'
                                   }`}
                                 >
                                   {shd.label}
@@ -3702,14 +3702,14 @@ export default function AtelierStudioPage() {
                       )}
 
                       {/* Color Pickers */}
-                      <div className="grid grid-cols-2 gap-3 pt-2 border-t border-[#CAD8CE]">
+                      <div className="grid grid-cols-2 gap-3 pt-2 border-t-[0.5px] border-line">
                         <div>
                           <Label htmlFor="btn-bg-color">Button Background Color</Label>
                           <div className="flex items-center gap-2 mt-1">
                             <input
                               id="btn-bg-color"
                               type="color"
-                              value={currentProfile.designSettings?.buttonColor || '#52796F'}
+                              value={currentProfile.designSettings?.buttonColor || '#16A34A'}
                               onChange={(e) => {
                                 const val = e.target.value;
                                 setCurrentProfile((prev) => ({
@@ -3720,11 +3720,11 @@ export default function AtelierStudioPage() {
                                   },
                                 }));
                               }}
-                              className="w-8 h-8 rounded-lg cursor-pointer border border-[#CAD8CE]"
+                              className="w-8 h-8 rounded-lg cursor-pointer border-[0.5px] border-line"
                             />
                             <input
                               type="text"
-                              value={currentProfile.designSettings?.buttonColor || '#52796F'}
+                              value={currentProfile.designSettings?.buttonColor || '#16A34A'}
                               onChange={(e) => {
                                 const val = e.target.value;
                                 setCurrentProfile((prev) => ({
@@ -3735,7 +3735,7 @@ export default function AtelierStudioPage() {
                                   },
                                 }));
                               }}
-                              className="font-mono text-xs px-2.5 py-1.5 bg-white border border-[#CAD8CE] rounded-lg w-full"
+                              className="font-mono text-xs px-2.5 py-1.5 bg-white border-[0.5px] border-line rounded-lg w-full"
                             />
                           </div>
                         </div>
@@ -3757,7 +3757,7 @@ export default function AtelierStudioPage() {
                                   },
                                 }));
                               }}
-                              className="w-8 h-8 rounded-lg cursor-pointer border border-[#CAD8CE]"
+                              className="w-8 h-8 rounded-lg cursor-pointer border-[0.5px] border-line"
                             />
                             <input
                               type="text"
@@ -3772,7 +3772,7 @@ export default function AtelierStudioPage() {
                                   },
                                 }));
                               }}
-                              className="font-mono text-xs px-2.5 py-1.5 bg-white border border-[#CAD8CE] rounded-lg w-full"
+                              className="font-mono text-xs px-2.5 py-1.5 bg-white border-[0.5px] border-line rounded-lg w-full"
                             />
                           </div>
                         </div>
@@ -3784,10 +3784,10 @@ export default function AtelierStudioPage() {
                   {designSubMenu === 'text' && (
                     <div className="space-y-4 animate-fadeIn">
                       {/* Active Pairing Summary */}
-                      <div className="p-3.5 rounded-xl bg-[#F5F3ED] border border-[#CAD8CE]">
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-[#5C6B64]">Active Font Pairing</span>
+                      <div className="p-3.5 rounded-xl bg-surface-2 border-[0.5px] border-line">
+                        <span className="text-[10px] font-semibold uppercase tracking-wider text-ink-500">Active Font Pairing</span>
                         <div className="flex items-center justify-between mt-1">
-                          <span className="text-sm font-bold text-[#28352F]">{currentProfile.font || 'Playfair Display'} (Headline)</span>
+                          <span className="text-sm font-semibold text-ink-700">{currentProfile.font || 'Playfair Display'} (Headline)</span>
                           <span className="text-xs text-stone-500 font-mono">+ {getTitleFontName(currentProfile.alternativeTitleFont) || 'Default Serif'}</span>
                         </div>
                       </div>
@@ -3812,7 +3812,7 @@ export default function AtelierStudioPage() {
                           variant="outline"
                           size="sm"
                           onClick={() => setShowTitleFontModal(true)}
-                          className="w-full text-xs font-semibold bg-white border-[#CAD8CE] text-[#52796F] hover:border-[#52796F]"
+                          className="w-full text-xs font-semibold bg-white border-line text-brand-500 hover:border-brand-500"
                         >
                           {getTitleFontName(currentProfile.alternativeTitleFont) ? `Font: ${getTitleFontName(currentProfile.alternativeTitleFont)}` : 'Browse 48 Expressive Fonts'}
                         </Button>
@@ -3826,17 +3826,17 @@ export default function AtelierStudioPage() {
                       <Label className="block">Centralized 6-Hex Studio Palette</Label>
                       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                         {[
-                          { label: 'Surface', hex: '#FFFEFA' },
-                          { label: 'Primary', hex: currentProfile.designSettings?.buttonColor || '#52796F' },
-                          { label: 'Card Background', hex: '#F5F3ED' },
-                          { label: 'Text Body', hex: '#28352F' },
-                          { label: 'Border', hex: '#CAD8CE' },
+                          { label: 'Surface', hex: '#FFFFFF' },
+                          { label: 'Primary', hex: currentProfile.designSettings?.buttonColor || '#16A34A' },
+                          { label: 'Card Background', hex: '#F8F8F9' },
+                          { label: 'Text Body', hex: '#333333' },
+                          { label: 'Border', hex: '#DCDCDC' },
                           { label: 'Accent', hex: '#38BDF8' },
                         ].map((cItem, cIdx) => (
-                          <div key={cIdx} className="p-3 bg-[#F5F3ED] border border-[#CAD8CE] rounded-xl flex flex-col gap-1.5">
-                            <span className="text-[10px] font-bold uppercase tracking-wider text-[#5C6B64]">{cItem.label}</span>
+                          <div key={cIdx} className="p-3 bg-surface-2 border-[0.5px] border-line rounded-xl flex flex-col gap-1.5">
+                            <span className="text-[10px] font-semibold uppercase tracking-wider text-ink-500">{cItem.label}</span>
                             <div className="flex items-center justify-between">
-                              <span className="font-mono text-xs font-bold text-[#28352F]">{cItem.hex}</span>
+                              <span className="font-mono text-xs font-semibold text-ink-700">{cItem.hex}</span>
                               <span className="w-5 h-5 rounded-full border border-black/15 shadow-2xs" style={{ backgroundColor: cItem.hex }} />
                             </div>
                           </div>
@@ -3850,7 +3850,7 @@ export default function AtelierStudioPage() {
                     <div className="space-y-5 animate-fadeIn">
                       <div className="flex items-center justify-between">
                         <div>
-                          <h4 className="text-xs font-bold uppercase tracking-wider text-[#5C6B64]">
+                          <h4 className="text-[12px] font-semibold uppercase tracking-wider text-ink-500">
                             Interactive Sticker Packs (Drag & Drop onto Preview)
                           </h4>
                           <p className="text-xs text-stone-500 mt-0.5">
@@ -3877,10 +3877,10 @@ export default function AtelierStudioPage() {
                       </div>
 
                       {STICKER_PACKS.map((pack) => (
-                        <div key={pack.id} className="p-3.5 rounded-xl bg-[#F5F3ED] border border-[#CAD8CE] space-y-2">
+                        <div key={pack.id} className="p-3.5 rounded-xl bg-surface-2 border-[0.5px] border-line space-y-2">
                           <div className="flex items-center justify-between">
-                            <span className="text-xs font-bold text-[#28352F]">{pack.name}</span>
-                            <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-white border border-[#CAD8CE] text-[#52796F]">
+                            <span className="text-xs font-semibold text-ink-700">{pack.name}</span>
+                            <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-white border-[0.5px] border-line text-brand-500">
                               {pack.tag}
                             </span>
                           </div>
@@ -3926,7 +3926,7 @@ export default function AtelierStudioPage() {
                                     },
                                   }));
                                 }}
-                                className="text-2xl p-2.5 rounded-xl bg-white border border-[#CAD8CE] hover:border-[#52796F] hover:scale-110 transition-all flex items-center justify-center cursor-grab active:cursor-grabbing shadow-2xs select-none"
+                                className="text-2xl p-2.5 rounded-xl bg-white border-[0.5px] border-line hover:border-brand-500 hover:scale-110 transition-all flex items-center justify-center cursor-grab active:cursor-grabbing shadow-2xs select-none"
                                 title={`Drag or click to place ${stk.name}`}
                               >
                                 {stk.emoji}
@@ -3940,15 +3940,15 @@ export default function AtelierStudioPage() {
 
                   {/* SUB-MENU 7: FOOTER */}
                   {designSubMenu === 'footer' && (
-                    <div className="p-4 rounded-xl bg-[#F5F3ED] border border-[#CAD8CE] flex items-center justify-between gap-4 animate-fadeIn">
+                    <div className="p-4 rounded-xl bg-surface-2 border-[0.5px] border-line flex items-center justify-between gap-4 animate-fadeIn">
                       <div>
                         <div className="flex items-center gap-2">
-                          <h4 className="font-bold text-sm text-[#28352F]">Hide Linktree Footer Branding</h4>
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+                          <h4 className="text-[12px] font-semibold text-ink-700">Hide Linktree Footer Branding</h4>
+                          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-brand-100 text-brand-800">
                             Free For All
                           </span>
                         </div>
-                        <p className="text-xs text-[#5C6B64] mt-0.5">
+                        <p className="text-xs text-ink-500 mt-0.5">
                           Remove &ldquo;Powered by TreeInBio&rdquo; from the bottom of your live profile.
                         </p>
                       </div>
@@ -3973,47 +3973,47 @@ export default function AtelierStudioPage() {
 
               {/* Tab 3: Widgets & Bounties */}
               {activeTab === 'widgets' && (
-                <div className="bg-white border border-[#CAD8CE]/80 rounded-2xl p-5 sm:p-6 shadow-xs flex flex-col gap-5">
-                  <div className="flex items-center justify-between pb-3.5 border-b border-[#E0DCD3]/80">
-                    <h3 className="font-sans font-bold text-base text-[#28352F]">
+                <div className="bg-white border-[0.5px] border-line/80 rounded-2xl p-5 sm:p-6 flex flex-col gap-5">
+                  <div className="flex items-center justify-between pb-3.5 border-b-[0.5px] border-line/80">
+                    <h3 className="text-[14px] font-sans font-semibold text-ink-700">
                       Interactive Bio Widgets &amp; Monetization Bounties
                     </h3>
-                    <span className="font-mono text-xs text-[#52796F]">Zero Platform Fee</span>
+                    <span className="font-mono text-xs text-brand-500">Zero Platform Fee</span>
                   </div>
 
                   <div className="flex flex-col gap-3">
                     {/* Lead Capture Dialog Widget */}
-                    <div className="p-3.5 sm:p-4 bg-[#F5F3ED] border border-[#CAD8CE] rounded-xl flex flex-col gap-3">
+                    <div className="p-3.5 sm:p-4 bg-surface-2 border-[0.5px] border-line rounded-xl flex flex-col gap-3">
                       <div className="flex items-center justify-between gap-3">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-lg bg-white text-[#52796F] border border-[#CAD8CE] flex items-center justify-center shrink-0">
+                          <div className="w-10 h-10 rounded-lg bg-white text-brand-500 border-[0.5px] border-line flex items-center justify-center shrink-0">
                             <Contact className="w-5 h-5" />
                           </div>
                           <div>
-                            <h4 className="text-sm font-bold text-[#28352F]">
+                            <h4 className="text-[12px] font-semibold text-ink-700">
                               Interactive Lead Capture &amp; Contact Sync
                             </h4>
-                            <p className="text-xs font-mono text-[#5C6B64]">
+                            <p className="text-xs font-mono text-ink-500">
                               Shows &apos;Connect&apos; button with validated form &amp; Google Contacts sync
                             </p>
                           </div>
                         </div>
                         <button
                           onClick={() => setShowLeadModal(true)}
-                          className="px-3.5 py-2 bg-white hover:bg-[#F5F3ED] border border-[#CAD8CE] text-xs sm:text-sm font-semibold rounded-lg cursor-pointer min-h-[36px] transition-colors shrink-0"
+                          className="px-3.5 py-2 bg-white hover:bg-surface-2 border-[0.5px] border-line text-xs sm:text-sm font-semibold rounded-lg cursor-pointer min-h-[36px] transition-colors shrink-0"
                         >
                           Preview Form
                         </button>
                       </div>
 
                       {/* User Auto-Sync Option */}
-                      <div className="pt-2.5 border-t border-[#CAD8CE]/70 flex items-center justify-between gap-3 text-xs">
+                      <div className="pt-2.5 border-t-[0.5px] border-line/70 flex items-center justify-between gap-3 text-xs">
                         <div className="flex items-center gap-2">
-                          <Sparkles className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
-                          <span className="font-semibold text-[#28352F]">Auto-Sync contacts to Google &amp; Gmail</span>
-                          <span className={`px-1.5 py-0.2 rounded text-[10px] font-mono font-bold ${
+                          <Sparkles className="w-3.5 h-3.5 text-brand-700 shrink-0" />
+                          <span className="font-semibold text-ink-700">Auto-Sync contacts to Google &amp; Gmail</span>
+                          <span className={`px-1.5 py-0.2 rounded text-[10px] font-mono font-semibold ${
                             currentProfile.leadCapture?.syncToGoogleContacts !== false
-                              ? 'bg-emerald-100 text-emerald-800'
+                              ? 'bg-brand-100 text-brand-800'
                               : 'bg-stone-200 text-stone-600'
                           }`}>
                             {currentProfile.leadCapture?.syncToGoogleContacts !== false ? 'ON' : 'OFF'}
@@ -4033,63 +4033,63 @@ export default function AtelierStudioPage() {
                     </div>
 
                     {/* Bookings & 1:1 Meetings Widget */}
-                    <div className="p-3.5 sm:p-4 bg-[#F5F3ED] border border-[#CAD8CE] rounded-xl flex items-center justify-between gap-3">
+                    <div className="p-3.5 sm:p-4 bg-surface-2 border-[0.5px] border-line rounded-xl flex items-center justify-between gap-3">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-lg bg-white text-[#52796F] border border-[#CAD8CE] flex items-center justify-center shrink-0">
+                        <div className="w-10 h-10 rounded-lg bg-white text-brand-500 border-[0.5px] border-line flex items-center justify-center shrink-0">
                           <Calendar className="w-5 h-5" />
                         </div>
                         <div>
-                          <h4 className="text-sm font-bold text-[#28352F]">
+                          <h4 className="text-[12px] font-semibold text-ink-700">
                             1:1 Consultation &amp; Google Meet Scheduling
                           </h4>
-                          <p className="text-xs font-mono text-[#5C6B64]">
+                          <p className="text-xs font-mono text-ink-500">
                             Direct slot booking with Google Calendar availability
                           </p>
                         </div>
                       </div>
                       <button
                         onClick={() => setShowMeetingModal(true)}
-                        className="px-3.5 py-2 bg-white hover:bg-[#F5F3ED] border border-[#CAD8CE] text-xs sm:text-sm font-semibold rounded-lg cursor-pointer min-h-[36px] transition-colors shrink-0"
+                        className="px-3.5 py-2 bg-white hover:bg-surface-2 border-[0.5px] border-line text-xs sm:text-sm font-semibold rounded-lg cursor-pointer min-h-[36px] transition-colors shrink-0"
                       >
                         Preview Calendar
                       </button>
                     </div>
 
                     {/* Creator Tip Jar Widget */}
-                    <div className="p-3.5 sm:p-4 bg-[#F5F3ED] border border-[#CAD8CE] rounded-xl flex items-center justify-between gap-3">
+                    <div className="p-3.5 sm:p-4 bg-surface-2 border-[0.5px] border-line rounded-xl flex items-center justify-between gap-3">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-lg bg-white text-[#52796F] border border-[#CAD8CE] flex items-center justify-center shrink-0">
+                        <div className="w-10 h-10 rounded-lg bg-white text-brand-500 border-[0.5px] border-line flex items-center justify-center shrink-0">
                           <Coffee className="w-5 h-5" />
                         </div>
                         <div>
-                          <h4 className="text-sm font-bold text-[#28352F]">
+                          <h4 className="text-[12px] font-semibold text-ink-700">
                             Stripe Direct Tip Jar with Champagne Confetti
                           </h4>
-                          <p className="text-xs font-mono text-[#5C6B64]">
+                          <p className="text-xs font-mono text-ink-500">
                             $5, $15, $50 fan support with custom notes &amp; confetti
                           </p>
                         </div>
                       </div>
                       <button
                         onClick={() => setShowTipModal(true)}
-                        className="px-3.5 py-2 bg-[#52796F] hover:bg-[#3D5C54] text-white text-xs sm:text-sm font-semibold rounded-lg cursor-pointer min-h-[36px] transition-colors shrink-0"
+                        className="px-3.5 py-2 bg-brand-500 hover:bg-brand-600 text-white text-xs sm:text-sm font-semibold rounded-lg cursor-pointer min-h-[36px] transition-colors shrink-0"
                       >
                         Test Tip Jar
                       </button>
                     </div>
 
                     {/* Live Social Proof Ticker Widget */}
-                    <div className="p-3.5 sm:p-4 bg-[#F5F3ED] border border-[#CAD8CE] rounded-xl flex flex-col gap-2.5">
+                    <div className="p-3.5 sm:p-4 bg-surface-2 border-[0.5px] border-line rounded-xl flex flex-col gap-2.5">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-lg bg-white text-amber-600 border border-[#CAD8CE] flex items-center justify-center shrink-0">
+                          <div className="w-10 h-10 rounded-lg bg-white text-amber-600 border-[0.5px] border-line flex items-center justify-center shrink-0">
                             <Sparkles className="w-5 h-5" />
                           </div>
                           <div>
-                            <h4 className="text-sm font-bold text-[#28352F]">
+                            <h4 className="text-[12px] font-semibold text-ink-700">
                               Live Social Proof Activity Ticker
                             </h4>
-                            <p className="text-xs font-mono text-[#5C6B64]">
+                            <p className="text-xs font-mono text-ink-500">
                               Subtle floating notifications (&ldquo;Sarah from London just downloaded...&rdquo;)
                             </p>
                           </div>
@@ -4108,8 +4108,8 @@ export default function AtelierStudioPage() {
                       </div>
 
                       {currentProfile.socialProof?.enabled && (
-                        <div className="pt-2.5 border-t border-[#CAD8CE]/60 flex items-center justify-between text-xs sm:text-sm">
-                          <span className="text-xs text-[#5C6B64]">Notification Cycle Interval:</span>
+                        <div className="pt-2.5 border-t-[0.5px] border-line/60 flex items-center justify-between text-xs sm:text-sm">
+                          <span className="text-xs text-ink-500">Notification Cycle Interval:</span>
                           <div className="flex items-center gap-2 font-mono text-xs sm:text-sm">
                             <div className="w-20">
                               <Input
@@ -4125,32 +4125,32 @@ export default function AtelierStudioPage() {
                                     intervalMs: Math.max(3000, Number(e.target.value) * 1000)
                                   }
                                 })}
-                                className="text-center font-bold"
+                                className="text-center font-semibold"
                               />
                             </div>
-                            <span className="text-slate-500 font-sans">seconds</span>
+                            <span className="text-ink-500 font-sans">seconds</span>
                           </div>
                         </div>
                       )}
                     </div>
 
                     {/* 1-Click Tracking Pixels Hub Widget */}
-                    <div className="p-3.5 sm:p-4 bg-[#F5F3ED] border border-[#CAD8CE] rounded-xl flex flex-col gap-2.5">
+                    <div className="p-3.5 sm:p-4 bg-surface-2 border-[0.5px] border-line rounded-xl flex flex-col gap-2.5">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-lg bg-white text-indigo-600 border border-[#CAD8CE] flex items-center justify-center shrink-0">
+                        <div className="w-10 h-10 rounded-lg bg-white text-indigo-600 border-[0.5px] border-line flex items-center justify-center shrink-0">
                           <TrendingUp className="w-5 h-5" />
                         </div>
                         <div>
-                          <h4 className="text-sm font-bold text-[#28352F]">
+                          <h4 className="text-[12px] font-semibold text-ink-700">
                             1-Click Tracking Pixel Hub (Retargeting)
                           </h4>
-                          <p className="text-xs font-mono text-[#5C6B64]">
+                          <p className="text-xs font-mono text-ink-500">
                             Zero coding: Paste pixel IDs to retarget visitors on Meta, TikTok, Google &amp; Pinterest
                           </p>
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 pt-3 border-t border-[#CAD8CE]/70 text-xs sm:text-sm">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 pt-3 border-t-[0.5px] border-line/70 text-xs sm:text-sm">
                         <div>
                           <Label htmlFor="pixel-meta">Meta (Facebook) Pixel ID</Label>
                           <Input
@@ -4230,17 +4230,17 @@ export default function AtelierStudioPage() {
                     </div>
 
                     {/* FTC Affiliate Auto-Disclosure Widget */}
-                    <div className="p-3.5 sm:p-4 bg-[#F5F3ED] border border-[#CAD8CE] rounded-xl flex flex-col gap-2.5">
+                    <div className="p-3.5 sm:p-4 bg-surface-2 border-[0.5px] border-line rounded-xl flex flex-col gap-2.5">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-lg bg-white text-emerald-700 border border-[#CAD8CE] flex items-center justify-center shrink-0">
+                          <div className="w-10 h-10 rounded-lg bg-white text-brand-700 border-[0.5px] border-line flex items-center justify-center shrink-0">
                             <Tag className="w-5 h-5" />
                           </div>
                           <div>
-                            <h4 className="text-sm font-bold text-[#28352F]">
+                            <h4 className="text-[12px] font-semibold text-ink-700">
                               FTC Affiliate Auto-Disclosure
                             </h4>
-                            <p className="text-xs font-mono text-[#5C6B64]">
+                            <p className="text-xs font-mono text-ink-500">
                               1-toggle compliance badge keeping your bio compliant with international advertising laws
                             </p>
                           </div>
@@ -4259,7 +4259,7 @@ export default function AtelierStudioPage() {
                       </div>
 
                       {currentProfile.compliance?.affiliateDisclosure && (
-                        <div className="pt-3 border-t border-[#CAD8CE]/70 text-xs sm:text-sm">
+                        <div className="pt-3 border-t-[0.5px] border-line/70 text-xs sm:text-sm">
                           <Label htmlFor="affiliate-disclosure-note">Custom Legal Disclosure Note</Label>
                           <Input
                             id="affiliate-disclosure-note"
@@ -4280,17 +4280,17 @@ export default function AtelierStudioPage() {
                     </div>
 
                     {/* Profile Access Gate & Sensitive Content Notice Widget */}
-                    <div className="p-3.5 sm:p-4 bg-[#F5F3ED] border border-[#CAD8CE] rounded-xl flex flex-col gap-3">
+                    <div className="p-3.5 sm:p-4 bg-surface-2 border-[0.5px] border-line rounded-xl flex flex-col gap-3">
                       <div className="flex items-center justify-between gap-3">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-lg bg-white text-[#52796F] border border-[#CAD8CE] flex items-center justify-center shrink-0">
-                            <Lock className="w-5 h-5 text-[#52796F]" />
+                          <div className="w-10 h-10 rounded-lg bg-white text-brand-500 border-[0.5px] border-line flex items-center justify-center shrink-0">
+                            <Lock className="w-5 h-5 text-brand-500" />
                           </div>
                           <div>
-                            <h4 className="text-sm font-bold text-[#28352F]">
+                            <h4 className="text-[12px] font-semibold text-ink-700">
                               Profile Access Gate (Passcode / 18+ Notice)
                             </h4>
-                            <p className="text-xs font-mono text-[#5C6B64]">
+                            <p className="text-xs font-mono text-ink-500">
                               Restrict profile viewing behind a passcode or require age / content confirmation
                             </p>
                           </div>
@@ -4310,7 +4310,7 @@ export default function AtelierStudioPage() {
                       </div>
 
                       {currentProfile.accessGate?.enabled && (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 pt-3 border-t border-[#CAD8CE]/70 text-xs sm:text-sm">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 pt-3 border-t-[0.5px] border-line/70 text-xs sm:text-sm">
                           <div>
                             <Label htmlFor="gate-type-select">Gate Enforcement Type</Label>
                             <Select
@@ -4347,7 +4347,7 @@ export default function AtelierStudioPage() {
                                     passcode: e.target.value,
                                   }
                                 })}
-                                className="font-mono font-bold"
+                                className="font-mono font-semibold"
                               />
                             </div>
                           )}
@@ -4397,7 +4397,7 @@ export default function AtelierStudioPage() {
 
             {/* Right 5 Columns: Live Bio Preview */}
             <div className="xl:col-span-5 flex flex-col gap-2">
-              <div className="bg-white border border-[#CAD8CE]/80 rounded-2xl p-4 sm:p-5 shadow-xs flex flex-col items-center">
+              <div className="bg-white border-[0.5px] border-line/80 rounded-2xl p-4 sm:p-5 flex flex-col items-center">
                 <PhoneMockup
                   profile={currentProfile}
                   onIncrementClick={handleMockupLinkClick}

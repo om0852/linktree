@@ -23,19 +23,19 @@ const Input = forwardRef(function Input(
   const ActiveLeftIcon = Icon || LeftIcon;
 
   const sizeClasses = size === 'sm'
-    ? 'py-2 min-h-[38px] text-xs'
+    ? 'h-[30px] text-[12px]'
     : size === 'lg'
-    ? 'py-3 min-h-[46px] text-base'
-    : 'py-2.5 min-h-[42px] text-xs sm:text-sm';
+    ? 'h-[40px] text-[14px]'
+    : 'h-[34px] text-[12px]';
 
-  const paddingLeft = ActiveLeftIcon ? 'pl-10 pr-3.5' : rightElement ? 'pl-3.5 pr-10' : 'px-3.5';
+  const paddingLeft = ActiveLeftIcon ? 'pl-[30px] pr-[10px]' : rightElement ? 'pl-[10px] pr-[30px]' : 'px-[10px]';
 
   return (
     <div className="w-full flex flex-col">
       <div className="relative w-full flex items-center">
         {ActiveLeftIcon && (
-          <div className="absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-[#5C6B64] flex items-center justify-center">
-            <ActiveLeftIcon className="w-4 h-4" />
+          <div className="absolute left-[10px] top-1/2 -translate-y-1/2 pointer-events-none text-ink-500 flex items-center justify-center">
+            <ActiveLeftIcon className="size-[16px]" strokeWidth={1.5} />
           </div>
         )}
 
@@ -47,10 +47,10 @@ const Input = forwardRef(function Input(
           onChange={onChange}
           placeholder={placeholder}
           disabled={disabled}
-          className={`w-full bg-white border rounded-lg text-[#28352F] font-sans placeholder-[#5C6B64]/60 transition-all shadow-xs focus:outline-none focus:ring-2 disabled:bg-[#F5F3ED] disabled:text-[#5C6B64] disabled:cursor-not-allowed ${
+          className={`w-full bg-surface-1 border-[0.5px] rounded-sm text-ink-700 font-sans font-light placeholder:text-ink-500 transition-colors outline-none focus:ring-1 disabled:bg-surface-2 disabled:text-ink-400 disabled:cursor-not-allowed ${
             error
-              ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/15'
-              : 'border-[#CAD8CE] focus:border-[#52796F] focus:ring-[#52796F]/15'
+              ? 'border-danger focus:border-danger focus:ring-danger/30'
+              : 'border-line focus:border-brand-500 focus:ring-brand-500/30'
           } ${sizeClasses} ${paddingLeft} ${className}`}
           {...props}
         />
@@ -63,7 +63,7 @@ const Input = forwardRef(function Input(
       </div>
 
       {error && (
-        <span className="text-xs text-rose-600 mt-1 font-medium">
+        <span className="text-[10px] text-danger mt-[4px]">
           {error}
         </span>
       )}

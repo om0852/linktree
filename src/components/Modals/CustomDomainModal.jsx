@@ -186,28 +186,28 @@ export default function CustomDomainModal({ profile, onClose }) {
 
   return (
     <div className="modal-overlay">
-      <div className="modal-content p-6 max-w-2xl w-full relative max-h-[90vh] overflow-y-auto border border-[#CAD8CE] bg-[#FFFEFA] shadow-2xl rounded-2xl">
+      <div className="modal-content p-6 max-w-2xl w-full relative max-h-[90vh] overflow-y-auto border-[0.5px] border-line bg-white shadow-modal rounded-2xl">
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-2 rounded-full text-[#5C6B64] hover:text-[#28352F] hover:bg-[#F5F3ED] transition-all cursor-pointer"
+          className="absolute top-4 right-4 p-2 rounded-full text-ink-500 hover:text-ink-700 hover:bg-surface-2 transition-all cursor-pointer"
         >
           <X className="w-5 h-5" />
         </button>
 
         {/* Header */}
-        <div className="flex items-center gap-3.5 mb-5 pb-4 border-b border-[#E0DCD3]">
-          <div className="w-12 h-12 rounded-full bg-[#52796F]/10 text-[#52796F] border border-[#52796F]/20 flex items-center justify-center shadow-sm">
+        <div className="flex items-center gap-3.5 mb-5 pb-4 border-b-[0.5px] border-line">
+          <div className="w-12 h-12 rounded-full bg-brand-500/10 text-brand-500 border border-brand-500/20 flex items-center justify-center ">
             <Globe className="w-6 h-6" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h3 className="font-sans text-base font-semibold text-[#28352F]">Custom Domains &amp; SSL</h3>
-              <span className="px-2 py-0.5 rounded-sm bg-[#52796F]/10 text-[#52796F] text-[10px] font-mono border border-[#52796F]/20 font-semibold">
+              <h3 className="text-[14px] font-sans font-semibold text-ink-700">Custom Domains &amp; SSL</h3>
+              <span className="px-2 py-0.5 rounded-sm bg-brand-500/10 text-brand-500 text-[10px] font-mono border border-brand-500/20 font-semibold">
                 Caddy On-Demand TLS
               </span>
             </div>
-            <p className="text-xs text-[#5C6B64] mt-0.5">
+            <p className="text-xs text-ink-500 mt-0.5">
               Serve your TreeInBio page on your own branded domain with automated Let&apos;s Encrypt SSL
             </p>
           </div>
@@ -218,12 +218,12 @@ export default function CustomDomainModal({ profile, onClose }) {
           <div
             className={`p-3.5 rounded-xl mb-5 flex items-start gap-2.5 text-xs ${
               actionFeedback.type === 'success'
-                ? 'bg-[#52796F]/10 border border-[#52796F]/30 text-[#28352F]'
+                ? 'bg-brand-500/10 border border-brand-500/30 text-ink-700'
                 : 'bg-rose-50 border border-rose-200 text-rose-700'
             }`}
           >
             {actionFeedback.type === 'success' ? (
-              <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5 text-[#52796F]" />
+              <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5 text-brand-500" />
             ) : (
               <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-rose-600" />
             )}
@@ -241,12 +241,12 @@ export default function CustomDomainModal({ profile, onClose }) {
         )}
 
         {/* Add Domain Form */}
-        <form onSubmit={handleAddDomain} className="p-4 rounded-xl bg-[#F5F3ED] border border-[#CAD8CE] mb-6 space-y-3">
+        <form onSubmit={handleAddDomain} className="p-4 rounded-xl bg-surface-2 border-[0.5px] border-line mb-6 space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-[#28352F] flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-[#52796F]" /> Connect a New Domain
+            <span className="text-xs font-semibold text-ink-700 flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5 text-brand-500" /> Connect a New Domain
             </span>
-            <span className="text-[11px] font-mono text-[#52796F] bg-[#FFFEFA] px-2 py-0.5 rounded-sm border border-[#CAD8CE]">
+            <span className="text-[11px] font-mono text-brand-500 bg-white px-2 py-0.5 rounded-sm border-[0.5px] border-line">
               Profile: @{profile.username}
             </span>
           </div>
@@ -261,7 +261,7 @@ export default function CustomDomainModal({ profile, onClose }) {
                 className="tb-input w-full pl-9 text-xs"
                 required
               />
-              <Globe className="w-4 h-4 text-[#5C6B64] absolute left-3 top-1/2 -translate-y-1/2" />
+              <Globe className="w-4 h-4 text-ink-500 absolute left-3 top-1/2 -translate-y-1/2" />
             </div>
 
             <button
@@ -278,54 +278,54 @@ export default function CustomDomainModal({ profile, onClose }) {
               )}
             </button>
           </div>
-          <p className="text-[11px] text-[#5C6B64]">
-            Tip: You can use any subdomain (e.g. <span className="font-mono text-[#52796F]">links.yourbrand.com</span>) or root domain (<span className="font-mono text-[#52796F]">yourbrand.com</span>).
+          <p className="text-[11px] text-ink-500">
+            Tip: You can use any subdomain (e.g. <span className="font-mono text-brand-500">links.yourbrand.com</span>) or root domain (<span className="font-mono text-brand-500">yourbrand.com</span>).
           </p>
         </form>
 
         {/* DNS Configuration Instructions */}
         <div className="mb-6 space-y-3">
           <div className="flex items-center justify-between">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-[#28352F] flex items-center gap-1.5">
-              <Server className="w-3.5 h-3.5 text-[#52796F]" /> DNS Setup Instructions (Oracle Cloud VM)
+            <h4 className="text-[12px] font-semibold uppercase tracking-wider text-ink-700 flex items-center gap-1.5">
+              <Server className="w-3.5 h-3.5 text-brand-500" /> DNS Setup Instructions (Oracle Cloud VM)
             </h4>
-            <span className="text-[11px] text-[#52796F] font-mono">IP: {IP_TARGET}</span>
+            <span className="text-[11px] text-brand-500 font-mono">IP: {IP_TARGET}</span>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {/* CNAME Card */}
-            <div className="p-3.5 rounded-xl bg-[#F5F3ED] border border-[#CAD8CE] hover:border-[#52796F] transition-all">
+            <div className="p-3.5 rounded-xl bg-surface-2 border-[0.5px] border-line hover:border-brand-500 transition-all">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-bold text-[#28352F] flex items-center gap-1">
+                <span className="text-xs font-semibold text-ink-700 flex items-center gap-1">
                   Option 1: CNAME Record
                 </span>
-                <span className="px-1.5 py-0.2 rounded text-[10px] font-semibold bg-[#52796F]/10 text-[#52796F] border border-[#52796F]/30">
+                <span className="px-1.5 py-0.2 rounded text-[10px] font-semibold bg-brand-500/10 text-brand-500 border border-brand-500/30">
                   Recommended
                 </span>
               </div>
-              <p className="text-[11px] text-[#5C6B64] mb-2">For subdomains like <code className="text-[#52796F]">bio</code> or <code className="text-[#52796F]">links</code></p>
+              <p className="text-[11px] text-ink-500 mb-2">For subdomains like <code className="text-brand-500">bio</code> or <code className="text-brand-500">links</code></p>
               
               <div className="space-y-1.5 text-[11px] font-mono">
-                <div className="flex justify-between bg-[#FFFEFA] p-1.5 rounded-md border border-[#CAD8CE]">
-                  <span className="text-[#5C6B64]">Type:</span>
-                  <span className="text-[#28352F] font-bold">CNAME</span>
+                <div className="flex justify-between bg-white p-1.5 rounded-md border-[0.5px] border-line">
+                  <span className="text-ink-500">Type:</span>
+                  <span className="text-ink-700 font-semibold">CNAME</span>
                 </div>
-                <div className="flex justify-between bg-[#FFFEFA] p-1.5 rounded-md border border-[#CAD8CE]">
-                  <span className="text-[#5C6B64]">Name / Host:</span>
-                  <span className="text-[#28352F] font-bold">subdomain (e.g. bio)</span>
+                <div className="flex justify-between bg-white p-1.5 rounded-md border-[0.5px] border-line">
+                  <span className="text-ink-500">Name / Host:</span>
+                  <span className="text-ink-700 font-semibold">subdomain (e.g. bio)</span>
                 </div>
-                <div className="flex justify-between items-center bg-[#FFFEFA] p-1.5 rounded-md border border-[#CAD8CE]">
-                  <span className="text-[#5C6B64]">Target / Value:</span>
+                <div className="flex justify-between items-center bg-white p-1.5 rounded-md border-[0.5px] border-line">
+                  <span className="text-ink-500">Target / Value:</span>
                   <div className="flex items-center gap-1">
-                    <span className="text-[#52796F] font-bold">{CNAME_TARGET}</span>
+                    <span className="text-brand-500 font-semibold">{CNAME_TARGET}</span>
                     <button
                       type="button"
                       onClick={() => handleCopy(CNAME_TARGET, 'cname')}
-                      className="p-1 hover:text-[#28352F] text-[#5C6B64] transition-colors"
+                      className="p-1 hover:text-ink-700 text-ink-500 transition-colors"
                       title="Copy CNAME target"
                     >
                       {copiedKey === 'cname' ? (
-                        <Check className="w-3 h-3 text-[#52796F]" />
+                        <Check className="w-3 h-3 text-brand-500" />
                       ) : (
                         <Copy className="w-3 h-3" />
                       )}
@@ -336,38 +336,38 @@ export default function CustomDomainModal({ profile, onClose }) {
             </div>
 
             {/* A Record Card */}
-            <div className="p-3.5 rounded-xl bg-[#F5F3ED] border border-[#CAD8CE] hover:border-[#52796F] transition-all">
+            <div className="p-3.5 rounded-xl bg-surface-2 border-[0.5px] border-line hover:border-brand-500 transition-all">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-bold text-[#28352F] flex items-center gap-1">
+                <span className="text-xs font-semibold text-ink-700 flex items-center gap-1">
                   Option 2: A Record
                 </span>
                 <span className="px-1.5 py-0.2 rounded text-[10px] font-semibold bg-amber-50 text-amber-800 border border-amber-200">
                   Apex / Root
                 </span>
               </div>
-              <p className="text-[11px] text-[#5C6B64] mb-2">For root apex domains (e.g. <code className="text-[#52796F]">yourbrand.com</code>)</p>
+              <p className="text-[11px] text-ink-500 mb-2">For root apex domains (e.g. <code className="text-brand-500">yourbrand.com</code>)</p>
               
               <div className="space-y-1.5 text-[11px] font-mono">
-                <div className="flex justify-between bg-[#FFFEFA] p-1.5 rounded-md border border-[#CAD8CE]">
-                  <span className="text-[#5C6B64]">Type:</span>
-                  <span className="text-[#28352F] font-bold">A</span>
+                <div className="flex justify-between bg-white p-1.5 rounded-md border-[0.5px] border-line">
+                  <span className="text-ink-500">Type:</span>
+                  <span className="text-ink-700 font-semibold">A</span>
                 </div>
-                <div className="flex justify-between bg-[#FFFEFA] p-1.5 rounded-md border border-[#CAD8CE]">
-                  <span className="text-[#5C6B64]">Name / Host:</span>
-                  <span className="text-[#28352F] font-bold">@ (or root)</span>
+                <div className="flex justify-between bg-white p-1.5 rounded-md border-[0.5px] border-line">
+                  <span className="text-ink-500">Name / Host:</span>
+                  <span className="text-ink-700 font-semibold">@ (or root)</span>
                 </div>
-                <div className="flex justify-between items-center bg-[#FFFEFA] p-1.5 rounded-md border border-[#CAD8CE]">
-                  <span className="text-[#5C6B64]">Target / Value:</span>
+                <div className="flex justify-between items-center bg-white p-1.5 rounded-md border-[0.5px] border-line">
+                  <span className="text-ink-500">Target / Value:</span>
                   <div className="flex items-center gap-1">
-                    <span className="text-[#52796F] font-bold">{IP_TARGET}</span>
+                    <span className="text-brand-500 font-semibold">{IP_TARGET}</span>
                     <button
                       type="button"
                       onClick={() => handleCopy(IP_TARGET, 'ip')}
-                      className="p-1 hover:text-[#28352F] text-[#5C6B64] transition-colors"
+                      className="p-1 hover:text-ink-700 text-ink-500 transition-colors"
                       title="Copy IP target"
                     >
                       {copiedKey === 'ip' ? (
-                        <Check className="w-3 h-3 text-[#52796F]" />
+                        <Check className="w-3 h-3 text-brand-500" />
                       ) : (
                         <Copy className="w-3 h-3" />
                       )}
@@ -382,27 +382,27 @@ export default function CustomDomainModal({ profile, onClose }) {
         {/* Connected Domains List */}
         <div>
           <div className="flex items-center justify-between mb-3">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-[#28352F] flex items-center gap-1.5">
-              <ShieldCheck className="w-3.5 h-3.5 text-[#52796F]" /> Connected Custom Domains ({domains.length})
+            <h4 className="text-[12px] font-semibold uppercase tracking-wider text-ink-700 flex items-center gap-1.5">
+              <ShieldCheck className="w-3.5 h-3.5 text-brand-500" /> Connected Custom Domains ({domains.length})
             </h4>
             <button
               onClick={refreshDomains}
-              className="text-[11px] text-[#52796F] hover:text-[#3D5C54] flex items-center gap-1 cursor-pointer font-medium"
+              className="text-[11px] text-brand-500 hover:text-brand-600 flex items-center gap-1 cursor-pointer font-medium"
             >
               <RefreshCw className="w-3 h-3" /> Refresh
             </button>
           </div>
 
           {loading ? (
-            <div className="p-8 text-center text-[#5C6B64] flex flex-col items-center justify-center gap-2">
-              <Loader2 className="w-6 h-6 animate-spin text-[#52796F]" />
+            <div className="p-8 text-center text-ink-500 flex flex-col items-center justify-center gap-2">
+              <Loader2 className="w-6 h-6 animate-spin text-brand-500" />
               <span className="text-xs">Loading domains...</span>
             </div>
           ) : domains.length === 0 ? (
-            <div className="p-6 rounded-xl bg-[#F5F3ED] border border-dashed border-[#CAD8CE] text-center">
-              <Globe className="w-8 h-8 text-[#5C6B64] mx-auto mb-2" />
-              <p className="text-xs font-bold text-[#28352F]">No custom domains connected yet</p>
-              <p className="text-[11px] text-[#5C6B64] max-w-sm mx-auto mt-1">
+            <div className="p-6 rounded-xl bg-surface-2 border border-dashed border-line text-center">
+              <Globe className="w-8 h-8 text-ink-500 mx-auto mb-2" />
+              <p className="text-xs font-semibold text-ink-700">No custom domains connected yet</p>
+              <p className="text-[11px] text-ink-500 max-w-sm mx-auto mt-1">
                 Add your branded domain above to serve this profile directly at your own URL with automatic SSL certificate issuance.
               </p>
             </div>
@@ -413,18 +413,18 @@ export default function CustomDomainModal({ profile, onClose }) {
                 return (
                   <div
                     key={dom._id}
-                    className="p-4 rounded-xl bg-[#F5F3ED] border border-[#CAD8CE] hover:border-[#52796F] transition-all flex flex-col md:flex-row md:items-center justify-between gap-3"
+                    className="p-4 rounded-xl bg-surface-2 border-[0.5px] border-line hover:border-brand-500 transition-all flex flex-col md:flex-row md:items-center justify-between gap-3"
                   >
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
-                        <span className="text-sm font-bold text-[#28352F] font-mono flex items-center gap-1.5">
-                          <Globe className="w-4 h-4 text-[#52796F]" />
+                        <span className="text-sm font-semibold text-ink-700 font-mono flex items-center gap-1.5">
+                          <Globe className="w-4 h-4 text-brand-500" />
                           {dom.hostname}
                         </span>
 
                         {dom.verified ? (
-                          <span className="px-2 py-0.5 rounded-sm bg-[#52796F]/10 text-[#52796F] text-[10px] font-semibold border border-[#52796F]/30 flex items-center gap-1">
-                            <Lock className="w-2.5 h-2.5 text-[#52796F]" /> SSL Active
+                          <span className="px-2 py-0.5 rounded-sm bg-brand-500/10 text-brand-500 text-[10px] font-semibold border border-brand-500/30 flex items-center gap-1">
+                            <Lock className="w-2.5 h-2.5 text-brand-500" /> SSL Active
                           </span>
                         ) : (
                           <span className="px-2 py-0.5 rounded-sm bg-amber-50 text-amber-800 text-[10px] font-semibold border border-amber-200 flex items-center gap-1">
@@ -433,23 +433,23 @@ export default function CustomDomainModal({ profile, onClose }) {
                         )}
                       </div>
 
-                      <div className="text-[11px] text-[#5C6B64] flex items-center gap-3">
-                        <span>Target: <code className="text-[#52796F]">{dom.target}</code></span>
+                      <div className="text-[11px] text-ink-500 flex items-center gap-3">
+                        <span>Target: <code className="text-brand-500">{dom.target}</code></span>
                         {dom.verifiedAt && (
-                          <span className="text-[#5C6B64]">
+                          <span className="text-ink-500">
                             Verified on {new Date(dom.verifiedAt).toLocaleDateString()}
                           </span>
                         )}
                       </div>
 
                       {!dom.verified && dom.verificationToken && (
-                        <div className="text-[11px] text-[#5C6B64] space-y-0.5">
+                        <div className="text-[11px] text-ink-500 space-y-0.5">
                           <p>Prove ownership with a TXT record:</p>
                           <p className="font-mono break-all">
-                            Name: <code className="text-[#28352F]">{domainVerificationRecordName(dom.hostname)}</code>
+                            Name: <code className="text-ink-700">{domainVerificationRecordName(dom.hostname)}</code>
                           </p>
                           <p className="font-mono break-all">
-                            Value: <code className="text-[#28352F]">{dom.verificationToken}</code>
+                            Value: <code className="text-ink-700">{dom.verificationToken}</code>
                           </p>
                         </div>
                       )}
@@ -469,7 +469,7 @@ export default function CustomDomainModal({ profile, onClose }) {
                         disabled={isVerifying}
                         className={`tb-btn text-xs px-3 py-1.5 rounded-sm cursor-pointer ${
                           dom.verified
-                            ? 'bg-[#FFFEFA] text-[#28352F] hover:bg-[#EAE7DE] border border-[#CAD8CE]'
+                            ? 'bg-white text-ink-700 hover:bg-surface-3 border-[0.5px] border-line'
                             : 'tb-btn-primary'
                         }`}
                         title="Run In-App DNS Verification Engine"
@@ -492,7 +492,7 @@ export default function CustomDomainModal({ profile, onClose }) {
                           href={`https://${dom.hostname}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="p-2 rounded-sm bg-[#FFFEFA] hover:bg-[#EAE7DE] text-[#52796F] border border-[#CAD8CE] transition-all"
+                          className="p-2 rounded-sm bg-white hover:bg-surface-3 text-brand-500 border-[0.5px] border-line transition-all"
                           title="Open live custom domain in new tab"
                         >
                           <ExternalLink className="w-3.5 h-3.5" />

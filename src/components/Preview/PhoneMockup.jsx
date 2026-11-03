@@ -335,8 +335,8 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
       }
       if (wp.type === 'pattern') {
         return {
-          backgroundColor: '#FFFEFA',
-          backgroundImage: 'radial-gradient(#CAD8CE 1.5px, transparent 1.5px)',
+          backgroundColor: '#FFFFFF',
+          backgroundImage: 'radial-gradient(#DCDCDC 1.5px, transparent 1.5px)',
           backgroundSize: '16px 16px',
         };
       }
@@ -345,7 +345,7 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
         return { background: parseTailwindGradient(wp.gradient) };
       }
       // If user customized a specific fill color that isn't the blank default, or if preset matches
-      if (wp.type === 'fill' && wp.value && wp.value !== '#FFFEFA') {
+      if (wp.type === 'fill' && wp.value && wp.value !== '#FFFFFF') {
         return { backgroundColor: wp.value };
       }
     }
@@ -416,7 +416,7 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
     }
 
     if (!cardStyle.backgroundColor) {
-      cardStyle.backgroundColor = isDark ? 'rgba(255, 255, 255, 0.1)' : '#F5F3ED';
+      cardStyle.backgroundColor = isDark ? 'rgba(255, 255, 255, 0.1)' : '#F8F8F9';
     }
 
     // Border Resolution
@@ -435,10 +435,10 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
       } else if (preset.border === 'border-stone-200') {
         cardStyle.borderColor = '#e7e5e4';
       } else {
-        cardStyle.borderColor = isDark ? 'rgba(255, 255, 255, 0.18)' : '#CAD8CE';
+        cardStyle.borderColor = isDark ? 'rgba(255, 255, 255, 0.18)' : '#DCDCDC';
       }
     } else {
-      cardStyle.borderColor = isDark ? 'rgba(255, 255, 255, 0.18)' : '#CAD8CE';
+      cardStyle.borderColor = isDark ? 'rgba(255, 255, 255, 0.18)' : '#DCDCDC';
     }
 
     // Corner Roundness synchronized across all cards & buttons
@@ -469,7 +469,7 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
     } else if (shadow === 'hard') {
       cardStyle.boxShadow = isDark ? '0 8px 28px rgba(0, 0, 0, 0.5)' : '0 6px 20px rgba(0, 0, 0, 0.14)';
     } else if (shadow === 'offset') {
-      cardStyle.boxShadow = `3px 3px 0px ${preset?.accent || (isDark ? '#FFFFFF' : '#28352F')}`;
+      cardStyle.boxShadow = `3px 3px 0px ${preset?.accent || (isDark ? '#FFFFFF' : '#333333')}`;
     }
 
     // Icon Container Box Style
@@ -489,8 +489,8 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
       iconBoxStyle,
       btnRadius,
       cardRadius,
-      accentColor: preset?.accent || '#52796F',
-      primaryColor: preset?.primary || '#52796F',
+      accentColor: preset?.accent || '#16A34A',
+      primaryColor: preset?.primary || '#16A34A',
     };
   };
 
@@ -516,7 +516,7 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
     }
 
     // 2. Button Fill Style & Colors
-    const btnColor = ds?.buttonColor || preset?.primary || '#52796F';
+    const btnColor = ds?.buttonColor || preset?.primary || '#16A34A';
     const textColor = ds?.buttonTextColor || '#FFFFFF';
     const btnStyle = ds?.buttonStyle || 'solid';
 
@@ -528,7 +528,7 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
       style.backgroundColor = themeStyles.isDark ? 'rgba(255, 255, 255, 0.2)' : 'rgba(255, 255, 255, 0.7)';
       style.backdropFilter = 'blur(16px)';
       style.WebkitBackdropFilter = 'blur(16px)';
-      style.color = themeStyles.isDark ? '#FFFFFF' : (themeStyles.titleColor || '#28352F');
+      style.color = themeStyles.isDark ? '#FFFFFF' : (themeStyles.titleColor || '#333333');
       style.border = themeStyles.isDark ? '1px solid rgba(255, 255, 255, 0.4)' : '1px solid rgba(255, 255, 255, 0.85)';
     } else if (btnStyle === 'outline') {
       style.backgroundColor = 'transparent';
@@ -548,7 +548,7 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
       } else if (shadow === 'hard') {
         style.boxShadow = '0 8px 22px rgba(0, 0, 0, 0.2)';
       } else if (shadow === 'offset') {
-        style.boxShadow = `3px 3px 0px ${preset?.accent || '#28352F'}`;
+        style.boxShadow = `3px 3px 0px ${preset?.accent || '#333333'}`;
       }
     } else {
       style.boxShadow = 'none';
@@ -988,7 +988,7 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
                 transform: `translate(-50%, -50%) scale(${props.scale}) rotate(${props.rotate}deg)`,
                 touchAction: 'none',
                 borderWidth: isSelected ? `${Math.max(0.75, scaleInv)}px` : '0px',
-                borderColor: isSelected ? '#52796F' : 'transparent',
+                borderColor: isSelected ? '#16A34A' : 'transparent',
                 borderStyle: 'solid',
               }}
               onClick={(e) => {
@@ -1013,10 +1013,10 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
                   onClick={(e) => e.stopPropagation()}
                   title="Drag handle to rotate sticker (hold Shift for 15° snap)"
                 >
-                  <div className="w-4 h-4 rounded-full bg-white border border-[#52796F] text-[#52796F] shadow-xs flex items-center justify-center hover:scale-125 transition-transform">
-                    <RotateCw className="w-2.5 h-2.5 text-[#52796F]" />
+                  <div className="w-4 h-4 rounded-full bg-white border border-brand-500 text-brand-500 shadow-xs flex items-center justify-center hover:scale-125 transition-transform">
+                    <RotateCw className="w-2.5 h-2.5 text-brand-500" />
                   </div>
-                  <div className="w-px h-3 bg-[#52796F]" />
+                  <div className="w-px h-3 bg-brand-500" />
                 </div>
               )}
 
@@ -1036,8 +1036,8 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
                   onClick={(e) => e.stopPropagation()}
                   title="Drag handle to resize sticker"
                 >
-                  <div className="w-3.5 h-3.5 rounded-full bg-white border border-[#52796F] text-[#52796F] shadow-xs flex items-center justify-center">
-                    <div className="w-1.5 h-1.5 bg-[#52796F] rounded-full" />
+                  <div className="w-3.5 h-3.5 rounded-full bg-white border border-brand-500 text-brand-500 shadow-xs flex items-center justify-center">
+                    <div className="w-1.5 h-1.5 bg-brand-500 rounded-full" />
                   </div>
                 </div>
               )}
@@ -1158,7 +1158,7 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
 
     const avatarUrl = profile?.avatar && typeof profile.avatar === 'string' && profile.avatar.trim() !== ''
       ? profile.avatar.trim()
-      : `https://ui-avatars.com/api/?name=${encodeURIComponent(profile?.name || profile?.title || 'Creator')}&background=52796F&color=FFFEFA&bold=true&size=256`;
+      : `https://ui-avatars.com/api/?name=${encodeURIComponent(profile?.name || profile?.title || 'Creator')}&background=16A34A&color=FFFFFF&bold=true&size=256`;
 
     return (
       <div 
@@ -1178,7 +1178,7 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
           {renderStickers(getActiveCanvasRef(), 'HEADER')}
           {/* Banner Cover Image (Banner Mode) */}
           {layoutMode === 'banner' && (
-            <div className={`w-full ${deviceMode === 'tablet' ? 'h-28' : deviceMode === 'laptop' ? 'h-32' : 'h-20'} rounded-t-xl relative overflow-hidden bg-gradient-to-r from-[#28352F] via-[#52796F] to-[#CAD8CE]`}>
+            <div className={`w-full ${deviceMode === 'tablet' ? 'h-28' : deviceMode === 'laptop' ? 'h-32' : 'h-20'} rounded-t-xl relative overflow-hidden bg-gradient-to-r from-ink-900 via-brand-500 to-brand-100`}>
               {hasCover ? (
                 <img 
                   src={profile.coverImage} 
@@ -1186,7 +1186,7 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <div className="w-full h-full opacity-30 bg-[radial-gradient(#FFFEFA_1px,transparent_1px)] [background-size:12px_12px]" />
+                <div className="w-full h-full opacity-30 bg-[radial-gradient(#FFFFFF_1px,transparent_1px)] [background-size:12px_12px]" />
               )}
             </div>
           )}
@@ -1196,15 +1196,15 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
           }`}>
             {/* Avatar (Hero Portrait vs Classic / Banner) */}
             {layoutMode === 'hero' ? (
-              <div className="w-full max-w-[180px] aspect-[4/5] rounded-2xl overflow-hidden border-2 border-white shadow-md relative group mb-2 bg-[#F5F3ED]">
+              <div className="w-full max-w-[180px] aspect-[4/5] rounded-2xl overflow-hidden border-2 border-white shadow-md relative group mb-2 bg-surface-2">
                 <img 
                   src={avatarUrl} 
                   alt={profile?.name || profile?.title || 'Creator'} 
                   className="w-full h-full object-cover"
                 />
                 {profile.verified && (
-                  <div className="absolute bottom-2 right-2 bg-[#52796F] text-white rounded-full p-1 shadow-sm border-2 border-white" title="Verified Profile">
-                    <CheckCircle2 className="w-3 h-3 fill-[#52796F] text-white" />
+                  <div className="absolute bottom-2 right-2 bg-brand-500 text-white rounded-full p-1 shadow-sm border-2 border-white" title="Verified Profile">
+                    <CheckCircle2 className="w-3 h-3 fill-brand-500 text-white" />
                   </div>
                 )}
               </div>
@@ -1218,8 +1218,8 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
                   sizeClasses={isSplit ? 'w-20 h-20' : deviceMode === 'tablet' ? 'w-24 h-24' : 'w-20 h-20'}
                 />
                 {profile.verified && (
-                  <div className="absolute bottom-0 right-0 bg-[#52796F] text-white rounded-full p-1 shadow-sm border-2 border-white" title="Verified Profile">
-                    <CheckCircle2 className="w-3.5 h-3.5 fill-[#52796F] text-white" />
+                  <div className="absolute bottom-0 right-0 bg-brand-500 text-white rounded-full p-1 shadow-sm border-2 border-white" title="Verified Profile">
+                    <CheckCircle2 className="w-3.5 h-3.5 fill-brand-500 text-white" />
                   </div>
                 )}
               </div>
@@ -1403,7 +1403,7 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
         <img
           src={link.thumbnail}
           alt=""
-          className="w-8 h-8 rounded-lg object-cover shrink-0 border border-[#CAD8CE]"
+          className="w-8 h-8 rounded-lg object-cover shrink-0 border border-line"
         />
       );
     }
@@ -1414,18 +1414,18 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
       const IconComp = ICON_MAP[link.thumbnailIcon];
       if (IconComp) {
         return (
-          <div className="p-2 rounded-xl bg-[#F5F3ED] border border-[#CAD8CE] text-[#52796F] shrink-0">
+          <div className="p-2 rounded-xl bg-surface-2 border border-line text-brand-500 shrink-0">
             <IconComp className="w-4 h-4" />
           </div>
         );
       }
     }
     if (link.leadMagnet?.enabled) {
-      return <Lock className="w-4 h-4 text-[#52796F]" />;
+      return <Lock className="w-4 h-4 text-brand-500" />;
     }
     const fallbackIcon = getIcon(link.icon);
     return fallbackIcon ? (
-      <div className="p-2 rounded-xl bg-[#F5F3ED] border border-[#CAD8CE] text-[#52796F] shrink-0">
+      <div className="p-2 rounded-xl bg-surface-2 border border-line text-brand-500 shrink-0">
         {fallbackIcon}
       </div>
     ) : null;
@@ -1449,7 +1449,7 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
     const iconElement = renderLinkThumbnail(link);
     const btnCustomStyle = getButtonCustomStyle();
     const isSolid = (profile?.designSettings?.buttonStyle || 'solid') === 'solid';
-    const textColor = btnCustomStyle.color || '#28352F';
+    const textColor = btnCustomStyle.color || '#333333';
 
     return (
       <button
@@ -1463,8 +1463,8 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
             <div 
               className="p-2 rounded-xl shrink-0"
               style={{
-                backgroundColor: isSolid ? 'rgba(255, 255, 255, 0.2)' : '#F5F3ED',
-                color: isSolid ? '#FFFFFF' : '#52796F',
+                backgroundColor: isSolid ? 'rgba(255, 255, 255, 0.2)' : '#F8F8F9',
+                color: isSolid ? '#FFFFFF' : '#16A34A',
                 border: '1px solid rgba(0, 0, 0, 0.08)'
               }}
             >
@@ -1484,7 +1484,7 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
             <span 
               className="px-2 py-0.5 rounded-md text-[8px] font-bold uppercase shadow-xs"
               style={{
-                backgroundColor: isSolid ? 'rgba(255, 255, 255, 0.25)' : '#CAD8CE',
+                backgroundColor: isSolid ? 'rgba(255, 255, 255, 0.25)' : '#DCDCDC',
                 color: textColor
               }}
             >
@@ -1505,7 +1505,7 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
     const iconElement = renderLinkThumbnail(link);
     const btnCustomStyle = getButtonCustomStyle();
     const isSolid = (profile?.designSettings?.buttonStyle || 'solid') === 'solid';
-    const textColor = btnCustomStyle.color || '#28352F';
+    const textColor = btnCustomStyle.color || '#333333';
 
     return (
       <button
@@ -1521,7 +1521,7 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
           <span 
             className="absolute top-2.5 right-2.5 px-2 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-wider shadow-xs"
             style={{
-              backgroundColor: isSolid ? 'rgba(255, 255, 255, 0.25)' : '#CAD8CE',
+              backgroundColor: isSolid ? 'rgba(255, 255, 255, 0.25)' : '#DCDCDC',
               color: textColor
             }}
           >
@@ -1534,8 +1534,8 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
             <div 
               className="p-2 rounded-xl"
               style={{
-                backgroundColor: isSolid ? 'rgba(255, 255, 255, 0.2)' : '#F5F3ED',
-                color: isSolid ? '#FFFFFF' : '#52796F',
+                backgroundColor: isSolid ? 'rgba(255, 255, 255, 0.2)' : '#F8F8F9',
+                color: isSolid ? '#FFFFFF' : '#16A34A',
                 border: '1px solid rgba(0, 0, 0, 0.08)'
               }}
             >
@@ -1596,17 +1596,17 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
         <div key={collection.id} className="w-full space-y-2 pt-1 min-w-0">
           <div className="w-full flex items-center justify-between px-1.5 py-1 text-left">
             <div className="flex items-center gap-1.5">
-              <div className="w-5 h-5 rounded-md bg-[#52796F]/15 flex items-center justify-center text-[#52796F]">
+              <div className="w-5 h-5 rounded-md bg-brand-500/15 flex items-center justify-center text-brand-500">
                 <Folder className="w-3 h-3" />
               </div>
-              <span className="font-sans font-bold text-xs text-[#28352F]">
+              <span className="font-sans font-bold text-xs text-ink-700">
                 {collection.title}
               </span>
-              <span className="px-1.5 py-0.2 rounded-full text-[8px] font-mono font-bold bg-[#E8EFEA] text-[#52796F]">
+              <span className="px-1.5 py-0.2 rounded-full text-[8px] font-mono font-bold bg-brand-50 text-brand-500">
                 {collectionLinks.length}
               </span>
             </div>
-            <span className="text-[8px] uppercase font-bold tracking-wider text-[#5C6B64] bg-[#F5F3ED] px-1.5 py-0.5 rounded border border-[#CAD8CE]">
+            <span className="text-[8px] uppercase font-bold tracking-wider text-ink-500 bg-surface-2 px-1.5 py-0.5 rounded border border-line">
               Showcase
             </span>
           </div>
@@ -1626,17 +1626,17 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
         <div key={collection.id} className="w-full space-y-2 pt-1 min-w-0">
           <div className="w-full flex items-center justify-between px-1.5 py-1 text-left">
             <div className="flex items-center gap-1.5">
-              <div className="w-5 h-5 rounded-md bg-[#52796F]/15 flex items-center justify-center text-[#52796F]">
+              <div className="w-5 h-5 rounded-md bg-brand-500/15 flex items-center justify-center text-brand-500">
                 <Folder className="w-3 h-3" />
               </div>
-              <span className="font-sans font-bold text-xs text-[#28352F]">
+              <span className="font-sans font-bold text-xs text-ink-700">
                 {collection.title}
               </span>
-              <span className="px-1.5 py-0.2 rounded-full text-[8px] font-mono font-bold bg-[#E8EFEA] text-[#52796F]">
+              <span className="px-1.5 py-0.2 rounded-full text-[8px] font-mono font-bold bg-brand-50 text-brand-500">
                 {collectionLinks.length}
               </span>
             </div>
-            <span className="text-[8px] uppercase font-bold tracking-wider text-[#5C6B64] bg-[#F5F3ED] px-1.5 py-0.5 rounded border border-[#CAD8CE]">
+            <span className="text-[8px] uppercase font-bold tracking-wider text-ink-500 bg-surface-2 px-1.5 py-0.5 rounded border border-line">
               2-Grid
             </span>
           </div>
@@ -1910,7 +1910,7 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
         </div>
       )}
       {!profile?.designSettings?.hideFooter && (
-        <p className="text-[9px] text-[#5C6B64] font-mono tracking-wider uppercase font-bold">
+        <p className="text-[9px] text-ink-500 font-mono tracking-wider uppercase font-bold">
           Powered by TreeInBio
         </p>
       )}
@@ -1947,14 +1947,14 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
             {renderScheduleMeeting()}
             {renderHeroVideo()}
             {profile.shop?.published && (
-              <div className="flex items-center justify-center gap-1 p-1 bg-[#F5F3ED]/90 backdrop-blur-md rounded-xl border border-[#CAD8CE] w-full max-w-[200px] mx-auto shadow-2xs">
+              <div className="flex items-center justify-center gap-1 p-1 bg-surface-2/90 backdrop-blur-md rounded-xl border border-line w-full max-w-[200px] mx-auto shadow-2xs">
                 <button
                   type="button"
                   onClick={() => setActiveBioTab('links')}
                   className={`flex-1 py-1 px-2.5 rounded-lg text-xs font-bold transition-all ${
                     activeBioTab === 'links'
-                      ? 'bg-[#52796F] text-white shadow-xs'
-                      : 'text-[#5C6B64] hover:text-[#28352F]'
+                      ? 'bg-brand-500 text-white shadow-xs'
+                      : 'text-ink-500 hover:text-ink-700'
                   }`}
                 >
                   Links
@@ -1964,8 +1964,8 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
                   onClick={() => setActiveBioTab('shop')}
                   className={`flex-1 py-1 px-2.5 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1 ${
                     activeBioTab === 'shop'
-                      ? 'bg-[#52796F] text-white shadow-xs'
-                      : 'text-[#5C6B64] hover:text-[#28352F]'
+                      ? 'bg-brand-500 text-white shadow-xs'
+                      : 'text-ink-500 hover:text-ink-700'
                   }`}
                 >
                   <ShoppingBag className="w-3 h-3" />
@@ -1988,14 +1988,14 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
         {renderScheduleMeeting()}
         {renderHeroVideo()}
         {profile.shop?.published && (
-          <div className="flex items-center justify-center gap-1 p-1 bg-[#F5F3ED]/90 backdrop-blur-md rounded-xl border border-[#CAD8CE] w-full max-w-[200px] mx-auto shadow-2xs">
+          <div className="flex items-center justify-center gap-1 p-1 bg-surface-2/90 backdrop-blur-md rounded-xl border border-line w-full max-w-[200px] mx-auto shadow-2xs">
             <button
               type="button"
               onClick={() => setActiveBioTab('links')}
               className={`flex-1 py-1 px-2.5 rounded-lg text-xs font-bold transition-all ${
                 activeBioTab === 'links'
-                  ? 'bg-[#52796F] text-white shadow-xs'
-                  : 'text-[#5C6B64] hover:text-[#28352F]'
+                  ? 'bg-brand-500 text-white shadow-xs'
+                  : 'text-ink-500 hover:text-ink-700'
               }`}
             >
               Links
@@ -2005,8 +2005,8 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
               onClick={() => setActiveBioTab('shop')}
               className={`flex-1 py-1 px-2.5 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1 ${
                 activeBioTab === 'shop'
-                  ? 'bg-[#52796F] text-white shadow-xs'
-                  : 'text-[#5C6B64] hover:text-[#28352F]'
+                  ? 'bg-brand-500 text-white shadow-xs'
+                  : 'text-ink-500 hover:text-ink-700'
               }`}
             >
               <ShoppingBag className="w-3 h-3" />
@@ -2037,16 +2037,16 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
   return (
     <div className="flex flex-col items-center justify-start w-full relative">
       {/* Responsive Device & Zoom Toolbar */}
-      <div className="mb-3.5 z-30 flex flex-col gap-2 bg-[#F5F3ED] backdrop-blur-xl p-2 rounded-xl border border-[#CAD8CE] shadow-xs w-full max-w-xl">
+      <div className="mb-3.5 z-30 flex flex-col gap-2 bg-surface-2 backdrop-blur-xl p-2 rounded-xl border border-line shadow-xs w-full max-w-xl">
         {/* Row 1: 3 Device Switcher Tabs */}
-        <div className="grid grid-cols-3 gap-1.5 bg-white p-1 rounded-lg border border-[#CAD8CE]/70 w-full">
+        <div className="grid grid-cols-3 gap-1.5 bg-white p-1 rounded-lg border border-line/70 w-full">
           <button
             type="button"
             onClick={() => setDeviceMode('mobile')}
             className={`py-1.5 px-2 rounded-md text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
               deviceMode === 'mobile'
-                ? 'bg-[#52796F] text-white shadow-xs'
-                : 'text-[#5C6B64] hover:text-[#28352F] hover:bg-[#F5F3ED]'
+                ? 'bg-brand-500 text-white shadow-xs'
+                : 'text-ink-500 hover:text-ink-700 hover:bg-surface-2'
             }`}
             title="Mobile iPhone View (380px)"
           >
@@ -2059,8 +2059,8 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
             onClick={() => setDeviceMode('tablet')}
             className={`py-1.5 px-2 rounded-md text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
               deviceMode === 'tablet'
-                ? 'bg-[#52796F] text-white shadow-xs'
-                : 'text-[#5C6B64] hover:text-[#28352F] hover:bg-[#F5F3ED]'
+                ? 'bg-brand-500 text-white shadow-xs'
+                : 'text-ink-500 hover:text-ink-700 hover:bg-surface-2'
             }`}
             title="Tablet iPad View (680px - scaled to fit)"
           >
@@ -2073,8 +2073,8 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
             onClick={() => setDeviceMode('laptop')}
             className={`py-1.5 px-2 rounded-md text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
               deviceMode === 'laptop'
-                ? 'bg-[#52796F] text-white shadow-xs'
-                : 'text-[#5C6B64] hover:text-[#28352F] hover:bg-[#F5F3ED]'
+                ? 'bg-brand-500 text-white shadow-xs'
+                : 'text-ink-500 hover:text-ink-700 hover:bg-surface-2'
             }`}
             title="Laptop MacBook View (920px - scaled to fit)"
           >
@@ -2091,8 +2091,8 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
             onClick={() => setShowViewAsModal(true)}
             className={`px-2.5 py-1 rounded-md text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer border ${
               simulation.location !== 'global' || simulation.platform !== 'all' || simulation.language !== 'en'
-                ? 'bg-[#52796F] text-white border-[#3D5C54] shadow-xs'
-                : 'bg-white hover:bg-[#F5F3ED] text-[#28352F] border-[#CAD8CE]'
+                ? 'bg-brand-500 text-white border-brand-600 shadow-xs'
+                : 'bg-white hover:bg-surface-2 text-ink-700 border-line'
             }`}
             title="Preview how this profile renders for visitors by Location, Device OS, or Language"
           >
@@ -2104,11 +2104,11 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
           </button>
 
           {/* Explicit Zoom Out [-] | Zoom Scale % | Zoom In [+] Controls */}
-          <div className="flex items-center gap-1 bg-white p-0.5 rounded-md border border-[#CAD8CE]">
+          <div className="flex items-center gap-1 bg-white p-0.5 rounded-md border border-line">
             <button
               type="button"
               onClick={handleZoomOut}
-              className="p-1 hover:bg-[#F5F3ED] text-[#28352F] rounded text-xs transition-colors cursor-pointer disabled:opacity-30"
+              className="p-1 hover:bg-surface-2 text-ink-700 rounded text-xs transition-colors cursor-pointer disabled:opacity-30"
               title="Zoom Out"
               disabled={zoomScale <= 0.4}
             >
@@ -2118,7 +2118,7 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
             <button
               type="button"
               onClick={handleZoomReset}
-              className="px-1.5 py-0.5 text-[11px] font-mono font-bold text-[#28352F] hover:text-[#52796F] transition-colors"
+              className="px-1.5 py-0.5 text-[11px] font-mono font-bold text-ink-700 hover:text-brand-500 transition-colors"
               title="Click to reset zoom to 100%"
             >
               {Math.round(zoomScale * 100)}%
@@ -2127,7 +2127,7 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
             <button
               type="button"
               onClick={handleZoomIn}
-              className="p-1 hover:bg-[#F5F3ED] text-[#28352F] rounded text-xs transition-colors cursor-pointer disabled:opacity-30"
+              className="p-1 hover:bg-surface-2 text-ink-700 rounded text-xs transition-colors cursor-pointer disabled:opacity-30"
               title="Zoom In"
               disabled={zoomScale >= 1.5}
             >
@@ -2141,7 +2141,7 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
               href={`/${profile.username}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="p-1.5 rounded-md bg-white hover:bg-[#F5F3ED] text-[#52796F] border border-[#CAD8CE] transition-all shadow-xs"
+              className="p-1.5 rounded-md bg-white hover:bg-surface-2 text-brand-500 border border-line transition-all shadow-xs"
               title="Open Live Bio Page in New Tab"
             >
               <ExternalLink className="w-3.5 h-3.5" />
@@ -2182,7 +2182,7 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
             type="button"
             onClick={(e) => handleFlipSticker(e, selectedSticker.id)}
             className={`p-1 rounded-full transition-all cursor-pointer ${
-              selectedStickerProps.flipX ? 'bg-[#52796F] text-amber-300' : 'hover:bg-white/20 text-white'
+              selectedStickerProps.flipX ? 'bg-brand-500 text-amber-300' : 'hover:bg-white/20 text-white'
             }`}
             title={selectedStickerProps.flipX ? 'Flipped Horizontally (Click to unflip)' : 'Flip Horizontally'}
           >
@@ -2295,16 +2295,16 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
 
       {/* Active Audience Simulation Indicator Chip */}
       {(simulation.location !== 'global' || simulation.platform !== 'all' || simulation.language !== 'en') && (
-        <div className="mb-3 px-3 py-1 rounded-full bg-[#52796F]/10 border border-[#52796F]/30 text-xs text-[#28352F] flex items-center gap-2 shadow-xs animate-fadeIn">
-          <Eye className="w-3.5 h-3.5 text-[#52796F]" />
+        <div className="mb-3 px-3 py-1 rounded-full bg-brand-500/10 border border-brand-500/30 text-xs text-ink-700 flex items-center gap-2 shadow-xs animate-fadeIn">
+          <Eye className="w-3.5 h-3.5 text-brand-500" />
           <span className="font-semibold">Simulating Visitor:</span>
-          <span className="font-mono text-[#52796F] font-bold">
+          <span className="font-mono text-brand-500 font-bold">
             {simulation.location.toUpperCase()} • {simulation.platform.toUpperCase()} • {simulation.language.toUpperCase()}
           </span>
           <button
             type="button"
             onClick={() => setSimulation({ location: 'global', platform: 'all', language: 'en' })}
-            className="text-[10px] text-[#5C6B64] hover:text-red-500 underline cursor-pointer ml-1"
+            className="text-[10px] text-ink-500 hover:text-red-500 underline cursor-pointer ml-1"
           >
             Reset
           </button>
@@ -2354,14 +2354,14 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
             {/* Share Button */}
             <button 
               onClick={handleCopyShare}
-              className="absolute top-2.5 right-3.5 z-40 p-2 rounded-full bg-[#FFFEFA]/90 backdrop-blur-md text-[#28352F] hover:text-[#52796F] hover:bg-white transition-all border border-[#CAD8CE] cursor-pointer shadow-sm"
+              className="absolute top-2.5 right-3.5 z-40 p-2 rounded-full bg-white/90 backdrop-blur-md text-ink-700 hover:text-brand-500 hover:bg-white transition-all border border-line cursor-pointer shadow-sm"
               title="Share profile"
             >
               <Share2 className="w-3.5 h-3.5" />
             </button>
 
             {copiedLink && (
-              <div className="absolute top-11 right-3.5 z-50 px-3 py-1 rounded-sm bg-[#52796F] text-white text-xs font-semibold shadow-md animate-bounce">
+              <div className="absolute top-11 right-3.5 z-50 px-3 py-1 rounded-sm bg-brand-500 text-white text-xs font-semibold shadow-md animate-bounce">
                 Link Copied!
               </div>
             )}
@@ -2413,14 +2413,14 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
             {/* Share Button */}
             <button 
               onClick={handleCopyShare}
-              className="absolute top-3.5 right-4 z-40 p-2 rounded-full bg-[#FFFEFA]/90 backdrop-blur-md text-[#28352F] hover:text-[#52796F] hover:bg-white transition-all border border-[#CAD8CE] cursor-pointer shadow-sm"
+              className="absolute top-3.5 right-4 z-40 p-2 rounded-full bg-white/90 backdrop-blur-md text-ink-700 hover:text-brand-500 hover:bg-white transition-all border border-line cursor-pointer shadow-sm"
               title="Share profile"
             >
               <Share2 className="w-3.5 h-3.5" />
             </button>
 
             {copiedLink && (
-              <div className="absolute top-12 right-4 z-50 px-3 py-1 rounded-sm bg-[#52796F] text-white text-xs font-semibold shadow-md animate-bounce">
+              <div className="absolute top-12 right-4 z-50 px-3 py-1 rounded-sm bg-brand-500 text-white text-xs font-semibold shadow-md animate-bounce">
                 Link Copied!
               </div>
             )}
@@ -2473,14 +2473,14 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
               {/* Share Button */}
               <button 
                 onClick={handleCopyShare}
-                className="absolute top-3 right-4 z-40 p-2 rounded-full bg-[#FFFEFA]/90 backdrop-blur-md text-[#28352F] hover:text-[#52796F] hover:bg-white transition-all border border-[#CAD8CE] cursor-pointer shadow-sm"
+                className="absolute top-3 right-4 z-40 p-2 rounded-full bg-white/90 backdrop-blur-md text-ink-700 hover:text-brand-500 hover:bg-white transition-all border border-line cursor-pointer shadow-sm"
                 title="Share profile"
               >
                 <Share2 className="w-3.5 h-3.5" />
               </button>
 
               {copiedLink && (
-                <div className="absolute top-12 right-4 z-50 px-3 py-1 rounded-sm bg-[#52796F] text-white text-xs font-semibold shadow-md animate-bounce">
+                <div className="absolute top-12 right-4 z-50 px-3 py-1 rounded-sm bg-brand-500 text-white text-xs font-semibold shadow-md animate-bounce">
                   Link Copied!
                 </div>
               )}

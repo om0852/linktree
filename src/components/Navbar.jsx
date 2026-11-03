@@ -53,26 +53,26 @@ export default function Navbar({
           <button
             onClick={onSaveProfile}
             disabled={isSaving}
-            className={`tb-btn font-bold cursor-pointer transition-all ${
+            className={`tb-btn font-semibold cursor-pointer transition-all ${
               isSaved 
-                ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-500/20' 
-                : 'bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/50'
+                ? 'bg-brand-600 hover:bg-brand-500 text-white shadow-pop shadow-emerald-500/20' 
+                : 'bg-brand-500/20 hover:bg-brand-500/30 text-brand-300 border border-brand-500/50'
             }`}
             title="Save changes to your public bio"
           >
             {isSaving ? (
               <>
-                <Loader2 className="w-4 h-4 animate-spin text-emerald-400" />
+                <Loader2 className="w-4 h-4 animate-spin text-brand-400" />
                 <span className="hidden sm:inline">Saving...</span>
               </>
             ) : isSaved ? (
               <>
-                <Check className="w-4 h-4 text-emerald-300" />
+                <Check className="w-4 h-4 text-brand-300" />
                 <span className="hidden sm:inline">Saved!</span>
               </>
             ) : (
               <>
-                <Save className="w-4 h-4 text-emerald-400" />
+                <Save className="w-4 h-4 text-brand-400" />
                 <span className="hidden sm:inline">Save</span>
               </>
             )}
@@ -85,7 +85,7 @@ export default function Navbar({
             href={`/${currentProfile.username}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="tb-btn tb-btn-ghost text-emerald-300 hover:text-white hidden sm:flex items-center gap-1.5"
+            className="tb-btn tb-btn-ghost text-brand-300 hover:text-white hidden sm:flex items-center gap-1.5"
             title="Open Live Public Bio"
           >
             <ExternalLink className="w-3.5 h-3.5" />
@@ -109,7 +109,7 @@ export default function Navbar({
             className="tb-btn tb-btn-ghost"
             title="View Traffic & Click Analytics"
           >
-            <BarChart3 className="w-4 h-4 text-emerald-400" />
+            <BarChart3 className="w-4 h-4 text-brand-400" />
             <span className="hidden md:inline">Analytics</span>
           </button>
         )}
@@ -130,10 +130,10 @@ export default function Navbar({
         {onOpenLeadsManager && (
           <button
             onClick={onOpenLeadsManager}
-            className="tb-btn tb-btn-ghost text-emerald-300 hover:text-white"
+            className="tb-btn tb-btn-ghost text-brand-300 hover:text-white"
             title="View Captured Contacts"
           >
-            <Users className="w-4 h-4 text-emerald-400" />
+            <Users className="w-4 h-4 text-brand-400" />
             <span className="hidden md:inline">Leads</span>
           </button>
         )}
