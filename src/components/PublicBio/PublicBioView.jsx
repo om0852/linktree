@@ -63,6 +63,7 @@ import TrackingPixels from './TrackingPixels';
 import AccessGateScreen from '../Common/AccessGateScreen';
 import CarouselSlider from '../Common/CarouselSlider';
 import { THEME_PRESETS, CURATED_THEMES, getTitleFontName, getStickerDeviceProps, getStickerCanvasPositionStyle, getStickerGraphicSizeStyle, isImageUrl, parseTailwindGradient } from '../../constants/app';
+import { safeLinkUrl } from '../../lib/safeUrl';
 
 const ICON_MAP = {
   Video, Star, Mail, FileText, Music, ShoppingBag, Zap, Briefcase, BookOpen, Calendar, MessageSquare, TrendingUp, Ticket, Globe,
@@ -234,8 +235,9 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
       }
     }
 
-    if (link.url && link.url !== '#') {
-      window.open(link.url, '_blank', 'noopener,noreferrer');
+    const destination = safeLinkUrl(link.url);
+    if (destination !== '#') {
+      window.open(destination, '_blank', 'noopener,noreferrer');
     }
   };
 

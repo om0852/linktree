@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import connectToDatabase from '@/lib/mongodb';
 import Profile from '@/models/Profile';
-import { toPublicProfile } from '@/lib/publicProfile';
+import { toVisitorProfile } from '@/lib/publicProfile';
 
 export async function GET(request, { params }) {
   try {
@@ -19,7 +19,7 @@ export async function GET(request, { params }) {
       return NextResponse.json({ success: false, message: 'Profile not found' }, { status: 404 });
     }
 
-    return NextResponse.json({ success: true, profile: toPublicProfile(profile) });
+    return NextResponse.json({ success: true, profile: toVisitorProfile(profile) });
   } catch (error) {
     console.error('API Profile [username] GET error:', error);
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });

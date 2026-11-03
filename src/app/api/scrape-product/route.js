@@ -1,6 +1,10 @@
 import { NextResponse } from 'next/server';
 import dns from 'node:dns/promises';
+import http from 'node:http';
+import https from 'node:https';
 import { isIP } from 'node:net';
+import { requireAuth } from '@/lib/authorization';
+import { consumeRateLimit } from '@/lib/rateLimit';
 
 function isPrivateAddress(address) {
   const ip = address.toLowerCase().split('%')[0];
@@ -10,25 +14,44 @@ function isPrivateAddress(address) {
   if (parts.length !== 4 || parts.some((part) => !Number.isInteger(part) || part < 0 || part > 255)) return true;
   return parts[0] === 0 || parts[0] === 10 || parts[0] === 127 ||
     (parts[0] === 169 && parts[1] === 254) || (parts[0] === 172 && parts[1] >= 16 && parts[1] <= 31) ||
-    (parts[0] === 192 && parts[1] === 168) || (parts[0] === 100 && parts[1] >= 64 && parts[1] <= 127) || parts[0] >= 224;
+    (parts[0] === 192 && parts[1] === 168) || (parts[0] === 100 && parts[1] >= 64 && parts[1] <= 127) ||
+    (parts[0] === 198 && (parts[1] === 18 || parts[1] === 19)) || (parts[0] === 192 && parts[1] === 0 && parts[2] === 0) || parts[0] >= 224;
 }
 
-async function readLimitedBody(response, maxBytes = 1_000_000) {
-  const reader = response.body?.getReader();
-  if (!reader) return '';
-  const chunks = [];
-  let size = 0;
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    size += value.byteLength;
-    if (size > maxBytes) {
-      await reader.cancel();
-      throw new Error('The product page is too large to process.');
-    }
-    chunks.push(value);
-  }
-  return new TextDecoder().decode(Buffer.concat(chunks));
+/**
+ * GET the page from the already-validated address. Connecting by that address
+ * (instead of letting the client resolve the hostname again) stops a DNS
+ * rebinding answer from sending the request to an internal host. Redirects are
+ * not followed, since their target was never validated.
+ */
+function fetchPinned(urlObj, { address, family }, { headers, timeoutMs = 6000, maxBytes = 1_000_000 }) {
+  const client = urlObj.protocol === 'https:' ? https : http;
+  const lookup = (_hostname, options, callback) => (options?.all
+    ? callback(null, [{ address, family }])
+    : callback(null, address, family));
+  return new Promise((resolve, reject) => {
+    const req = client.request(urlObj, { method: 'GET', headers, lookup, timeout: timeoutMs }, (res) => {
+      const chunks = [];
+      let size = 0;
+      res.on('data', (chunk) => {
+        size += chunk.length;
+        if (size > maxBytes) {
+          req.destroy(new Error('The product page is too large to process.'));
+          return;
+        }
+        chunks.push(chunk);
+      });
+      res.on('end', () => resolve({
+        ok: res.statusCode >= 200 && res.statusCode < 300,
+        contentType: String(res.headers['content-type'] || ''),
+        body: Buffer.concat(chunks).toString('utf8'),
+      }));
+      res.on('error', reject);
+    });
+    req.on('timeout', () => req.destroy(new Error('The product page took too long to respond.')));
+    req.on('error', reject);
+    req.end();
+  });
 }
 
 async function scrapeUrl(url) {
@@ -42,7 +65,9 @@ async function scrapeUrl(url) {
   if (!['http:', 'https:'].includes(urlObj.protocol) || urlObj.username || urlObj.password || !urlObj.hostname) {
     return { error: 'Only public HTTP or HTTPS product URLs are allowed.', status: 400 };
   }
-  const resolved = isIP(urlObj.hostname) ? [{ address: urlObj.hostname }] : await dns.lookup(urlObj.hostname, { all: true }).catch(() => []);
+  const resolved = isIP(urlObj.hostname)
+    ? [{ address: urlObj.hostname, family: isIP(urlObj.hostname) }]
+    : await dns.lookup(urlObj.hostname, { all: true }).catch(() => []);
   if (!resolved.length || resolved.some(({ address }) => isPrivateAddress(address))) {
     return { error: 'The product URL must resolve to a public internet address.', status: 400 };
   }
@@ -55,23 +80,16 @@ async function scrapeUrl(url) {
   let currency = '$';
 
   try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 6000);
-
-    const res = await fetch(urlObj, {
-      signal: controller.signal,
-      redirect: 'error',
+    const res = await fetchPinned(urlObj, resolved[0], {
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
       },
     });
-    clearTimeout(timeoutId);
 
     if (res.ok) {
-      const contentType = res.headers.get('content-type') || '';
-      if (!contentType.toLowerCase().includes('text/html')) return { error: 'The URL did not return an HTML product page.', status: 415 };
-      const html = await readLimitedBody(res);
+      if (!res.contentType.toLowerCase().includes('text/html')) return { error: 'The URL did not return an HTML product page.', status: 415 };
+      const html = res.body;
 
       // Extract Title
       const ogTitle = html.match(/<meta[^>]*property=["']og:title["'][^>]*content=["']([^"']+)["']/i) ||
@@ -144,8 +162,20 @@ async function scrapeUrl(url) {
   };
 }
 
+// The scraper makes outbound requests on the caller's behalf, so it is limited
+// to signed-in creators and rate limited per client.
+async function guardScraper(req) {
+  const access = await requireAuth(req);
+  if (access.error) return access.error;
+  const rate = consumeRateLimit(req, 'scrape-product', 30, 15 * 60 * 1000);
+  if (!rate.allowed) return NextResponse.json({ success: false, error: 'Too many product lookups. Try again later.' }, { status: 429, headers: { 'Retry-After': String(rate.retryAfter) } });
+  return null;
+}
+
 export async function POST(req) {
   try {
+    const denied = await guardScraper(req);
+    if (denied) return denied;
     const { url } = await req.json();
     const result = await scrapeUrl(url);
     if (result.error) {
@@ -159,6 +189,8 @@ export async function POST(req) {
 
 export async function GET(req) {
   try {
+    const denied = await guardScraper(req);
+    if (denied) return denied;
     const { searchParams } = new URL(req.url);
     const url = searchParams.get('url');
     const result = await scrapeUrl(url);

@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import crypto from 'crypto';
 import dns from 'dns';
 import connectToDatabase from '@/lib/mongodb';
 import CustomDomain from '@/models/CustomDomain';
@@ -10,7 +11,7 @@ try {
   // Ignore in environments where setting DNS servers is restricted
 }
 
-import { DOMAIN_TARGET_CNAME as TARGET_CNAME, DOMAIN_TARGET_IP as TARGET_IP, RESERVED_HOSTNAMES } from '@/constants/domains';
+import { DOMAIN_TARGET_CNAME as TARGET_CNAME, DOMAIN_TARGET_IP as TARGET_IP, RESERVED_HOSTNAMES, domainVerificationRecordName } from '@/constants/domains';
 import { requireAuth } from '@/lib/authorization';
 
 function sanitizeHostname(raw) {
@@ -44,6 +45,11 @@ export async function GET(request) {
 
     const query = username ? { username } : {};
     const domains = await CustomDomain.find(query).sort({ createdAt: -1 }).lean();
+    // Domains claimed before ownership tokens existed need one to verify.
+    await Promise.all(domains.filter((d) => !d.verified && !d.verificationToken).map(async (d) => {
+      d.verificationToken = crypto.randomBytes(16).toString('hex');
+      await CustomDomain.updateOne({ _id: d._id }, { $set: { verificationToken: d.verificationToken } });
+    }));
 
     return NextResponse.json({
       success: true,
@@ -117,37 +123,62 @@ export async function POST(request) {
       );
     }
 
-    // Check if domain is already claimed
+    const verificationTxt = {
+      type: 'TXT',
+      name: domainVerificationRecordName(hostname),
+    };
+
+    // An unverified claim proves nothing, so it does not block someone else from
+    // claiming the domain; only the TXT ownership record decides who verifies it.
     const existing = await CustomDomain.findOne({ hostname });
     if (existing) {
       if (existing.username === username) {
+        if (!existing.verificationToken) {
+          existing.verificationToken = crypto.randomBytes(16).toString('hex');
+          await existing.save();
+        }
         return NextResponse.json({
           success: true,
           message: 'Domain already registered to this profile.',
           domain: existing,
+          instructions: { txt: { ...verificationTxt, value: existing.verificationToken } },
         });
       }
-      return NextResponse.json(
-        { success: false, error: 'This domain is already claimed by another user.' },
-        { status: 409 }
-      );
+      if (existing.verified) {
+        return NextResponse.json(
+          { success: false, error: 'This domain is already claimed by another user.' },
+          { status: 409 }
+        );
+      }
     }
 
-    // Create new CustomDomain record
-    const newDomain = await CustomDomain.create({
-      hostname,
-      username,
-      verified: false,
-      status: 'pending',
-      target: TARGET_CNAME,
-      expectedIp: TARGET_IP,
-    });
+    const verificationToken = crypto.randomBytes(16).toString('hex');
+    const newDomain = await CustomDomain.findOneAndUpdate(
+      // The verified: false filter keeps a domain verified in the meantime from
+      // being overwritten; the upsert then hits the unique index instead.
+      { hostname, verified: false },
+      {
+        $set: {
+          hostname,
+          username,
+          verified: false,
+          status: 'pending',
+          target: TARGET_CNAME,
+          expectedIp: TARGET_IP,
+          verificationToken,
+          verifiedAt: null,
+          lastDnsCheckError: '',
+        },
+      },
+      { upsert: true, new: true, setDefaultsOnInsert: true }
+    );
 
     return NextResponse.json({
       success: true,
       message: 'Custom domain added successfully. Please configure your DNS records.',
       domain: newDomain,
       instructions: {
+        txt: { ...verificationTxt, value: verificationToken },
         cname: {
           type: 'CNAME',
           name: hostname.includes('.') ? hostname.split('.')[0] : 'bio',
@@ -161,6 +192,9 @@ export async function POST(request) {
       },
     });
   } catch (error) {
+    if (error?.code === 11000) {
+      return NextResponse.json({ success: false, error: 'This domain is already claimed by another user.' }, { status: 409 });
+    }
     console.error('Domains POST error:', error);
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }

@@ -26,8 +26,13 @@ export async function POST(req) {
     }
 
     // Check if username taken
-    const existing = await Profile.findOne({ username: cleanUsername });
-    if (existing) {
+    // Account usernames are reserved too: a user's primary username grants
+    // ownership of the profile with that name.
+    const [existing, existingUser] = await Promise.all([
+      Profile.exists({ username: cleanUsername }),
+      User.exists({ username: cleanUsername }),
+    ]);
+    if (existing || existingUser) {
       return NextResponse.json({ success: false, error: `@${cleanUsername} is already registered. Please choose another.` }, { status: 409 });
     }
 

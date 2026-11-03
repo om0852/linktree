@@ -19,7 +19,7 @@ import {
   Sparkles,
   Lock,
 } from 'lucide-react';
-import { DOMAIN_TARGET_CNAME, DOMAIN_TARGET_IP } from '@/constants/domains';
+import { DOMAIN_TARGET_CNAME, DOMAIN_TARGET_IP, domainVerificationRecordName } from '@/constants/domains';
 
 export default function CustomDomainModal({ profile, onClose }) {
   const [domains, setDomains] = useState([]);
@@ -441,6 +441,18 @@ export default function CustomDomainModal({ profile, onClose }) {
                           </span>
                         )}
                       </div>
+
+                      {!dom.verified && dom.verificationToken && (
+                        <div className="text-[11px] text-[#5C6B64] space-y-0.5">
+                          <p>Prove ownership with a TXT record:</p>
+                          <p className="font-mono break-all">
+                            Name: <code className="text-[#28352F]">{domainVerificationRecordName(dom.hostname)}</code>
+                          </p>
+                          <p className="font-mono break-all">
+                            Value: <code className="text-[#28352F]">{dom.verificationToken}</code>
+                          </p>
+                        </div>
+                      )}
 
                       {dom.lastDnsCheckError && !dom.verified && (
                         <p className="text-[10px] text-rose-700 bg-rose-50 p-1.5 rounded-md border border-rose-200 line-clamp-2">

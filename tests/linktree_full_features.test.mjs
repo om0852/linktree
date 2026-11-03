@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import mongoose from 'mongoose';
+import jwt from 'jsonwebtoken';
 import Profile from '../src/models/Profile.js';
 import { 
   GOOGLE_FONTS_LIST, 
@@ -114,9 +115,19 @@ test('Linktree-Grade Full Capabilities & Zero-Gating Test Suite', async (t) => {
   });
 
   await t.test('validates /api/scrape-product OpenGraph auto-scraper endpoint', async () => {
-    const res = await fetch('http://localhost:3000/api/scrape-product', {
+    const unauthenticated = await fetch('http://localhost:3000/api/scrape-product', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url: 'https://example.com' }),
+    });
+    assert.equal(unauthenticated.status, 401);
+
+    const jwtSecret = process.env.TEST_JWT_SECRET || process.env.JWT_SECRET;
+    assert.ok(jwtSecret && jwtSecret.length >= 32, 'Set TEST_JWT_SECRET (and use the same JWT_SECRET on the test server) to run authenticated API cases.');
+    const token = jwt.sign({ id: 'test_admin_id', username: 'emilyvance', role: 'admin' }, jwtSecret, { expiresIn: '7d' });
+    const res = await fetch('http://localhost:3000/api/scrape-product', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
       body: JSON.stringify({ url: 'https://example.com' }),
     });
     assert.equal(res.status, 200);

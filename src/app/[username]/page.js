@@ -5,7 +5,7 @@ import connectToDatabase from '@/lib/mongodb';
 import Profile from '@/models/Profile';
 import CustomDomain from '@/models/CustomDomain';
 import PublicBioView from '@/components/PublicBio/PublicBioView';
-import { toPublicProfile } from '@/lib/publicProfile';
+import { toVisitorProfile } from '@/lib/publicProfile';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -110,23 +110,7 @@ export default async function PublicProfilePage({ params }) {
   }
 
   const profile = await resolveProfile(username, customDomainHeader);
-  const isPasscodeGated = Boolean(profile?.accessGate?.enabled && profile.accessGate.type === 'passcode');
-  const profileData = profile ? toPublicProfile(profile) : null;
-  if (profileData && isPasscodeGated) {
-    profileData.bio = '';
-    profileData.avatar = '';
-    profileData.socials = {};
-    profileData.links = [];
-    profileData.collections = [];
-    profileData.widgets = {
-      hasNewsletter: false,
-      hasTipJar: false,
-      mediaKitStats: { followers: '0', engagement: '0%', monthlyViews: '0' },
-    };
-    profileData.shop = { enabled: false, products: [] };
-    profileData.leadCapture = { enabled: false };
-    profileData.designSettings = { ...profileData.designSettings, stickers: [] };
-  }
+  const profileData = profile ? toVisitorProfile(profile) : null;
 
   if (!profileData) {
     const isDomain = username?.includes('.') || Boolean(customDomainHeader);

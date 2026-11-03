@@ -49,8 +49,13 @@ export async function POST(request) {
       return NextResponse.json({ success: false, error: 'An account with this email already exists.' }, { status: 409 });
     }
 
-    const existingUsername = await User.findOne({ username: cleanUsername });
-    if (existingUsername) {
+    // A workspace profile can exist without a User of the same name; claiming its
+    // username would grant ownership of that workspace, so both must be free.
+    const [existingUsername, existingProfile] = await Promise.all([
+      User.exists({ username: cleanUsername }),
+      Profile.exists({ username: cleanUsername }),
+    ]);
+    if (existingUsername || existingProfile) {
       return NextResponse.json({ success: false, error: 'This username is already taken. Please choose another.' }, { status: 409 });
     }
 
@@ -66,20 +71,24 @@ export async function POST(request) {
       avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(cleanName)}&background=52796F&color=FFFEFA&bold=true&size=128`,
     });
 
-    // Create Initial Profile
-    const initialProfile = await Profile.findOneAndUpdate(
-      { username: cleanUsername },
-      {
-        $setOnInsert: {
-          ...INITIAL_USER_PROFILE,
-          username: cleanUsername,
-          name: cleanName,
-          title: cleanName,
-          avatar: newUser.avatar,
-        },
-      },
-      { upsert: true, new: true, setDefaultsOnInsert: true }
-    );
+    // Create Initial Profile. Never attach an existing profile: a concurrent
+    // workspace creation with the same username must not hand it to this user.
+    let initialProfile;
+    try {
+      initialProfile = await Profile.create({
+        ...INITIAL_USER_PROFILE,
+        username: cleanUsername,
+        name: cleanName,
+        title: cleanName,
+        avatar: newUser.avatar,
+      });
+    } catch (profileError) {
+      await User.deleteOne({ _id: newUser._id });
+      if (profileError?.code === 11000) {
+        return NextResponse.json({ success: false, error: 'This username is already taken. Please choose another.' }, { status: 409 });
+      }
+      throw profileError;
+    }
     newUser.profiles = [initialProfile._id];
     newUser.activeProfileId = initialProfile._id;
     await newUser.save();

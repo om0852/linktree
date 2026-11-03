@@ -34,6 +34,10 @@ const CustomDomainSchema = new mongoose.Schema({
     type: String,
     default: '159.54.139.45',
   },
+  verificationToken: {
+    type: String,
+    default: '',
+  },
   verificationMethod: {
     type: String,
     enum: ['cname', 'a_record', 'both'],

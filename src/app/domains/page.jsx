@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import AtelierSidebar from '../../components/Atelier/AtelierSidebar';
 import AtelierHeader from '../../components/Atelier/AtelierHeader';
 import AuthModal from '../../components/Auth/AuthModal';
-import { DOMAIN_TARGET_CNAME, DOMAIN_TARGET_IP } from '@/constants/domains';
+import { DOMAIN_TARGET_CNAME, DOMAIN_TARGET_IP, domainVerificationRecordName } from '@/constants/domains';
 import { DEFAULT_EMPTY_PROFILE } from '@/constants/app';
 import {
   Globe,
@@ -487,6 +487,11 @@ export default function DomainsPage() {
                         <span className="text-[0.65rem] text-[#5C6B64] font-mono block">
                           Routes to: @{d.username} • Target: {d.target || CNAME_TARGET}
                         </span>
+                        {!d.verified && d.verificationToken && (
+                          <span className="text-[0.65rem] text-[#5C6B64] font-mono block break-all">
+                            TXT {domainVerificationRecordName(d.hostname)} = {d.verificationToken}
+                          </span>
+                        )}
                       </div>
                     </div>
 

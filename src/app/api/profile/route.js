@@ -5,9 +5,10 @@ import Profile from '@/models/Profile';
 import User from '@/models/User';
 import { getAuthUser } from '@/lib/auth';
 import { INITIAL_USER_PROFILE } from '@/constants/app';
-import { toPublicProfile, toOwnerProfile } from '@/lib/publicProfile';
+import { toVisitorProfile, toOwnerProfile } from '@/lib/publicProfile';
 import { requireProfileOwner } from '@/lib/authorization';
 import { hashPassword } from '@/lib/auth';
+import { safeLinkUrl, safeMediaUrl } from '@/lib/safeUrl';
 
 // GET profile by ?username=xyz or current authenticated user
 export async function GET(request) {
@@ -53,7 +54,7 @@ export async function GET(request) {
     if (isOwner) {
       return NextResponse.json({ success: true, profile: toOwnerProfile(profile) });
     }
-    return NextResponse.json({ success: true, profile: toPublicProfile(profile) });
+    return NextResponse.json({ success: true, profile: toVisitorProfile(profile) });
   } catch (error) {
     console.error('API Profile GET error:', error);
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
@@ -75,21 +76,21 @@ export async function POST(request) {
     // Verify session authorization
     const access = await requireProfileOwner(request, normalizedUsername);
     if (access.error) return access.error;
-    const existingGate = await Profile.findOne({ username: normalizedUsername }).select('accessGate').lean();
+    const existingProfile = await Profile.findOne({ username: normalizedUsername }).select('accessGate verified').lean();
     const submittedPasscode = typeof body.accessGate?.passcode === 'string' ? body.accessGate.passcode : '';
     if (submittedPasscode.length > 128) return NextResponse.json({ success: false, error: 'Passcode must be 128 characters or fewer.' }, { status: 400 });
     const passcodeHash = submittedPasscode.startsWith('$2')
       ? submittedPasscode
       : submittedPasscode
         ? await hashPassword(submittedPasscode.trim())
-        : existingGate?.accessGate?.passcode || '';
+        : existingProfile?.accessGate?.passcode || '';
 
     // Clean links structure preserving power attributes
     const cleanedLinks = Array.isArray(body.links)
       ? body.links.map((link, idx) => ({
           id: link.id || `l_${Date.now()}_${idx}`,
           title: link.title || 'Untitled Link',
-          url: link.url || '#',
+          url: safeLinkUrl(link.url),
           type: link.type || 'standard',
           badge: link.badge || '',
           icon: link.icon || 'link',
@@ -99,7 +100,7 @@ export async function POST(request) {
           disabled: Boolean(link.disabled),
           isArchived: Boolean(link.isArchived),
           subtitle: link.subtitle || '',
-          leadMagnet: link.leadMagnet || {
+          leadMagnet: link.leadMagnet ? { ...link.leadMagnet, assetUrl: link.leadMagnet.assetUrl ? safeLinkUrl(link.leadMagnet.assetUrl) : '' } : {
             enabled: false,
             assetUrl: '',
             assetType: 'pdf',
@@ -120,7 +121,7 @@ export async function POST(request) {
             expiresAt: null,
           },
           collectionId: typeof link.collectionId === 'string' ? link.collectionId : '',
-          thumbnail: typeof link.thumbnail === 'string' ? link.thumbnail : '',
+          thumbnail: safeMediaUrl(link.thumbnail, { allowDataImage: true }),
           thumbnailType: ['image', 'icon', 'none'].includes(link.thumbnailType) ? link.thumbnailType : 'none',
           thumbnailIcon: typeof link.thumbnailIcon === 'string' ? link.thumbnailIcon : '',
           price: typeof link.price === 'string' ? link.price : '',
@@ -157,14 +158,15 @@ export async function POST(request) {
       title: finalTitle,
       titleLogo: body.titleLogo ? {
         enabled: Boolean(body.titleLogo.enabled),
-        url: body.titleLogo.url || '',
+        url: safeMediaUrl(body.titleLogo.url, { allowDataImage: true }),
         altText: body.titleLogo.altText || '',
         height: Number(body.titleLogo.height) || 40,
       } : { enabled: false, url: '', altText: '', height: 40 },
       bio: body.bio || '',
-      avatar: body.avatar || '',
+      avatar: safeMediaUrl(body.avatar, { allowDataImage: true }),
       avatarShape: ['circle', 'rounded', 'squircle', 'hexagon', 'arch', 'diamond', 'cutout'].includes(body.avatarShape) ? body.avatarShape : 'circle',
-      verified: Boolean(body.verified),
+      // The verified badge is granted by an administrator, never by the owner.
+      verified: access.user.role === 'admin' ? Boolean(body.verified) : Boolean(existingProfile?.verified),
       location: body.location || '',
       niche: body.niche || 'creator',
       nicheLabel: body.nicheLabel || 'Creator',
@@ -173,9 +175,9 @@ export async function POST(request) {
       buttonShape: body.buttonShape || 'rounded',
       font: body.font || 'Playfair Display',
       headerLayout: ['classic', 'banner', 'hero', 'cutout', 'shape'].includes(body.headerLayout) ? body.headerLayout : 'classic',
-      coverImage: body.coverImage || '',
+      coverImage: safeMediaUrl(body.coverImage, { allowDataImage: true }),
       socialsPosition: ['top', 'bottom'].includes(body.socialsPosition) ? body.socialsPosition : 'top',
-      heroVideo: body.heroVideo || '',
+      heroVideo: safeMediaUrl(body.heroVideo),
       socials: body.socials || {},
       links: cleanedLinks,
       collections: cleanedCollections,
@@ -189,7 +191,7 @@ export async function POST(request) {
           monthlyViews: '0',
         },
       },
-      storyBubble: body.storyBubble || {
+      storyBubble: body.storyBubble ? { ...body.storyBubble, videoUrl: safeMediaUrl(body.storyBubble.videoUrl) } : {
         enabled: false,
         videoUrl: '',
         caption: '',
@@ -216,12 +218,23 @@ export async function POST(request) {
         passcode: passcodeHash,
         title: body.accessGate.title || 'Restricted Profile',
         description: body.accessGate.description || 'This profile requires verification before viewing content.',
-      } : (existingGate?.accessGate || INITIAL_USER_PROFILE.accessGate),
+      } : (existingProfile?.accessGate || INITIAL_USER_PROFILE.accessGate),
       leadCapture: body.leadCapture || INITIAL_USER_PROFILE.leadCapture,
       scheduleMeeting: body.scheduleMeeting || INITIAL_USER_PROFILE.scheduleMeeting,
-      shop: body.shop || { enabled: false, products: [] },
+      shop: body.shop ? {
+        ...body.shop,
+        products: Array.isArray(body.shop.products)
+          ? body.shop.products.map((product) => ({
+              ...product,
+              url: safeLinkUrl(product?.url),
+              image: safeMediaUrl(product?.image, { allowDataImage: true }),
+            }))
+          : [],
+      } : { enabled: false, products: [] },
       designSettings: body.designSettings ? {
-        wallpaper: body.designSettings.wallpaper || { type: 'fill', value: '', blur: 0 },
+        wallpaper: body.designSettings.wallpaper
+          ? { ...body.designSettings.wallpaper, ...(body.designSettings.wallpaper.videoUrl !== undefined ? { videoUrl: safeMediaUrl(body.designSettings.wallpaper.videoUrl) } : {}) }
+          : { type: 'fill', value: '', blur: 0 },
         buttonStyle: ['solid', 'glass', 'outline'].includes(body.designSettings.buttonStyle) ? body.designSettings.buttonStyle : 'solid',
         buttonRoundness: (() => {
           let r = body.designSettings.buttonRoundness;

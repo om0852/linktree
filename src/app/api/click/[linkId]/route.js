@@ -31,6 +31,8 @@ export async function GET(request, { params }) {
     const profile = await Profile.findOne({ username }).select('links').lean();
     const link = profile?.links?.find((item) => item.id === linkId && item.active !== false && !item.disabled && !item.isArchived);
     if (!link) return NextResponse.json({ success: false, message: 'Link not found' }, { status: 404 });
+    // Gated downloads are released only by /api/v1/lead-magnet/unlock.
+    if (link.leadMagnet?.enabled) return NextResponse.json({ success: false, message: 'This resource must be unlocked first.' }, { status: 403 });
     let destination;
     try {
       destination = new URL(link.url);

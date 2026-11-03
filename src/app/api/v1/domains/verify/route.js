@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import crypto from 'crypto';
 import dns from 'dns';
 import connectToDatabase from '@/lib/mongodb';
 import CustomDomain from '@/models/CustomDomain';
@@ -10,7 +11,7 @@ try {
   // Ignore in environments where setting DNS servers is restricted
 }
 
-import { DOMAIN_TARGET_CNAME as TARGET_CNAME, DOMAIN_TARGET_IP as TARGET_IP } from '@/constants/domains';
+import { DOMAIN_TARGET_CNAME as TARGET_CNAME, DOMAIN_TARGET_IP as TARGET_IP, domainVerificationRecordName } from '@/constants/domains';
 import { requireAuth } from '@/lib/authorization';
 
 function sanitizeHostname(raw) {
@@ -63,6 +64,10 @@ export async function POST(request) {
     }
 
     const hostname = domainRecord.hostname;
+    if (!domainRecord.verificationToken) {
+      domainRecord.verificationToken = crypto.randomBytes(16).toString('hex');
+    }
+    const txtRecordName = domainVerificationRecordName(hostname);
     let resolvedCnames = [];
     let resolvedIps = [];
     let isCnameOk = false;
@@ -89,7 +94,22 @@ export async function POST(request) {
       dnsErrors.push(`A record lookup: ${err.code || err.message}`);
     }
 
-    const isVerified = isCnameOk || isIpOk;
+    // 3. Ownership proof. Pointing DNS at the platform does not show who owns
+    // the domain, so a first-time verification also needs the TXT token. A
+    // domain verified before tokens existed keeps its status while DNS still
+    // points here.
+    let isOwnershipOk = domainRecord.verified;
+    if (!isOwnershipOk) {
+      try {
+        const txtRecords = await dns.promises.resolveTxt(txtRecordName);
+        isOwnershipOk = txtRecords.some((chunks) => chunks.join('').trim() === domainRecord.verificationToken);
+      } catch (err) {
+        dnsErrors.push(`TXT lookup: ${err.code || err.message}`);
+      }
+    }
+
+    const isPointed = isCnameOk || isIpOk;
+    const isVerified = isPointed && isOwnershipOk;
     const now = new Date();
 
     domainRecord.lastCheckedAt = now;
@@ -119,8 +139,9 @@ export async function POST(request) {
     } else {
       domainRecord.verified = false;
       domainRecord.status = 'failed';
-      const diagnosticMsg =
-        `DNS not pointed correctly yet. Found CNAMEs: [${resolvedCnames.join(', ') || 'none'}], IPs: [${resolvedIps.join(', ') || 'none'}]. Expected CNAME "${TARGET_CNAME}" or IP "${TARGET_IP}".`;
+      const diagnosticMsg = !isPointed
+        ? `DNS not pointed correctly yet. Found CNAMEs: [${resolvedCnames.join(', ') || 'none'}], IPs: [${resolvedIps.join(', ') || 'none'}]. Expected CNAME "${TARGET_CNAME}" or IP "${TARGET_IP}".`
+        : `Ownership TXT record not found. Add a TXT record named "${txtRecordName}" with the value "${domainRecord.verificationToken}".`;
       domainRecord.lastDnsCheckError = diagnosticMsg;
       await domainRecord.save();
 
@@ -135,6 +156,7 @@ export async function POST(request) {
           resolvedIps,
           expectedCname: TARGET_CNAME,
           expectedIp: TARGET_IP,
+          expectedTxt: { name: txtRecordName, value: domainRecord.verificationToken },
           dnsErrors,
         },
       });

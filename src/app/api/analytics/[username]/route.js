@@ -4,6 +4,7 @@ import Profile from '@/models/Profile';
 import AnalyticsEvent from '@/models/AnalyticsEvent';
 import Subscriber from '@/models/Subscriber';
 import Tip from '@/models/Tip';
+import { requireProfileOwner } from '@/lib/authorization';
 
 export async function GET(request, { params }) {
   try {
@@ -15,6 +16,9 @@ export async function GET(request, { params }) {
     }
 
     const normalized = username.toLowerCase().trim();
+    // Returns subscriber emails and tip messages, so only the owner may read it.
+    const access = await requireProfileOwner(request, normalized);
+    if (access.error) return access.error;
     const profile = await Profile.findOne({ username: normalized });
 
     // Aggregate link clicks from profile
@@ -23,19 +27,17 @@ export async function GET(request, { params }) {
 
     // Aggregate events from AnalyticsEvent collection
     const [clickCount, viewCount, deviceStats, referrerStats, subscribersCount, recentTips, recentSubscribers] = await Promise.all([
-      AnalyticsEvent.countDocuments({ 
-        $or: [{ profileUsername: normalized }, { target_id: normalized }],
-        $or: [
-          { event_type: { $in: ['click', 'link_click'] } },
-          { eventType: { $in: ['click', 'link_click'] } }
+      AnalyticsEvent.countDocuments({
+        $and: [
+          { $or: [{ profileUsername: normalized }, { target_id: normalized }] },
+          { $or: [{ event_type: { $in: ['click', 'link_click'] } }, { eventType: { $in: ['click', 'link_click'] } }] },
         ],
         is_bot: { $ne: true }
       }),
-      AnalyticsEvent.countDocuments({ 
-        $or: [{ profileUsername: normalized }, { target_id: normalized }],
-        $or: [
-          { event_type: { $in: ['view', 'profile_view'] } },
-          { eventType: { $in: ['view', 'profile_view'] } }
+      AnalyticsEvent.countDocuments({
+        $and: [
+          { $or: [{ profileUsername: normalized }, { target_id: normalized }] },
+          { $or: [{ event_type: { $in: ['view', 'profile_view'] } }, { eventType: { $in: ['view', 'profile_view'] } }] },
         ],
         is_bot: { $ne: true }
       }),
