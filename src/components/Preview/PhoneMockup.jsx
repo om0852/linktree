@@ -210,13 +210,34 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
     loadGoogleFont(getTitleFontName(profile?.alternativeTitleFont));
   }, [profile?.font, profile?.alternativeTitleFont]);
 
+  // The device frames have fixed sizes; shrink them to the width the Studio
+  // column actually has so they never spill out of it on smaller screens.
+  const frameHostRef = React.useRef(null);
+  const frameRef = React.useRef(null);
+  const [fitWidths, setFitWidths] = useState({ mode: '', host: 0, frame: 0 });
+  React.useEffect(() => {
+    const host = frameHostRef.current;
+    const frame = frameRef.current;
+    if (!host || !frame || typeof ResizeObserver === 'undefined') return undefined;
+    const observer = new ResizeObserver(() => {
+      setFitWidths({ mode: deviceMode, host: host.clientWidth, frame: frame.offsetWidth });
+    });
+    observer.observe(host);
+    observer.observe(frame);
+    return () => observer.disconnect();
+  }, [deviceMode]);
+
   const getDeviceBaseScale = () => {
+    let preferred;
     switch (deviceMode) {
-      case 'laptop': return 0.46; // Scales 920px laptop frame to 423px to fit neatly into 5-col studio preview
-      case 'tablet': return 0.62; // Scales 680px tablet frame to 421px
+      case 'laptop': preferred = 0.46; break; // 920px laptop frame at ~423px
+      case 'tablet': preferred = 0.62; break; // 680px tablet frame at ~421px
       case 'mobile':
-      default: return 1.0;
+      default: preferred = 1.0;
     }
+    // A measurement only applies to the device frame it was taken for.
+    if (fitWidths.mode !== deviceMode || !fitWidths.host || !fitWidths.frame) return preferred;
+    return Math.min(preferred, fitWidths.host / fitWidths.frame);
   };
 
   const effectiveScale = getDeviceBaseScale() * zoomScale;
@@ -2346,10 +2367,12 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
 
       {/* Frame Container Scaled by effectiveScale to fit seamlessly inside Studio column */}
       <div 
+        ref={frameHostRef}
         className="w-full flex items-start justify-center overflow-visible"
         style={{ height: getContainerHeight(), minHeight: deviceMode === 'fluid' ? 'auto' : undefined }}
       >
         <div 
+          ref={frameRef}
           className="transition-transform duration-200 origin-top flex items-center justify-center shrink-0"
           style={{ transform: `scale(${effectiveScale})` }}
         >

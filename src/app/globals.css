@@ -15,6 +15,11 @@
   font-family: 'Space Grotesk', monospace !important;
 }
 
+/* Platform pages on phones: the notice covers the page, so stop it scrolling. */
+@media (max-width: 767px) {
+  body:has(.platform-phone-notice) { overflow: hidden; }
+}
+
 /* Landing page motion (disabled for reduced motion below). */
 @keyframes tib-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
 @keyframes tib-marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
