@@ -145,23 +145,23 @@ export const DEFAULT_EMPTY_PROFILE = INITIAL_USER_PROFILE;
 
 export const THEME_PRESETS = [
   { id: 'atelier', name: 'Atelier (Default)', bg: 'bg-[#FFFEFA]', cardBg: 'bg-[#F5F3ED]', text: 'text-[#28352F]', border: 'border-[#CAD8CE]', accent: '#52796F', primary: '#52796F', tag: 'Editorial' },
-  { id: 'emerald-gold', name: 'Emerald & Gold', bg: 'bg-[#0f241d]', cardBg: 'bg-[#153228]', text: 'text-[#f6edd9]', border: 'border-[#cbb279]/40', accent: '#cbb279', primary: '#0f241d', tag: 'Luxury' },
-  { id: 'dark-glass', name: 'Dark Glassmorphism', bg: 'bg-[#090d16]', cardBg: 'bg-white/10', text: 'text-white', border: 'border-white/20', accent: '#38bdf8', primary: '#38bdf8', tag: 'Futuristic' },
-  { id: 'sunset', name: 'Sunset Gradient', bg: 'bg-gradient-to-br from-amber-700 via-rose-700 to-purple-800', cardBg: 'bg-white/20', text: 'text-white', border: 'border-white/30', accent: '#f59e0b', primary: '#f59e0b', tag: 'Vibrant' },
+  { id: 'emerald-gold', name: 'Emerald & Gold', bg: 'bg-[#0f241d]', cardBg: 'bg-[#153228]', text: 'text-[#f6edd9]', border: 'border-[#cbb279]/40', accent: '#cbb279', primary: '#0f241d', tag: 'Luxury', button: '#cbb279', buttonText: '#0f241d' },
+  { id: 'dark-glass', name: 'Dark Glassmorphism', bg: 'bg-[#090d16]', cardBg: 'bg-white/10', text: 'text-white', border: 'border-white/20', accent: '#38bdf8', primary: '#38bdf8', tag: 'Futuristic', button: '#38bdf8', buttonText: '#04131f' },
+  { id: 'sunset', name: 'Sunset Gradient', bg: 'bg-gradient-to-br from-amber-700 via-rose-700 to-purple-800', cardBg: 'bg-black/20', text: 'text-white', border: 'border-white/30', accent: '#f59e0b', primary: '#f59e0b', tag: 'Vibrant', button: '#FFF7ED', buttonText: '#9F1239' },
   { id: 'minimal-light', name: 'Minimal Light', bg: 'bg-white', cardBg: 'bg-stone-50', text: 'text-stone-900', border: 'border-stone-200', accent: '#1c1917', primary: '#1c1917', tag: 'Clean' },
-  { id: 'neon', name: 'Cyber Neon', bg: 'bg-slate-950', cardBg: 'bg-slate-900/90', text: 'text-[#6EE7B7]', border: 'border-emerald-500/50', accent: '#10b981', primary: '#10b981', tag: 'Cyber' },
-  { id: 'agate', name: 'Agate Stone', bg: 'bg-[#2B2D42]', cardBg: 'bg-[#8D99AE]/20', text: 'text-[#EDF2F4]', border: 'border-[#8D99AE]/40', accent: '#EF233C', primary: '#2B2D42', tag: 'Modern' },
-  { id: 'air', name: 'Air Sky', bg: 'bg-[#EBF4F6]', cardBg: 'bg-[#FFFFFF]', text: 'text-[#088395]', border: 'border-[#4E8EA2]/30', accent: '#0A4D68', primary: '#088395', tag: 'Breezy' },
-  { id: 'astrid', name: 'Astrid Purple', bg: 'bg-[#1D1128]', cardBg: 'bg-[#371E4A]', text: 'text-[#E2CFEA]', border: 'border-[#805090]/40', accent: '#A06CD5', primary: '#1D1128', tag: 'Mystic' },
-  { id: 'aura', name: 'Aura Glow', bg: 'bg-gradient-to-tr from-[#FFDEE9] to-[#B5FFFC]', cardBg: 'bg-white/70', text: 'text-[#333333]', border: 'border-white/60', accent: '#FF758C', primary: '#FF758C', tag: 'Pastel' },
-  { id: 'bliss', name: 'Bliss Peach', bg: 'bg-[#FFF3E2]', cardBg: 'bg-[#FFE5CA]', text: 'text-[#1C0A00]', border: 'border-[#FA9884]/40', accent: '#E76161', primary: '#E76161', tag: 'Warm' },
-  { id: 'bloom', name: 'Bloom Floral', bg: 'bg-[#F9F5F6]', cardBg: 'bg-[#F8E8EE]', text: 'text-[#4A2E35]', border: 'border-[#FDCEDF]', accent: '#DF7899', primary: '#DF7899', tag: 'Floral' },
+  { id: 'neon', name: 'Cyber Neon', bg: 'bg-slate-950', cardBg: 'bg-slate-900/90', text: 'text-[#6EE7B7]', border: 'border-emerald-500/50', accent: '#10b981', primary: '#10b981', tag: 'Cyber', button: '#10b981', buttonText: '#022c22' },
+  { id: 'agate', name: 'Agate Stone', bg: 'bg-[#2B2D42]', cardBg: 'bg-[#8D99AE]/20', text: 'text-[#EDF2F4]', border: 'border-[#8D99AE]/40', accent: '#EF233C', primary: '#2B2D42', tag: 'Modern', button: '#D90429', buttonText: '#ffffff' },
+  { id: 'air', name: 'Air Sky', bg: 'bg-[#EBF4F6]', cardBg: 'bg-[#FFFFFF]', text: 'text-[#0A4D68]', border: 'border-[#4E8EA2]/30', accent: '#0A4D68', primary: '#088395', tag: 'Breezy', button: '#0A6E7E', buttonText: '#ffffff' },
+  { id: 'astrid', name: 'Astrid Purple', bg: 'bg-[#1D1128]', cardBg: 'bg-[#371E4A]', text: 'text-[#E2CFEA]', border: 'border-[#805090]/40', accent: '#A06CD5', primary: '#1D1128', tag: 'Mystic', button: '#A06CD5', buttonText: '#1D1128' },
+  { id: 'aura', name: 'Aura Glow', bg: 'bg-gradient-to-tr from-[#FFDEE9] to-[#B5FFFC]', cardBg: 'bg-white/70', text: 'text-[#333333]', border: 'border-white/60', accent: '#FF758C', primary: '#FF758C', tag: 'Pastel', button: '#FF758C', buttonText: '#3D0F1A' },
+  { id: 'bliss', name: 'Bliss Peach', bg: 'bg-[#FFF3E2]', cardBg: 'bg-[#FFE5CA]', text: 'text-[#1C0A00]', border: 'border-[#FA9884]/40', accent: '#E76161', primary: '#E76161', tag: 'Warm', button: '#C24848', buttonText: '#ffffff' },
+  { id: 'bloom', name: 'Bloom Floral', bg: 'bg-[#F9F5F6]', cardBg: 'bg-[#F8E8EE]', text: 'text-[#4A2E35]', border: 'border-[#FDCEDF]', accent: '#DF7899', primary: '#DF7899', tag: 'Floral', button: '#B84D72', buttonText: '#ffffff' },
   { id: 'breeze', name: 'Breeze Mint', bg: 'bg-[#E8F1F2]', cardBg: 'bg-[#FFFFFF]', text: 'text-[#13293D]', border: 'border-[#006494]/20', accent: '#247BA0', primary: '#247BA0', tag: 'Fresh' },
   { id: 'haven', name: 'Haven Earth', bg: 'bg-[#EFE9E6]', cardBg: 'bg-[#E0D5CE]', text: 'text-[#3B2C24]', border: 'border-[#C2ABA0]/50', accent: '#7F5539', primary: '#7F5539', tag: 'Organic' },
-  { id: 'mineral', name: 'Mineral Slate', bg: 'bg-[#1E2022]', cardBg: 'bg-[#2B2E4A]', text: 'text-[#F0F5F9]', border: 'border-[#52616B]/40', accent: '#E84545', primary: '#1E2022', tag: 'Industrial' },
+  { id: 'mineral', name: 'Mineral Slate', bg: 'bg-[#1E2022]', cardBg: 'bg-[#2B2E4A]', text: 'text-[#F0F5F9]', border: 'border-[#52616B]/40', accent: '#E84545', primary: '#1E2022', tag: 'Industrial', button: '#D63031', buttonText: '#ffffff' },
   { id: 'nourish', name: 'Nourish Sage', bg: 'bg-[#E9EDC9]', cardBg: 'bg-[#FEFAE0]', text: 'text-[#283618]', border: 'border-[#CCD5AE]', accent: '#606C38', primary: '#606C38', tag: 'Earthy' },
-  { id: 'rise', name: 'Rise Gold', bg: 'bg-[#1A1A1D]', cardBg: 'bg-[#4E4E50]', text: 'text-[#FFEAA7]', border: 'border-[#F1C40F]/40', accent: '#F39C12', primary: '#F39C12', tag: 'Sunset' },
-  { id: 'twilight', name: 'Twilight Deep', bg: 'bg-gradient-to-b from-[#0F2027] via-[#203A43] to-[#2C5364]', cardBg: 'bg-white/10', text: 'text-[#E0EAFC]', border: 'border-white/20', accent: '#6DD5ED', primary: '#6DD5ED', tag: 'Night' },
+  { id: 'rise', name: 'Rise Gold', bg: 'bg-[#1A1A1D]', cardBg: 'bg-[#4E4E50]', text: 'text-[#FFEAA7]', border: 'border-[#F1C40F]/40', accent: '#F39C12', primary: '#F39C12', tag: 'Sunset', button: '#F39C12', buttonText: '#1A1A1D' },
+  { id: 'twilight', name: 'Twilight Deep', bg: 'bg-gradient-to-b from-[#0F2027] via-[#203A43] to-[#2C5364]', cardBg: 'bg-white/10', text: 'text-[#E0EAFC]', border: 'border-white/20', accent: '#6DD5ED', primary: '#6DD5ED', tag: 'Night', button: '#6DD5ED', buttonText: '#0F2027' },
 ];
 
 export const AVATAR_SHAPES = [
@@ -172,15 +172,24 @@ export const AVATAR_SHAPES = [
   { id: 'hexagon', name: 'Hexagon', label: 'Hexagon', class: 'mask-hexagon' },
   { id: 'diamond', name: 'Diamond', label: 'Diamond', class: 'rounded-xl rotate-45 scale-90' },
   { id: 'cutout', name: 'Cutout', label: 'Cutout', class: 'rounded-none' },
+  // Masks drawn with clip-path / border-radius, shared by the picker and the avatar.
+  { id: 'blob', name: 'Blob', label: 'Blob', style: { borderRadius: '42% 58% 63% 37% / 41% 44% 56% 59%' } },
+  { id: 'leaf', name: 'Leaf', label: 'Leaf', style: { borderRadius: '50% 0 50% 0' } },
+  { id: 'pentagon', name: 'Pentagon', label: 'Pentagon', style: { clipPath: 'polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%)' } },
+  { id: 'octagon', name: 'Octagon', label: 'Octagon', style: { clipPath: 'polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%)' } },
+  { id: 'star', name: 'Star', label: 'Star', style: { clipPath: 'polygon(50% 0%, 63% 32%, 98% 35%, 72% 58%, 80% 94%, 50% 75%, 20% 94%, 28% 58%, 2% 35%, 37% 32%)' } },
+  { id: 'shield', name: 'Shield', label: 'Shield', style: { clipPath: 'polygon(50% 0%, 100% 14%, 100% 52%, 50% 100%, 0% 52%, 0% 14%)' } },
 ];
 
+export const AVATAR_SHAPE_IDS = AVATAR_SHAPES.map((shape) => shape.id);
+
 export const CURATED_THEMES = [
-  { id: 'ariana-cloud', name: 'Ariana Cloud', creator: 'Ariana Grande', bg: 'bg-gradient-to-b from-[#f3e7e9] via-[#e3eeff] to-[#e3eeff]', cardBg: 'bg-white/80 backdrop-blur-md', text: 'text-[#4A4E69]', border: 'border-[#C9ADA7]/40', accent: '#9A8C98', primary: '#9A8C98', tag: 'Pop Icon' },
-  { id: 'olivia-guts', name: 'Olivia Guts', creator: 'Olivia Rodrigo', bg: 'bg-[#2B0938]', cardBg: 'bg-[#431259]', text: 'text-[#F3C5FF]', border: 'border-[#9B5DE5]/50', accent: '#E056FD', primary: '#9B5DE5', tag: 'Alt Pop' },
-  { id: 'billie-blohsh', name: 'Billie Neon', creator: 'Billie Eilish', bg: 'bg-[#0b0c10]', cardBg: 'bg-[#1f2833]', text: 'text-[#86efac]', border: 'border-[#25f43a]/50', accent: '#25f43a', primary: '#25f43a', tag: 'Hyper Dark' },
-  { id: 'travis-cactus', name: 'Cactus Earth', creator: 'Travis Scott', bg: 'bg-[#3A332B]', cardBg: 'bg-[#52493F]', text: 'text-[#E8DCC4]', border: 'border-[#8C7A6B]/50', accent: '#D4A373', primary: '#D4A373', tag: 'Hypebeast' },
-  { id: 'dua-future', name: 'Nostalgia Disco', creator: 'Dua Lipa', bg: 'bg-gradient-to-tr from-[#BE185D] via-[#581C87] to-[#0E7490]', cardBg: 'bg-black/40 backdrop-blur-lg', text: 'text-white', border: 'border-white/30', accent: '#00DFD8', primary: '#FF007F', tag: 'Nu-Disco' },
-  { id: 'steve-lacy', name: 'Gemini Lo-Fi', creator: 'Steve Lacy', bg: 'bg-[#FFB703]', cardBg: 'bg-[#FB8500]/20', text: 'text-[#023047]', border: 'border-[#023047]/30', accent: '#219EBC', primary: '#023047', tag: 'Lo-Fi' },
+  { id: 'ariana-cloud', name: 'Ariana Cloud', creator: 'Ariana Grande', bg: 'bg-gradient-to-b from-[#f3e7e9] via-[#e3eeff] to-[#e3eeff]', cardBg: 'bg-white/80 backdrop-blur-md', text: 'text-[#4A4E69]', border: 'border-[#C9ADA7]/40', accent: '#9A8C98', primary: '#9A8C98', tag: 'Pop Icon', button: '#6B5B6E', buttonText: '#ffffff' },
+  { id: 'olivia-guts', name: 'Olivia Guts', creator: 'Olivia Rodrigo', bg: 'bg-[#2B0938]', cardBg: 'bg-[#431259]', text: 'text-[#F3C5FF]', border: 'border-[#9B5DE5]/50', accent: '#E056FD', primary: '#9B5DE5', tag: 'Alt Pop', button: '#E056FD', buttonText: '#2B0938' },
+  { id: 'billie-blohsh', name: 'Billie Neon', creator: 'Billie Eilish', bg: 'bg-[#0b0c10]', cardBg: 'bg-[#1f2833]', text: 'text-[#86efac]', border: 'border-[#25f43a]/50', accent: '#25f43a', primary: '#25f43a', tag: 'Hyper Dark', button: '#25f43a', buttonText: '#0b0c10' },
+  { id: 'travis-cactus', name: 'Cactus Earth', creator: 'Travis Scott', bg: 'bg-[#3A332B]', cardBg: 'bg-[#52493F]', text: 'text-[#E8DCC4]', border: 'border-[#8C7A6B]/50', accent: '#D4A373', primary: '#D4A373', tag: 'Hypebeast', button: '#D4A373', buttonText: '#2A241E' },
+  { id: 'dua-future', name: 'Nostalgia Disco', creator: 'Dua Lipa', bg: 'bg-gradient-to-tr from-[#BE185D] via-[#581C87] to-[#0E7490]', cardBg: 'bg-black/40 backdrop-blur-lg', text: 'text-white', border: 'border-white/30', accent: '#00DFD8', primary: '#FF007F', tag: 'Nu-Disco', button: '#00DFD8', buttonText: '#062A33' },
+  { id: 'steve-lacy', name: 'Gemini Lo-Fi', creator: 'Steve Lacy', bg: 'bg-[#FFB703]', cardBg: 'bg-[#FB8500]/20', text: 'text-[#023047]', border: 'border-[#023047]/30', accent: '#219EBC', primary: '#023047', tag: 'Lo-Fi', button: '#023047', buttonText: '#FFB703' },
 ];
 
 export const GOOGLE_FONTS_LIST = {
@@ -292,6 +301,30 @@ export const STICKER_PACKS = [
     ],
   },
 ];
+
+// CSS font-family value for a Google font name (quoted, so names such as
+// "Press Start 2P" stay valid).
+export function getFontStack(name) {
+  const clean = String(name || '').replace(/["\\;{}<>]/g, '').trim();
+  return clean ? `"${clean}", system-ui, sans-serif` : '';
+}
+
+// Adds the Google Fonts stylesheet for `name` once (browser only).
+export function loadGoogleFont(name) {
+  const clean = String(name || '').replace(/["\\;{}<>]/g, '').trim();
+  if (!clean || typeof document === 'undefined') return;
+  const id = `gfont-${clean.replace(/\s+/g, '-').toLowerCase()}`;
+  if (document.getElementById(id)) return;
+  const link = document.createElement('link');
+  link.id = id;
+  link.rel = 'stylesheet';
+  link.href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(clean)}:wght@400;500;600;700;800&display=swap`;
+  document.head.appendChild(link);
+}
+
+// Readable fonts offered for the whole page (the title can use an expressive one).
+export const PAGE_FONTS = ['Playfair Display', ...GOOGLE_FONTS_LIST.other.map((font) => font.name)]
+  .filter((name, index, list) => list.indexOf(name) === index);
 
 export function getTitleFontName(val) {
   if (!val) return '';

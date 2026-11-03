@@ -17,7 +17,9 @@ import TitleFontModal from '../components/Modals/TitleFontModal';
 import AddProductModal from '../components/Modals/AddProductModal';
 import UnsavedChangesBar from '../components/Common/UnsavedChangesBar';
 import PhoneMockup from '../components/Preview/PhoneMockup';
-import { getReadableThemeColors } from '@/lib/theme-contrast';
+import { getReadableThemeColors, getReadableButtonText, getThemeAppearance, getPresetWallpaper } from '@/lib/theme-contrast';
+import ThemeCard from '../components/Builder/ThemeCard';
+import { GEO_COUNTRIES } from '@/lib/geoTargeting';
 import { 
   DEFAULT_EMPTY_PROFILE, 
   THEME_PRESETS, 
@@ -26,6 +28,8 @@ import {
   STICKER_PACKS,
   GOOGLE_FONTS_LIST,
   getTitleFontName,
+  getFontStack,
+  PAGE_FONTS,
   getStickerDeviceProps
 } from '../constants/app';
 import { calculateCTRScore, PERSONA_RECOMMENDATIONS, PERSONA_TAGLINES } from '../utils/aiScoring';
@@ -125,6 +129,12 @@ const ICON_LIST = [
   { id: 'mail', label: 'Mail', symbol: 'mail' },
   { id: 'link', label: 'Link', symbol: 'link' },
 ];
+
+// Random theme other than the active one (called from the shuffle button).
+function pickRandomTheme(themes, currentId) {
+  const choices = themes.filter((theme) => theme.id !== currentId);
+  return choices[Math.floor(Math.random() * choices.length)] || themes[0];
+}
 
 export default function AtelierStudioPage() {
   const [currentProfile, setCurrentProfile] = useState(DEFAULT_EMPTY_PROFILE);
@@ -650,29 +660,24 @@ export default function AtelierStudioPage() {
   };
 
   // Phase 2: Theme Shuffle and Theme Preset handlers
+  const ALL_THEMES = [...THEME_PRESETS, ...CURATED_THEMES];
+  const DESIGN_SECTION_TITLES = {
+    profile: 'Profile & header', theme: 'Theme', wallpaper: 'Wallpaper', buttons: 'Buttons',
+    text: 'Fonts', colors: 'Colors', stickers: 'Stickers', footer: 'Footer',
+  };
+
+  // Random theme from both libraries, never the one already active. Every
+  // theme passes the contrast audit (src/lib/theme-contrast.js).
   const handleThemeShuffle = () => {
-    const otherPresets = THEME_PRESETS.filter(p => p.id !== currentProfile.theme);
-    const currentIndex = THEME_PRESETS.findIndex((preset) => preset.id === currentProfile.theme);
-    const picked = otherPresets[(currentIndex + 1) % otherPresets.length] || THEME_PRESETS[0];
+    const picked = pickRandomTheme(ALL_THEMES, currentProfile.theme);
     handleApplyThemePreset(picked);
-    setToastMessage({
-      type: 'success',
-      text: `🎲 Theme Shuffled to "${picked.name}"!`,
-    });
+    setToastMessage({ type: 'success', text: `Theme changed to "${picked.name}"` });
     setTimeout(() => setToastMessage(null), 3000);
   };
 
   const handleApplyThemePreset = (preset) => {
-    const isGradient = preset.bg?.includes('gradient');
-    const wallpaperVal = preset.bg?.startsWith('bg-[#') 
-      ? preset.bg.slice(4, -1) 
-      : (preset.bg?.startsWith('bg-') ? preset.bg : '#FFFFFF');
-    const wallpaper = {
-      type: isGradient ? 'gradient' : 'fill',
-      value: isGradient ? '' : wallpaperVal,
-      gradient: isGradient ? preset.bg.replace(/^bg-/, '') : '',
-    };
-    const readableColors = getReadableThemeColors(preset, wallpaper);
+    const wallpaper = getPresetWallpaper(preset);
+    const look = getThemeAppearance(preset);
 
     setCurrentProfile(prev => ({
       ...prev,
@@ -683,20 +688,32 @@ export default function AtelierStudioPage() {
       avatarShape: preset.avatarShape || prev.avatarShape || 'circle',
       designSettings: {
         ...(prev.designSettings || {}),
-        wallpaper,
-        buttonColor: preset.primary || '#16A34A',
-        buttonTextColor: '#FFFFFF',
-        buttonStyle: preset.cardBg?.includes('/10') || preset.cardBg?.includes('/20') || preset.id === 'dark-glass' 
-          ? 'glass' 
-          : (prev.designSettings?.buttonStyle || 'solid'),
+        // A theme replaces the wallpaper and every colour, so nothing from the
+        // previous theme (a dark fill, a light title) survives the switch.
+        wallpaper: { ...(prev.designSettings?.wallpaper || {}), ...wallpaper, imageUrl: '', blurImage: '', videoUrl: '' },
+        buttonColor: look.button,
+        buttonTextColor: look.buttonText,
+        buttonStyle: preset.cardBg?.includes('/10') || preset.cardBg?.includes('/20') || preset.id === 'dark-glass'
+          ? 'glass'
+          : (prev.designSettings?.buttonStyle === 'glass' ? 'solid' : (prev.designSettings?.buttonStyle || 'solid')),
         buttonRoundness: prev.designSettings?.buttonRoundness || 'rounded',
         customColors: {
           ...(prev.designSettings?.customColors || {}),
-          title: readableColors.title,
-          pageText: readableColors.body,
+          title: look.title,
+          pageText: look.body,
         },
       },
     }));
+  };
+
+  const setDesignColor = (key, value) => {
+    setCurrentProfile((prev) => {
+      const ds = prev.designSettings || {};
+      if (key === 'title' || key === 'pageText') {
+        return { ...prev, designSettings: { ...ds, customColors: { ...(ds.customColors || {}), [key]: value } } };
+      }
+      return { ...prev, designSettings: { ...ds, [key]: value } };
+    });
   };
 
   // Sign out handler
@@ -1765,18 +1782,7 @@ export default function AtelierStudioPage() {
                                   <div>
                                     <Label className="mb-1.5">Select Targeted Countries:</Label>
                                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5">
-                                      {[
-                                        { code: 'US', name: 'United States', flag: '🇺🇸' },
-                                        { code: 'GB', name: 'United Kingdom', flag: '🇬🇧' },
-                                        { code: 'IN', name: 'India', flag: '🇮🇳' },
-                                        { code: 'EU', name: 'European Union', flag: '🇪🇺' },
-                                        { code: 'CA', name: 'Canada', flag: '🇨🇦' },
-                                        { code: 'AU', name: 'Australia', flag: '🇦🇺' },
-                                        { code: 'JP', name: 'Japan', flag: '🇯🇵' },
-                                        { code: 'DE', name: 'Germany', flag: '🇩🇪' },
-                                        { code: 'FR', name: 'France', flag: '🇫🇷' },
-                                        { code: 'BR', name: 'Brazil', flag: '🇧🇷' },
-                                      ].map((country) => {
+                                      {GEO_COUNTRIES.map((country) => {
                                         const isSelected = (linkForm.geoTargeting?.countries || []).includes(country.code);
                                         return (
                                           <button
@@ -2601,441 +2607,6 @@ export default function AtelierStudioPage() {
               {/* Tab 2: Style & Platinum Editor */}
               {activeTab === 'style' && (
                 <>
-                  <div className="bg-white border-[0.5px] border-line rounded-[10px] p-[15px] flex flex-col gap-5">
-                  <div className="flex items-center justify-between pb-3 border-b-[0.5px] border-line flex-wrap gap-2">
-                    <div className="flex items-center gap-2">
-                      <Sliders className="w-5 h-5 text-brand-500" />
-                      <h3 className="text-[14px] font-sans font-semibold text-ink-700">
-                        Persona Brand &amp; Typography Identity
-                      </h3>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Button
-                        variant="outline"
-                        size="xs"
-                        leftIcon={Dices}
-                        onClick={handleThemeShuffle}
-                        className="bg-surface-2 hover:bg-brand-100/50 text-ink-700 font-semibold shadow-2xs border-line"
-                      >
-                        🎲 Theme Shuffle
-                      </Button>
-                      <Badge variant="sage" size="xs">Editorial Grade</Badge>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-y-5 gap-x-4 text-[12px]">
-                    <div>
-                      <Label htmlFor="creator-name-input">Creator Name</Label>
-                      <Input
-                        id="creator-name-input"
-                        type="text"
-                        value={currentProfile.name || ''}
-                        onChange={(e) => setCurrentProfile({ ...currentProfile, name: e.target.value })}
-                        placeholder="Your full name or alias"
-                      />
-                    </div>
-
-                    <div>
-                      <Label htmlFor="username-input">Username / URL Handle</Label>
-                      <Input
-                        id="username-input"
-                        type="text"
-                        value={currentProfile.username || ''}
-                        onChange={(e) => setCurrentProfile({ ...currentProfile, username: e.target.value })}
-                        placeholder="username"
-                        className=""
-                      />
-                    </div>
-
-                    <div>
-                      <div className="p-3.5 rounded-[10px] bg-surface-2 border-[0.5px] border-line flex flex-col gap-2.5">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <Type className="w-4 h-4 text-brand-500" />
-                            <span className="font-semibold text-[12px] text-ink-700">
-                              Alternative Title Font
-                            </span>
-                            <span className="text-[10px] text-brand-700 bg-brand-100 font-semibold px-1.5 py-0.2 rounded">
-                              48 Free Fonts
-                            </span>
-                          </div>
-                          <Button
-                            variant="outline"
-                            size="xs"
-                            onClick={() => setShowTitleFontModal(true)}
-                            className="text-[12px] font-semibold bg-white border-line text-brand-500 hover:border-brand-500"
-                          >
-                            {getTitleFontName(currentProfile.alternativeTitleFont) ? getTitleFontName(currentProfile.alternativeTitleFont) : 'Choose Font'}
-                          </Button>
-                        </div>
-                        {getTitleFontName(currentProfile.alternativeTitleFont) && (
-                          <div className="flex items-center justify-between pt-2 border-t-[0.5px] border-line text-[12px]">
-                            <span className="text-stone-600 font-medium truncate" style={{ fontFamily: getTitleFontName(currentProfile.alternativeTitleFont) }}>
-                              Active: {getTitleFontName(currentProfile.alternativeTitleFont)} (Preview Style)
-                            </span>
-                            <button
-                              type="button"
-                              onClick={() => handleSelectAlternativeTitleFont('')}
-                              className="text-rose-500 hover:underline text-[11px]"
-                            >
-                              Reset
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Phase 2: Brand Logo Title Option */}
-                    <div className="md:col-span-2 p-3.5 rounded-[10px] bg-surface-2 border-[0.5px] border-line flex flex-col gap-2.5">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <Store className="w-4 h-4 text-brand-500" />
-                          <span className="font-semibold text-[12px] text-ink-700">
-                            Brand Logo Title
-                          </span>
-                          <span className="text-[10px] text-ink-500">
-                            (Display brand logo image instead of text name)
-                          </span>
-                        </div>
-                        <Switch
-                          checked={Boolean(currentProfile.titleLogo?.enabled)}
-                          onChange={(e) => setCurrentProfile({
-                            ...currentProfile,
-                            titleLogo: {
-                              ...(currentProfile.titleLogo || {}),
-                              enabled: e.target.checked,
-                            }
-                          })}
-                        />
-                      </div>
-
-                      {currentProfile.titleLogo?.enabled && (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2 border-t-[0.5px] border-line">
-                          <div>
-                            <Label htmlFor="title-logo-url" required>Logo Image URL (PNG / SVG with transparent background)</Label>
-                            <Input
-                              id="title-logo-url"
-                              type="text"
-                              placeholder="https://... brand-logo.png"
-                              value={currentProfile.titleLogo?.url || ''}
-                              onChange={(e) => setCurrentProfile({
-                                ...currentProfile,
-                                titleLogo: {
-                                  ...(currentProfile.titleLogo || {}),
-                                  url: e.target.value,
-                                }
-                              })}
-                              className="text-[12px]"
-                            />
-                          </div>
-                          <div>
-                            <Label htmlFor="title-logo-alt">Logo Alt Text / Brand Name</Label>
-                            <Input
-                              id="title-logo-alt"
-                              type="text"
-                              placeholder="e.g. Acme Studio Logo"
-                              value={currentProfile.titleLogo?.altText || ''}
-                              onChange={(e) => setCurrentProfile({
-                                ...currentProfile,
-                                titleLogo: {
-                                  ...(currentProfile.titleLogo || {}),
-                                  altText: e.target.value,
-                                }
-                              })}
-                              className="text-[12px]"
-                            />
-                          </div>
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="md:col-span-2">
-                      <div className="flex items-center justify-between mb-1.5">
-                        <Label htmlFor="bio-input" className="mb-0">Bio &amp; Subtitle</Label>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const recs = PERSONA_TAGLINES[currentProfile.niche] || [
-                              'Film & Theatre Actress • SAG-AFTRA • WME Literary & Theatrical'
-                            ];
-                            const randomBio = recs[Math.floor(Math.random() * recs.length)];
-                            setCurrentProfile({ ...currentProfile, bio: randomBio });
-                          }}
-                          className="text-[12px] text-brand-500 hover:underline flex items-center gap-1.5 cursor-pointer font-medium"
-                        >
-                          <Sparkles className="w-3.5 h-3.5" />
-                          <span>AI Suggest Bio</span>
-                        </button>
-                      </div>
-                      <textarea
-                        id="bio-input"
-                        rows={3}
-                        value={currentProfile.bio || ''}
-                        onChange={(e) => setCurrentProfile({ ...currentProfile, bio: e.target.value })}
-                        placeholder="Tell visitors about yourself..."
-                        className="w-full px-3.5 py-2.5 bg-white border-[0.5px] border-line rounded-[5px] text-[12px] text-ink-700 placeholder-ink-500/60 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/15 transition-all leading-relaxed"
-                      />
-                    </div>
-
-                    <div className="md:col-span-2">
-                      <Label htmlFor="avatar-url-input">Avatar Photo URL</Label>
-                      <Input
-                        id="avatar-url-input"
-                        type="text"
-                        value={currentProfile.avatar || ''}
-                        onChange={(e) => setCurrentProfile({ ...currentProfile, avatar: e.target.value })}
-                        placeholder="https://... or upload photo"
-                        className=""
-                      />
-                    </div>
-
-                    {/* Phase 2: Avatar Masks (Cutout & Shapes) */}
-                    <div className="md:col-span-2 flex flex-col gap-2">
-                      <div className="flex items-center justify-between">
-                        <Label className="mb-0 font-semibold text-[12px] text-ink-500">
-                          Avatar Mask Shape (Geometry &amp; Cutout)
-                        </Label>
-                        <span className="text-[11px] text-brand-500 font-semibold">
-                          Active: {currentProfile.avatarShape || 'circle'}
-                        </span>
-                      </div>
-                      <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
-                        {AVATAR_SHAPES.map((shape) => {
-                          const isSelected = (currentProfile.avatarShape || 'circle') === shape.id;
-                          return (
-                            <button
-                              key={shape.id}
-                              type="button"
-                              onClick={() => setCurrentProfile({ ...currentProfile, avatarShape: shape.id })}
-                              className={`p-2.5 rounded-[10px] border flex flex-col items-center justify-center gap-1.5 transition-all cursor-pointer ${
-                                isSelected
-                                  ? 'bg-brand-500 text-white border-brand-600 '
-                                  : 'bg-surface-2 text-ink-700 border-line hover:bg-white hover:border-brand-500'
-                              }`}
-                            >
-                              {/* Shape Icon Miniature Silhouette */}
-                              <div className={`w-7 h-7 border-2 ${isSelected ? 'border-white bg-white/20' : 'border-brand-500 bg-white'} ${
-                                shape.id === 'circle' ? 'rounded-full' :
-                                shape.id === 'rounded' ? 'rounded-[5px]' :
-                                shape.id === 'squircle' ? 'rounded-[30%]' :
-                                shape.id === 'arch' ? 'rounded-t-full rounded-b-xs' :
-                                shape.id === 'hexagon' ? '[clip-path:polygon(50%_0%,100%_25%,100%_75%,50%_100%,0%_75%,0%_25%)]' :
-                                shape.id === 'diamond' ? 'rotate-45 scale-75 rounded-xs' :
-                                'border-dashed rounded-none'
-                              }`} />
-                              <span className="text-[10px] font-semibold truncate max-w-full">{shape.name}</span>
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-
-                    {/* Header Layout Mode Selector */}
-                    <div>
-                      <Label htmlFor="header-layout-select">Header Layout Mode</Label>
-                      <Select
-                        id="header-layout-select"
-                        value={currentProfile.headerLayout || 'classic'}
-                        onChange={(e) => setCurrentProfile({ ...currentProfile, headerLayout: e.target.value })}
-                      >
-                        <option value="classic">Classic (Centered Circular Avatar)</option>
-                        <option value="banner">Banner Cover (Top Header Banner + Avatar)</option>
-                        <option value="hero">Hero Portrait (Large 4:5 Editorial Showcase)</option>
-                      </Select>
-                    </div>
-
-                    {/* Social Icons Placement Selector */}
-                    <div>
-                      <Label htmlFor="socials-position-select">Social Icons Placement</Label>
-                      <Select
-                        id="socials-position-select"
-                        value={currentProfile.socialsPosition || 'top'}
-                        onChange={(e) => setCurrentProfile({ ...currentProfile, socialsPosition: e.target.value })}
-                      >
-                        <option value="top">Top (Directly Below Bio &amp; Header)</option>
-                        <option value="bottom">Bottom (Above Page Footer)</option>
-                      </Select>
-                    </div>
-
-                    {/* Banner Cover Image Input (Visible if Banner Mode selected) */}
-                    {currentProfile.headerLayout === 'banner' && (
-                      <div className="md:col-span-2 animate-fadeIn">
-                        <Label htmlFor="cover-image-input">Cover Banner Image URL</Label>
-                        <Input
-                          id="cover-image-input"
-                          type="text"
-                          value={currentProfile.coverImage || ''}
-                          onChange={(e) => setCurrentProfile({ ...currentProfile, coverImage: e.target.value })}
-                          placeholder="https://... (1200x400 landscape banner recommended)"
-                          className=""
-                        />
-                        <p className="text-[11px] text-ink-500 mt-1">
-                          Displays a panoramic cover banner behind your avatar at the very top of your profile.
-                        </p>
-                      </div>
-                    )}
-
-                    {/* AI Palette Suggester Component (Auto-detects from avatar) */}
-                    <div className="md:col-span-2">
-                      <PaletteSuggester 
-                        avatarUrl={currentProfile.avatar} 
-                        currentTheme={currentProfile.theme} 
-                        onSelectTheme={(themeId) => setCurrentProfile({ ...currentProfile, theme: themeId })} 
-                      />
-                    </div>
-
-                    <div>
-                      <Label htmlFor="border-geometry-select">Button Border Geometry</Label>
-                      <Select
-                        id="border-geometry-select"
-                        value={currentProfile.buttonShape || 'rounded'}
-                        onChange={(e) => setCurrentProfile({ ...currentProfile, buttonShape: e.target.value })}
-                      >
-                        <option value="sharp">Sharp Edges (Editorial Luxury)</option>
-                        <option value="rounded">Soft Rounded (Atelier Default)</option>
-                        <option value="pill">Pill Shaped (Organic)</option>
-                        <option value="brutalism">Neo-Brutalism (Bold Border)</option>
-                      </Select>
-                    </div>
-
-                    <div>
-                      <Label htmlFor="typography-select">Headline Typography</Label>
-                      <Select
-                        id="typography-select"
-                        value={currentProfile.font || 'Playfair Display'}
-                        onChange={(e) => setCurrentProfile({ ...currentProfile, font: e.target.value })}
-                      >
-                        <option value="Playfair Display">Playfair Display (Haute Couture Serif)</option>
-                        <option value="DM Sans">DM Sans (Clean Modern Geometric)</option>
-                        <option value="Plus Jakarta Sans">Plus Jakarta Sans (Sleek Tech)</option>
-                        <option value="Space Grotesk">Space Grotesk (Editorial Brutalist)</option>
-                      </Select>
-                    </div>
-
-                    {/* Phase 2: Expanded Theme Preset Library (18 Presets) */}
-                    <div className="md:col-span-2 pt-4 border-t-[0.5px] border-line flex flex-col gap-3">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <span className="material-symbols-outlined text-brand-500 text-[14px]">palette</span>
-                          <h4 className="text-[12px] font-semibold text-ink-700">
-                            Curated Theme Presets Library
-                          </h4>
-                          <Badge variant="mint" size="xs">18 Presets</Badge>
-                        </div>
-                        <Button
-                          variant="ghost"
-                          size="xs"
-                          leftIcon={Dices}
-                          onClick={handleThemeShuffle}
-                          className="text-[12px] font-semibold text-brand-500"
-                        >
-                          🎲 Shuffle Random
-                        </Button>
-                      </div>
-
-                      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5">
-                        {THEME_PRESETS.map((preset) => {
-                          const isSelected = currentProfile.theme === preset.id;
-                          return (
-                            <button
-                              key={preset.id}
-                              type="button"
-                              onClick={() => handleApplyThemePreset(preset)}
-                              className={`p-2.5 rounded-[10px] border text-left flex flex-col justify-between gap-2 transition-all cursor-pointer ${
-                                isSelected
-                                  ? 'border-2 border-brand-500 bg-white ring-2 ring-brand-500/20 '
-                                  : 'border-line bg-surface-2 hover:bg-white hover:border-brand-500/50'
-                              }`}
-                            >
-                              {/* Color Swatch Trio */}
-                              <div className="flex items-center gap-1">
-                                <span className="w-4 h-4 rounded-full border border-black/10 shadow-2xs" style={{ backgroundColor: preset.bg }} />
-                                <span className="w-4 h-4 rounded-full border border-black/10 shadow-2xs" style={{ backgroundColor: preset.primary }} />
-                                <span className="w-4 h-4 rounded-full border border-black/10 shadow-2xs" style={{ backgroundColor: preset.accent }} />
-                              </div>
-                              <div>
-                                <div className="flex items-center justify-between">
-                                  <span className="text-[12px] font-semibold text-ink-700 block truncate">{preset.name}</span>
-                                  {isSelected && <span className="text-[10px] text-brand-600 font-semibold">✓</span>}
-                                </div>
-                                <span className="text-[9px] text-ink-500 font-medium block truncate">{preset.tag}</span>
-                              </div>
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-
-                    {/* Story Bubble Greeting Video Section */}
-                    <div className="md:col-span-2 p-[15px] rounded-[10px] bg-surface-2 border-[0.5px] border-line flex flex-col gap-3 mt-1">
-                      <div className="flex items-center justify-between gap-3">
-                        <div className="flex items-center gap-3">
-                          <div className="w-9 h-9 rounded-[5px] bg-gradient-to-tr from-amber-500 to-rose-500 text-white flex items-center justify-center shrink-0">
-                            <Video className="w-4.5 h-4.5" />
-                          </div>
-                          <div>
-                            <h4 className="text-[12px] font-semibold text-ink-700">
-                              Instagram/TikTok Story Bubble Avatar
-                            </h4>
-                            <p className="text-[12px] text-ink-500">
-                              Pulsing gradient ring opening vertical video greeting when clicked
-                            </p>
-                          </div>
-                        </div>
-
-                        <Switch
-                          checked={Boolean(currentProfile.storyBubble?.enabled)}
-                          onChange={(e) => setCurrentProfile({
-                            ...currentProfile,
-                            storyBubble: {
-                              ...(currentProfile.storyBubble || {}),
-                              enabled: e.target.checked
-                            }
-                          })}
-                        />
-                      </div>
-
-                      {currentProfile.storyBubble?.enabled && (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 pt-3 border-t-[0.5px] border-line text-[12px]">
-                          <div>
-                            <Label htmlFor="story-video-url" required>Greeting Video URL (MP4 / WebM)</Label>
-                            <Input
-                              id="story-video-url"
-                              type="text"
-                              placeholder="https://... vertical 9:16 video URL"
-                              value={currentProfile.storyBubble?.videoUrl || ''}
-                              onChange={(e) => setCurrentProfile({
-                                ...currentProfile,
-                                storyBubble: {
-                                  ...(currentProfile.storyBubble || {}),
-                                  videoUrl: e.target.value
-                                }
-                              })}
-                              className=""
-                            />
-                          </div>
-                          <div>
-                            <Label htmlFor="story-caption">Story Greeting Caption (Optional)</Label>
-                            <Input
-                              id="story-caption"
-                              type="text"
-                              placeholder="e.g. Welcome! Tap below to explore my links"
-                              value={currentProfile.storyBubble?.caption || ''}
-                              onChange={(e) => setCurrentProfile({
-                                ...currentProfile,
-                                storyBubble: {
-                                  ...(currentProfile.storyBubble || {}),
-                                  caption: e.target.value
-                                }
-                              })}
-                            />
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
                 {/* Design Tab: Drill-Down Slide Navigation Engine */}
                 <div className="bg-white border-[0.5px] border-line rounded-[10px] p-[15px] flex flex-col gap-5">
                   {/* Header: Back navigation when in sub-menu or Root title */}
@@ -3054,13 +2625,13 @@ export default function AtelierStudioPage() {
                         <div className="flex items-center gap-2">
                           <Palette className="w-5 h-5 text-brand-500" />
                           <h3 className="text-[14px] font-sans font-semibold text-ink-700">
-                            Design &amp; Studio Customization
+                            Design
                           </h3>
                         </div>
                       )}
                       {designSubMenu !== 'root' && (
-                        <span className="text-[12px] font-semibold text-ink-700 capitalize">
-                          / {designSubMenu}
+                        <span className="text-[12px] font-semibold text-ink-700">
+                          / {DESIGN_SECTION_TITLES[designSubMenu] || designSubMenu}
                         </span>
                       )}
                     </div>
@@ -3083,51 +2654,58 @@ export default function AtelierStudioPage() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       {[
                         {
+                          id: 'profile',
+                          title: 'Profile & header',
+                          desc: 'Name, bio, logo, avatar shape, header layout and story video',
+                          icon: Contact,
+                          badge: currentProfile.headerLayout || 'classic',
+                        },
+                        {
                           id: 'theme',
-                          title: 'Themes',
-                          desc: 'Customizable presets & curated creator themes (Ariana, Olivia, Billie)',
+                          title: 'Theme',
+                          desc: 'One-click looks: background, text, cards and buttons together',
                           icon: Palette,
-                          badge: currentProfile.theme || 'atelier',
+                          badge: ALL_THEMES.find((t) => t.id === currentProfile.theme)?.name || 'Custom',
                         },
                         {
                           id: 'wallpaper',
                           title: 'Wallpaper',
-                          desc: 'Fill color, gradient, blur backdrop, pattern, image, or video',
+                          desc: 'Page background: colour, gradient, image, blur, pattern or video',
                           icon: ImageIcon,
-                          badge: currentProfile.designSettings?.wallpaper?.type || 'Fill',
+                          badge: currentProfile.designSettings?.wallpaper?.type || 'fill',
                         },
                         {
                           id: 'buttons',
                           title: 'Buttons',
-                          desc: 'Solid, glass, or outline styles, corner radius, drop shadows, and color',
+                          desc: 'Link button style, corner shape and shadow',
                           icon: Layers,
-                          badge: `${currentProfile.designSettings?.buttonStyle || 'Solid'} • ${currentProfile.designSettings?.buttonRoundness || 'Full'}`,
+                          badge: `${currentProfile.designSettings?.buttonStyle || 'solid'} • ${currentProfile.designSettings?.buttonRoundness || 'rounded'}`,
                         },
                         {
                           id: 'text',
-                          title: 'Text & Typography',
-                          desc: 'Headline typography and expressive alternative title fonts',
+                          title: 'Fonts',
+                          desc: 'Page font for all text, plus an optional font for your name',
                           icon: Type,
                           badge: currentProfile.font || 'Playfair Display',
                         },
                         {
                           id: 'colors',
                           title: 'Colors',
-                          desc: 'Centralized 6-hex studio palette for surface, primary, border, and text',
+                          desc: 'Title, text and button colours (kept readable automatically)',
                           icon: Paintbrush,
-                          badge: '6 Hex Values',
+                          badge: 'Custom',
                         },
                         {
                           id: 'stickers',
                           title: 'Stickers',
-                          desc: 'Sorta Spooky, Like & Subscribe, Pointers, and Cause sticker packs',
+                          desc: 'Decorate your page; drag them onto the preview',
                           icon: Smile,
-                          badge: `${(currentProfile.designSettings?.stickers || []).length} Placed`,
+                          badge: `${(currentProfile.designSettings?.stickers || []).length} placed`,
                         },
                         {
                           id: 'footer',
                           title: 'Footer',
-                          desc: 'Control visibility of TreeInBio footer branding on your public page',
+                          desc: 'Show or hide the TreeInBio footer on your public page',
                           icon: Sliders,
                           badge: currentProfile.designSettings?.hideFooter ? 'Hidden' : 'Visible',
                         },
@@ -3165,88 +2743,343 @@ export default function AtelierStudioPage() {
                     </div>
                   )}
 
-                  {/* SUB-MENU 1: THEMES */}
-                  {designSubMenu === 'theme' && (
-                    <div className="space-y-6 animate-fadeIn">
-                      {/* Section A: Customizable Presets */}
+                  {/* SUB-MENU: PROFILE & HEADER */}
+                  {designSubMenu === 'profile' && (
+                    <div className="animate-fadeIn">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-y-5 gap-x-4 text-[12px]">
                       <div>
-                        <div className="flex items-center justify-between mb-2.5">
-                          <h4 className="text-[12px] font-semibold text-ink-500">
-                            Customizable Theme Presets (18)
-                          </h4>
+                        <Label htmlFor="creator-name-input">Creator Name</Label>
+                        <Input
+                          id="creator-name-input"
+                          type="text"
+                          value={currentProfile.name || ''}
+                          onChange={(e) => setCurrentProfile({ ...currentProfile, name: e.target.value })}
+                          placeholder="Your full name or alias"
+                        />
+                      </div>
+
+                      <div>
+                        <Label htmlFor="username-input">Username / URL Handle</Label>
+                        <Input
+                          id="username-input"
+                          type="text"
+                          value={currentProfile.username || ''}
+                          onChange={(e) => setCurrentProfile({ ...currentProfile, username: e.target.value })}
+                          placeholder="username"
+                          className=""
+                        />
+                      </div>
+
+                      {/* Phase 2: Brand Logo Title Option */}
+                      <div className="md:col-span-2 p-3.5 rounded-[10px] bg-surface-2 border-[0.5px] border-line flex flex-col gap-2.5">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <Store className="w-4 h-4 text-brand-500" />
+                            <span className="font-semibold text-[12px] text-ink-700">
+                              Brand Logo Title
+                            </span>
+                            <span className="text-[10px] text-ink-500">
+                              (Display brand logo image instead of text name)
+                            </span>
+                          </div>
+                          <Switch
+                            checked={Boolean(currentProfile.titleLogo?.enabled)}
+                            onChange={(e) => setCurrentProfile({
+                              ...currentProfile,
+                              titleLogo: {
+                                ...(currentProfile.titleLogo || {}),
+                                enabled: e.target.checked,
+                              }
+                            })}
+                          />
                         </div>
-                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5">
-                          {THEME_PRESETS.map((preset) => {
-                            const isSelected = currentProfile.theme === preset.id;
+
+                        {currentProfile.titleLogo?.enabled && (
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2 border-t-[0.5px] border-line">
+                            <div>
+                              <Label htmlFor="title-logo-url" required>Logo Image URL (PNG / SVG with transparent background)</Label>
+                              <Input
+                                id="title-logo-url"
+                                type="text"
+                                placeholder="https://... brand-logo.png"
+                                value={currentProfile.titleLogo?.url || ''}
+                                onChange={(e) => setCurrentProfile({
+                                  ...currentProfile,
+                                  titleLogo: {
+                                    ...(currentProfile.titleLogo || {}),
+                                    url: e.target.value,
+                                  }
+                                })}
+                                className="text-[12px]"
+                              />
+                            </div>
+                            <div>
+                              <Label htmlFor="title-logo-alt">Logo Alt Text / Brand Name</Label>
+                              <Input
+                                id="title-logo-alt"
+                                type="text"
+                                placeholder="e.g. Acme Studio Logo"
+                                value={currentProfile.titleLogo?.altText || ''}
+                                onChange={(e) => setCurrentProfile({
+                                  ...currentProfile,
+                                  titleLogo: {
+                                    ...(currentProfile.titleLogo || {}),
+                                    altText: e.target.value,
+                                  }
+                                })}
+                                className="text-[12px]"
+                              />
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="md:col-span-2">
+                        <div className="flex items-center justify-between mb-1.5">
+                          <Label htmlFor="bio-input" className="mb-0">Bio &amp; Subtitle</Label>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const recs = PERSONA_TAGLINES[currentProfile.niche] || [
+                                'Film & Theatre Actress • SAG-AFTRA • WME Literary & Theatrical'
+                              ];
+                              const randomBio = recs[Math.floor(Math.random() * recs.length)];
+                              setCurrentProfile({ ...currentProfile, bio: randomBio });
+                            }}
+                            className="text-[12px] text-brand-500 hover:underline flex items-center gap-1.5 cursor-pointer font-medium"
+                          >
+                            <Sparkles className="w-3.5 h-3.5" />
+                            <span>AI Suggest Bio</span>
+                          </button>
+                        </div>
+                        <textarea
+                          id="bio-input"
+                          rows={3}
+                          value={currentProfile.bio || ''}
+                          onChange={(e) => setCurrentProfile({ ...currentProfile, bio: e.target.value })}
+                          placeholder="Tell visitors about yourself..."
+                          className="w-full px-3.5 py-2.5 bg-white border-[0.5px] border-line rounded-[5px] text-[12px] text-ink-700 placeholder-ink-500/60 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/15 transition-all leading-relaxed"
+                        />
+                      </div>
+
+                      <div className="md:col-span-2">
+                        <Label htmlFor="avatar-url-input">Avatar Photo URL</Label>
+                        <Input
+                          id="avatar-url-input"
+                          type="text"
+                          value={currentProfile.avatar || ''}
+                          onChange={(e) => setCurrentProfile({ ...currentProfile, avatar: e.target.value })}
+                          placeholder="https://... or upload photo"
+                          className=""
+                        />
+                      </div>
+
+                      {/* Phase 2: Avatar Masks (Cutout & Shapes) */}
+                      <div className="md:col-span-2 flex flex-col gap-2">
+                        <div className="flex items-center justify-between">
+                          <Label className="mb-0 font-semibold text-[12px] text-ink-500">
+                            Avatar Mask Shape (Geometry &amp; Cutout)
+                          </Label>
+                          <span className="text-[11px] text-brand-500 font-semibold">
+                            Active: {currentProfile.avatarShape || 'circle'}
+                          </span>
+                        </div>
+                        <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+                          {AVATAR_SHAPES.map((shape) => {
+                            const isSelected = (currentProfile.avatarShape || 'circle') === shape.id;
                             return (
                               <button
-                                key={preset.id}
+                                key={shape.id}
                                 type="button"
-                                onClick={() => handleApplyThemePreset(preset)}
-                                className={`p-2.5 rounded-[10px] border text-left flex flex-col justify-between gap-2 transition-all cursor-pointer ${
+                                onClick={() => setCurrentProfile({ ...currentProfile, avatarShape: shape.id })}
+                                className={`p-2.5 rounded-[10px] border flex flex-col items-center justify-center gap-1.5 transition-all cursor-pointer ${
                                   isSelected
-                                    ? 'border-2 border-brand-500 bg-white ring-2 ring-brand-500/20 '
-                                    : 'border-line bg-surface-2 hover:bg-white hover:border-brand-500/50'
+                                    ? 'bg-brand-500 text-white border-brand-600 '
+                                    : 'bg-surface-2 text-ink-700 border-line hover:bg-white hover:border-brand-500'
                                 }`}
                               >
-                                <div className="flex items-center gap-1">
-                                  <span className="w-4 h-4 rounded-full border border-black/10 shadow-2xs" style={{ backgroundColor: preset.bg }} />
-                                  <span className="w-4 h-4 rounded-full border border-black/10 shadow-2xs" style={{ backgroundColor: preset.primary }} />
-                                  <span className="w-4 h-4 rounded-full border border-black/10 shadow-2xs" style={{ backgroundColor: preset.accent }} />
-                                </div>
-                                <div>
-                                  <div className="flex items-center justify-between">
-                                    <span className="text-[12px] font-semibold text-ink-700 block truncate">{preset.name}</span>
-                                    {isSelected && <span className="text-[10px] text-brand-600 font-semibold">✓</span>}
-                                  </div>
-                                  <span className="text-[9px] text-ink-500 font-medium block truncate">{preset.tag}</span>
-                                </div>
+                                {/* Shape Icon Miniature Silhouette */}
+                                <div className={`w-7 h-7 border-2 ${isSelected ? 'border-white bg-white/20' : 'border-brand-500 bg-white'} ${
+                                  shape.id === 'circle' ? 'rounded-full' :
+                                  shape.id === 'rounded' ? 'rounded-[5px]' :
+                                  shape.id === 'squircle' ? 'rounded-[30%]' :
+                                  shape.id === 'arch' ? 'rounded-t-full rounded-b-xs' :
+                                  shape.id === 'hexagon' ? '[clip-path:polygon(50%_0%,100%_25%,100%_75%,50%_100%,0%_75%,0%_25%)]' :
+                                  shape.id === 'diamond' ? 'rotate-45 scale-75 rounded-xs' :
+                                  'border-dashed rounded-none'
+                                }`} />
+                                <span className="text-[10px] font-semibold truncate max-w-full">{shape.name}</span>
                               </button>
                             );
                           })}
                         </div>
                       </div>
 
-                      {/* Section B: Curated Creator Themes */}
+                      {/* Header Layout Mode Selector */}
+                      <div>
+                        <Label htmlFor="header-layout-select">Header Layout Mode</Label>
+                        <Select
+                          id="header-layout-select"
+                          value={currentProfile.headerLayout || 'classic'}
+                          onChange={(e) => setCurrentProfile({ ...currentProfile, headerLayout: e.target.value })}
+                        >
+                          <option value="classic">Classic (Centered Circular Avatar)</option>
+                          <option value="banner">Banner Cover (Top Header Banner + Avatar)</option>
+                          <option value="hero">Hero Portrait (Large 4:5 Editorial Showcase)</option>
+                        </Select>
+                      </div>
+
+                      {/* Social Icons Placement Selector */}
+                      <div>
+                        <Label htmlFor="socials-position-select">Social Icons Placement</Label>
+                        <Select
+                          id="socials-position-select"
+                          value={currentProfile.socialsPosition || 'top'}
+                          onChange={(e) => setCurrentProfile({ ...currentProfile, socialsPosition: e.target.value })}
+                        >
+                          <option value="top">Top (Directly Below Bio &amp; Header)</option>
+                          <option value="bottom">Bottom (Above Page Footer)</option>
+                        </Select>
+                      </div>
+
+                      {/* Banner Cover Image Input (Visible if Banner Mode selected) */}
+                      {currentProfile.headerLayout === 'banner' && (
+                        <div className="md:col-span-2 animate-fadeIn">
+                          <Label htmlFor="cover-image-input">Cover Banner Image URL</Label>
+                          <Input
+                            id="cover-image-input"
+                            type="text"
+                            value={currentProfile.coverImage || ''}
+                            onChange={(e) => setCurrentProfile({ ...currentProfile, coverImage: e.target.value })}
+                            placeholder="https://... (1200x400 landscape banner recommended)"
+                            className=""
+                          />
+                          <p className="text-[11px] text-ink-500 mt-1">
+                            Displays a panoramic cover banner behind your avatar at the very top of your profile.
+                          </p>
+                        </div>
+                      )}
+
+                      {/* Story Bubble Greeting Video Section */}
+                      <div className="md:col-span-2 p-[15px] rounded-[10px] bg-surface-2 border-[0.5px] border-line flex flex-col gap-3 mt-1">
+                        <div className="flex items-center justify-between gap-3">
+                          <div className="flex items-center gap-3">
+                            <div className="w-9 h-9 rounded-[5px] bg-gradient-to-tr from-amber-500 to-rose-500 text-white flex items-center justify-center shrink-0">
+                              <Video className="w-4.5 h-4.5" />
+                            </div>
+                            <div>
+                              <h4 className="text-[12px] font-semibold text-ink-700">
+                                Instagram/TikTok Story Bubble Avatar
+                              </h4>
+                              <p className="text-[12px] text-ink-500">
+                                Pulsing gradient ring opening vertical video greeting when clicked
+                              </p>
+                            </div>
+                          </div>
+
+                          <Switch
+                            checked={Boolean(currentProfile.storyBubble?.enabled)}
+                            onChange={(e) => setCurrentProfile({
+                              ...currentProfile,
+                              storyBubble: {
+                                ...(currentProfile.storyBubble || {}),
+                                enabled: e.target.checked
+                              }
+                            })}
+                          />
+                        </div>
+
+                        {currentProfile.storyBubble?.enabled && (
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 pt-3 border-t-[0.5px] border-line text-[12px]">
+                            <div>
+                              <Label htmlFor="story-video-url" required>Greeting Video URL (MP4 / WebM)</Label>
+                              <Input
+                                id="story-video-url"
+                                type="text"
+                                placeholder="https://... vertical 9:16 video URL"
+                                value={currentProfile.storyBubble?.videoUrl || ''}
+                                onChange={(e) => setCurrentProfile({
+                                  ...currentProfile,
+                                  storyBubble: {
+                                    ...(currentProfile.storyBubble || {}),
+                                    videoUrl: e.target.value
+                                  }
+                                })}
+                                className=""
+                              />
+                            </div>
+                            <div>
+                              <Label htmlFor="story-caption">Story Greeting Caption (Optional)</Label>
+                              <Input
+                                id="story-caption"
+                                type="text"
+                                placeholder="e.g. Welcome! Tap below to explore my links"
+                                value={currentProfile.storyBubble?.caption || ''}
+                                onChange={(e) => setCurrentProfile({
+                                  ...currentProfile,
+                                  storyBubble: {
+                                    ...(currentProfile.storyBubble || {}),
+                                    caption: e.target.value
+                                  }
+                                })}
+                              />
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    </div>
+                  )}
+
+                  {/* SUB-MENU 1: THEMES */}
+                  {designSubMenu === 'theme' && (
+                    <div className="space-y-5 animate-fadeIn">
+                      <p className="text-[12px] text-ink-500">
+                        A theme sets the background, text, cards and buttons in one click. You can fine-tune any of them afterwards in Wallpaper, Buttons, Fonts and Colors.
+                      </p>
+
+                      <div>
+                        <h4 className="text-[12px] font-semibold text-ink-700 mb-2.5">Themes</h4>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2.5">
+                          {THEME_PRESETS.map((preset) => (
+                            <ThemeCard
+                              key={preset.id}
+                              theme={preset}
+                              selected={currentProfile.theme === preset.id}
+                              onSelect={handleApplyThemePreset}
+                            />
+                          ))}
+                        </div>
+                      </div>
+
                       <div className="pt-4 border-t-[0.5px] border-line">
-                        <div className="flex items-center justify-between mb-2.5">
-                          <h4 className="text-[12px] font-semibold text-ink-500 flex items-center gap-1.5">
-                            <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-                            <span>Curated Creator Themes (100% Free)</span>
-                          </h4>
+                        <h4 className="text-[12px] font-semibold text-ink-700">Creator-inspired themes</h4>
+                        <p className="text-[12px] text-ink-500 mt-0.5 mb-2.5">
+                          Same kind of theme, styled after an artist&apos;s album look.
+                        </p>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2.5">
+                          {CURATED_THEMES.map((theme) => (
+                            <ThemeCard
+                              key={theme.id}
+                              theme={theme}
+                              subtitle={`Inspired by ${theme.creator}`}
+                              selected={currentProfile.theme === theme.id}
+                              onSelect={handleApplyThemePreset}
+                            />
+                          ))}
                         </div>
-                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                          {CURATED_THEMES.map((theme) => {
-                            const isSelected = currentProfile.theme === theme.id;
-                            return (
-                              <button
-                                key={theme.id}
-                                type="button"
-                                onClick={() => handleApplyThemePreset(theme)}
-                                className={`p-3 rounded-[10px] border text-left flex flex-col justify-between gap-2.5 transition-all cursor-pointer ${
-                                  isSelected
-                                    ? 'border-2 border-brand-500 bg-white ring-2 ring-brand-500/20 '
-                                    : 'border-line bg-surface-2 hover:bg-white hover:border-brand-500/50'
-                                }`}
-                              >
-                                <div className="flex items-center justify-between">
-                                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-brand-100/50 text-ink-700">
-                                    {theme.creator}
-                                  </span>
-                                  {isSelected && <span className="text-[12px] text-brand-600 font-semibold">✓ Active</span>}
-                                </div>
-                                <div>
-                                  <h5 className="font-semibold text-[12px] text-ink-700">{theme.name}</h5>
-                                  <span className="text-[10px] text-ink-500">{theme.tag}</span>
-                                </div>
-                                <div className="flex items-center gap-1.5">
-                                  <span className="w-5 h-5 rounded-[5px] border border-black/10" style={{ backgroundColor: theme.primary }} />
-                                  <span className="w-5 h-5 rounded-[5px] border border-black/10" style={{ backgroundColor: theme.accent }} />
-                                </div>
-                              </button>
-                            );
-                          })}
-                        </div>
+                      </div>
+
+                      {/* AI Palette Suggester Component (Auto-detects from avatar) */}
+                      <div className="pt-4 border-t-[0.5px] border-line">
+                        <PaletteSuggester 
+                          avatarUrl={currentProfile.avatar} 
+                          currentTheme={currentProfile.theme} 
+                          onSelectTheme={(themeId) => {
+                            const theme = ALL_THEMES.find((t) => t.id === themeId);
+                            if (theme) handleApplyThemePreset(theme);
+                          }}
+                        />
                       </div>
                     </div>
                   )}
@@ -3528,149 +3361,148 @@ export default function AtelierStudioPage() {
                         </div>
                       )}
 
-                      {/* Color Pickers */}
-                      <div className="grid grid-cols-2 gap-3 pt-2 border-t-[0.5px] border-line">
-                        <div>
-                          <Label htmlFor="btn-bg-color">Button Background Color</Label>
-                          <div className="flex items-center gap-2 mt-1">
-                            <input
-                              id="btn-bg-color"
-                              type="color"
-                              value={currentProfile.designSettings?.buttonColor || '#16A34A'}
-                              onChange={(e) => {
-                                const val = e.target.value;
-                                setCurrentProfile((prev) => ({
-                                  ...prev,
-                                  designSettings: {
-                                    ...(prev.designSettings || {}),
-                                    buttonColor: val,
-                                  },
-                                }));
-                              }}
-                              className="w-8 h-8 rounded-[5px] cursor-pointer border-[0.5px] border-line"
-                            />
-                            <input
-                              type="text"
-                              value={currentProfile.designSettings?.buttonColor || '#16A34A'}
-                              onChange={(e) => {
-                                const val = e.target.value;
-                                setCurrentProfile((prev) => ({
-                                  ...prev,
-                                  designSettings: {
-                                    ...(prev.designSettings || {}),
-                                    buttonColor: val,
-                                  },
-                                }));
-                              }}
-                              className="text-[12px] px-2.5 py-1.5 bg-white border-[0.5px] border-line rounded-[5px] w-full"
-                            />
-                          </div>
-                        </div>
-
-                        <div>
-                          <Label htmlFor="btn-text-color">Button Text Color</Label>
-                          <div className="flex items-center gap-2 mt-1">
-                            <input
-                              id="btn-text-color"
-                              type="color"
-                              value={currentProfile.designSettings?.buttonTextColor || '#FFFFFF'}
-                              onChange={(e) => {
-                                const val = e.target.value;
-                                setCurrentProfile((prev) => ({
-                                  ...prev,
-                                  designSettings: {
-                                    ...(prev.designSettings || {}),
-                                    buttonTextColor: val,
-                                  },
-                                }));
-                              }}
-                              className="w-8 h-8 rounded-[5px] cursor-pointer border-[0.5px] border-line"
-                            />
-                            <input
-                              type="text"
-                              value={currentProfile.designSettings?.buttonTextColor || '#FFFFFF'}
-                              onChange={(e) => {
-                                const val = e.target.value;
-                                setCurrentProfile((prev) => ({
-                                  ...prev,
-                                  designSettings: {
-                                    ...(prev.designSettings || {}),
-                                    buttonTextColor: val,
-                                  },
-                                }));
-                              }}
-                              className="text-[12px] px-2.5 py-1.5 bg-white border-[0.5px] border-line rounded-[5px] w-full"
-                            />
-                          </div>
-                        </div>
-                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setDesignSubMenu('colors')}
+                        className="text-[12px] font-medium text-brand-500 hover:underline"
+                      >
+                        Change button colours in Colors →
+                      </button>
                     </div>
                   )}
 
-                  {/* SUB-MENU 4: TEXT */}
+                  {/* SUB-MENU 4: FONTS */}
                   {designSubMenu === 'text' && (
                     <div className="space-y-4 animate-fadeIn">
-                      {/* Active Pairing Summary */}
-                      <div className="p-3.5 rounded-[10px] bg-surface-2 border-[0.5px] border-line">
-                        <span className="text-[10px] font-semibold text-ink-500">Active Font Pairing</span>
-                        <div className="flex items-center justify-between mt-1">
-                          <span className="text-[12px] font-semibold text-ink-700">{currentProfile.font || 'Playfair Display'} (Headline)</span>
-                          <span className="text-[12px] text-stone-500">+ {getTitleFontName(currentProfile.alternativeTitleFont) || 'Default Serif'}</span>
-                        </div>
+                      <p className="text-[12px] text-ink-500">
+                        Your page uses two fonts: the page font for all text, and an optional title font for your name at the top.
+                      </p>
+
+                      {/* Live sample in the chosen fonts */}
+                      <div className="rounded-[10px] border-[0.5px] border-line bg-surface-2 px-[15px] py-[18px] flex flex-col items-center gap-1 text-center">
+                        <span className="text-[18px] font-bold text-ink-700 leading-tight" style={{ fontFamily: getFontStack(getTitleFontName(currentProfile.alternativeTitleFont) || currentProfile.font) }}>
+                          {currentProfile.name || 'Your name'}
+                        </span>
+                        <span className="text-[12px] text-ink-500 max-w-[320px] line-clamp-2" style={{ fontFamily: getFontStack(currentProfile.font) }}>
+                          {currentProfile.bio || 'Your bio, links and buttons use the page font.'}
+                        </span>
                       </div>
 
                       <div>
-                        <Label htmlFor="typography-select-sub">Headline Typography</Label>
+                        <Label htmlFor="page-font-select">Page font</Label>
                         <Select
-                          id="typography-select-sub"
+                          id="page-font-select"
                           value={currentProfile.font || 'Playfair Display'}
                           onChange={(e) => setCurrentProfile({ ...currentProfile, font: e.target.value })}
                         >
-                          <option value="Playfair Display">Playfair Display (Haute Couture Serif)</option>
-                          <option value="DM Sans">DM Sans (Clean Modern Geometric)</option>
-                          <option value="Plus Jakarta Sans">Plus Jakarta Sans (Sleek Tech)</option>
-                          <option value="Space Grotesk">Space Grotesk (Editorial Brutalist)</option>
+                          {[...new Set([currentProfile.font || 'Playfair Display', ...PAGE_FONTS])].map((font) => (
+                            <option key={font} value={font}>{font}</option>
+                          ))}
                         </Select>
+                        <p className="text-[11px] text-ink-500 mt-1">Bio, links, buttons, forms and every other text.</p>
                       </div>
 
                       <div>
-                        <Label className="mb-1.5 block">Alternative Title Font (48 Google Fonts)</Label>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setShowTitleFontModal(true)}
-                          className="w-full text-[12px] font-semibold bg-white border-line text-brand-500 hover:border-brand-500"
-                        >
-                          {getTitleFontName(currentProfile.alternativeTitleFont) ? `Font: ${getTitleFontName(currentProfile.alternativeTitleFont)}` : 'Browse 48 Expressive Fonts'}
-                        </Button>
+                        <Label className="mb-1.5 block">Title font</Label>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setShowTitleFontModal(true)}
+                            className="flex-1 justify-between text-[12px] font-medium bg-white border-line text-ink-700 hover:border-brand-500"
+                          >
+                            <span style={{ fontFamily: getFontStack(getTitleFontName(currentProfile.alternativeTitleFont)) || undefined }}>
+                              {getTitleFontName(currentProfile.alternativeTitleFont) || 'Same as page font'}
+                            </span>
+                            <span className="text-brand-500">Change</span>
+                          </Button>
+                          {getTitleFontName(currentProfile.alternativeTitleFont) && (
+                            <button
+                              type="button"
+                              onClick={() => handleSelectAlternativeTitleFont('')}
+                              className="text-[12px] text-rose-500 hover:underline"
+                            >
+                              Reset
+                            </button>
+                          )}
+                        </div>
+                        <p className="text-[11px] text-ink-500 mt-1">Only your name at the top. Choose from 48 expressive Google Fonts.</p>
                       </div>
                     </div>
                   )}
 
                   {/* SUB-MENU 5: COLORS */}
-                  {designSubMenu === 'colors' && (
-                    <div className="space-y-4 animate-fadeIn">
-                      <Label className="block">Centralized 6-Hex Studio Palette</Label>
-                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                        {[
-                          { label: 'Surface', hex: '#FFFFFF' },
-                          { label: 'Primary', hex: currentProfile.designSettings?.buttonColor || '#16A34A' },
-                          { label: 'Card Background', hex: '#F8F8F9' },
-                          { label: 'Text Body', hex: '#333333' },
-                          { label: 'Border', hex: '#DCDCDC' },
-                          { label: 'Accent', hex: '#38BDF8' },
-                        ].map((cItem, cIdx) => (
-                          <div key={cIdx} className="p-3 bg-surface-2 border-[0.5px] border-line rounded-[10px] flex flex-col gap-1.5">
-                            <span className="text-[10px] font-semibold text-ink-500">{cItem.label}</span>
-                            <div className="flex items-center justify-between">
-                              <span className="text-[12px] font-semibold text-ink-700">{cItem.hex}</span>
-                              <span className="w-5 h-5 rounded-full border border-black/15 shadow-2xs" style={{ backgroundColor: cItem.hex }} />
-                            </div>
-                          </div>
-                        ))}
+                  {designSubMenu === 'colors' && (() => {
+                    const activeTheme = ALL_THEMES.find((t) => t.id === currentProfile.theme) || null;
+                    const ds = currentProfile.designSettings || {};
+                    const readable = getReadableThemeColors(activeTheme, ds.wallpaper, ds.customColors || {});
+                    const themeLook = activeTheme ? getThemeAppearance(activeTheme) : null;
+                    const buttonColor = ds.buttonColor || themeLook?.button || '#16A34A';
+                    const rows = [
+                      { key: 'title', label: 'Title', help: 'Your name', chosen: ds.customColors?.title || readable.title, shown: readable.title },
+                      { key: 'pageText', label: 'Page text', help: 'Bio and descriptions', chosen: ds.customColors?.pageText || readable.body, shown: readable.body },
+                      { key: 'buttonColor', label: 'Button', help: 'Solid and outline buttons', chosen: buttonColor, shown: buttonColor },
+                      {
+                        key: 'buttonTextColor',
+                        label: 'Button text',
+                        help: 'Label on solid buttons',
+                        chosen: ds.buttonTextColor || themeLook?.buttonText || '#FFFFFF',
+                        shown: getReadableButtonText(buttonColor, ds.buttonTextColor || themeLook?.buttonText, themeLook?.buttonText),
+                      },
+                    ];
+                    return (
+                      <div className="space-y-4 animate-fadeIn">
+                        <p className="text-[12px] text-ink-500">
+                          Colours start from your theme. If a colour would be hard to read on its background, the page uses a readable one instead.
+                        </p>
+                        <div className="flex flex-col gap-2">
+                          {rows.map((row) => {
+                            const adjusted = row.shown.toLowerCase() !== row.chosen.toLowerCase();
+                            return (
+                              <div key={row.key} className="flex items-center justify-between gap-3 rounded-[10px] border-[0.5px] border-line bg-white px-[12px] py-[10px]">
+                                <div className="min-w-0">
+                                  <span className="block text-[12px] font-medium text-ink-700">{row.label}</span>
+                                  <span className="block text-[11px] text-ink-500">
+                                    {adjusted ? `Shown as ${row.shown} so it stays readable` : row.help}
+                                  </span>
+                                </div>
+                                <div className="flex items-center gap-2 shrink-0">
+                                  <input
+                                    type="color"
+                                    aria-label={`${row.label} colour`}
+                                    value={/^#[\da-f]{6}$/i.test(row.chosen) ? row.chosen : '#000000'}
+                                    onChange={(e) => setDesignColor(row.key, e.target.value)}
+                                    className="w-8 h-8 rounded-[5px] border-[0.5px] border-line cursor-pointer bg-white p-0.5"
+                                  />
+                                  <input
+                                    type="text"
+                                    aria-label={`${row.label} hex`}
+                                    value={row.chosen}
+                                    onChange={(e) => setDesignColor(row.key, e.target.value)}
+                                    className="w-[84px] text-[12px] px-2 py-1.5 bg-white border-[0.5px] border-line rounded-[5px]"
+                                  />
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                        {activeTheme && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setDesignColor('title', themeLook.title);
+                              setDesignColor('pageText', themeLook.body);
+                              setDesignColor('buttonColor', themeLook.button);
+                              setDesignColor('buttonTextColor', themeLook.buttonText);
+                            }}
+                            className="text-[12px] font-medium text-brand-500 hover:underline"
+                          >
+                            Reset to {activeTheme.name} colours
+                          </button>
+                        )}
                       </div>
-                    </div>
-                  )}
+                    );
+                  })()}
 
                   {/* SUB-MENU 6: STICKERS */}
                   {designSubMenu === 'stickers' && (

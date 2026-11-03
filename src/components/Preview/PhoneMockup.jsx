@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { getReadableThemeColors } from '@/lib/theme-contrast';
+import { getReadableThemeColors, getGlassButtonColors, getReadableButtonText, getReadableOutlineColor, getThemeCardColor } from '@/lib/theme-contrast';
 import TipModal from '../Modals/TipModal';
 import { 
   InstagramIcon, 
@@ -59,14 +59,15 @@ import {
 } from '@/components/icons';
 import LeadCaptureModal from '../Modals/LeadCaptureModal';
 import ScheduleMeetingModal from '../Modals/ScheduleMeetingModal';
-import ViewAsModal from '../Modals/ViewAsModal';
+import ViewAsModal, { SIMULATION_LOCATIONS } from '../Modals/ViewAsModal';
+import { isLinkVisibleInCountry } from '@/lib/geoTargeting';
 import AccessGateScreen from '../Common/AccessGateScreen';
 import StoryBubbleAvatar from '../PublicBio/StoryBubbleAvatar';
 import SocialProofTicker from '../PublicBio/SocialProofTicker';
 import CarouselSlider from '../Common/CarouselSlider';
 import StickerBlockLayer, { getBlockStickerPositionStyle, findStickerBlockAt } from '../Common/StickerBlockLayer';
 import ScaledCanvas from '../Common/ScaledCanvas';
-import { THEME_PRESETS, CURATED_THEMES, getTitleFontName, getStickerDeviceProps, getStickerPlacementKey, getStickerCanvasPositionStyle, getStickerGraphicSizeStyle, isImageUrl, parseTailwindGradient } from '../../constants/app';
+import { THEME_PRESETS, CURATED_THEMES, getTitleFontName, getFontStack, loadGoogleFont, getStickerDeviceProps, getStickerPlacementKey, getStickerCanvasPositionStyle, getStickerGraphicSizeStyle, isImageUrl, parseTailwindGradient } from '../../constants/app';
 
 const ICON_MAP = {
   Video, Star, Mail, FileText, Music, ShoppingBag, Zap, Briefcase, BookOpen, Calendar, MessageSquare, TrendingUp, Ticket, Globe,
@@ -203,19 +204,11 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
     setZoomScale(1);
   };
 
-  // Dynamic Google Font Loader for expressive alternative title fonts in studio preview
+  // Load the page font and the optional title font from Google Fonts.
   React.useEffect(() => {
-    const font = getTitleFontName(profile?.alternativeTitleFont);
-    if (!font) return;
-    const fontId = `gfont-${font.replace(/\s+/g, '-').toLowerCase()}`;
-    if (typeof document !== 'undefined' && !document.getElementById(fontId)) {
-      const link = document.createElement('link');
-      link.id = fontId;
-      link.rel = 'stylesheet';
-      link.href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(font)}:wght@400;600;700;800&display=swap`;
-      document.head.appendChild(link);
-    }
-  }, [profile?.alternativeTitleFont]);
+    loadGoogleFont(profile?.font);
+    loadGoogleFont(getTitleFontName(profile?.alternativeTitleFont));
+  }, [profile?.font, profile?.alternativeTitleFont]);
 
   const getDeviceBaseScale = () => {
     switch (deviceMode) {
@@ -247,11 +240,10 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
   const [showViewAsModal, setShowViewAsModal] = useState(false);
   const [isGateUnlocked, setIsGateUnlocked] = useState(false);
   const [selectedStickerId, setSelectedStickerId] = useState(null);
-  const [simulation, setSimulation] = useState({
-    location: 'global',
-    platform: 'all',
-    language: 'en',
-  });
+  // "View as": preview the page for a visitor from another country.
+  const [simulation, setSimulation] = useState({ location: 'global' });
+  const isSimulating = simulation.location !== 'global';
+  const simulatedLocation = SIMULATION_LOCATIONS.find((loc) => loc.code === simulation.location);
 
   const getIcon = (iconName) => {
     if (!iconName || iconName === 'link' || iconName === 'external') return null;
@@ -314,19 +306,6 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
       CURATED_THEMES.find((t) => t.id === profile?.theme) ||
       null
     );
-  };
-
-  const getThemeClass = () => {
-    switch (profile?.theme) {
-      case 'sunset': return 'theme-sunset';
-      case 'emerald': return 'theme-emerald';
-      case 'minimal-light': return 'theme-minimal-light';
-      case 'neon': return 'theme-neon';
-      case 'dark-glass': return 'theme-dark-glass';
-      case 'emerald-gold': return 'theme-emerald-gold';
-      case 'atelier': return 'theme-atelier';
-      default: return 'theme-atelier';
-    }
   };
 
   // Dynamic Wallpaper Style based on Studio designSettings and active theme preset
@@ -396,33 +375,12 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
 
     // 3. Card Background & Border Style
     const cardStyle = {};
-    if (preset?.cardBg) {
-      if (preset.cardBg.startsWith('bg-[#') && preset.cardBg.endsWith(']')) {
-        cardStyle.backgroundColor = preset.cardBg.slice(4, -1);
-      } else if (preset.cardBg.startsWith('bg-white/')) {
-        const opacity = parseInt(preset.cardBg.split('/')[1], 10) / 100;
-        cardStyle.backgroundColor = `rgba(255, 255, 255, ${opacity || 0.15})`;
+    const cardColor = getThemeCardColor(preset, readableColors);
+    if (cardColor) {
+      cardStyle.backgroundColor = cardColor;
+      if (cardColor.startsWith('rgba')) {
         cardStyle.backdropFilter = 'blur(16px)';
         cardStyle.WebkitBackdropFilter = 'blur(16px)';
-      } else if (preset.cardBg.startsWith('bg-black/')) {
-        const opacity = parseInt(preset.cardBg.split('/')[1], 10) / 100;
-        cardStyle.backgroundColor = `rgba(0, 0, 0, ${opacity || 0.4})`;
-        cardStyle.backdropFilter = 'blur(16px)';
-        cardStyle.WebkitBackdropFilter = 'blur(16px)';
-      } else if (preset.cardBg.includes('/')) {
-        const parts = preset.cardBg.split('/');
-        const colorPart = parts[0].replace('bg-[', '').replace(']', '');
-        const op = parseInt(parts[1], 10) / 100;
-        if (colorPart.startsWith('#')) {
-          const r = parseInt(colorPart.slice(1, 3), 16);
-          const g = parseInt(colorPart.slice(3, 5), 16);
-          const b = parseInt(colorPart.slice(5, 7), 16);
-          cardStyle.backgroundColor = `rgba(${r}, ${g}, ${b}, ${op || 0.25})`;
-        }
-      } else if (preset.cardBg === 'bg-white') {
-        cardStyle.backgroundColor = '#FFFFFF';
-      } else if (preset.cardBg === 'bg-stone-50') {
-        cardStyle.backgroundColor = '#fafaf9';
       }
     }
 
@@ -485,7 +443,7 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
 
     // Icon Container Box Style
     const iconBoxStyle = {
-      backgroundColor: isDark ? 'rgba(255, 255, 255, 0.14)' : 'rgba(0, 0, 0, 0.05)',
+      backgroundColor: isDark ? 'rgba(0, 0, 0, 0.15)' : 'rgba(0, 0, 0, 0.05)',
       borderColor: cardStyle.borderColor,
       color: titleColor,
       borderRadius: btnRadius,
@@ -500,7 +458,8 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
       iconBoxStyle,
       btnRadius,
       cardRadius,
-      accentColor: preset?.accent || '#16A34A',
+      accentColor: readableColors.accent,
+      readableColors,
       primaryColor: preset?.primary || '#16A34A',
     };
   };
@@ -527,8 +486,9 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
     }
 
     // 2. Button Fill Style & Colors
-    const btnColor = ds?.buttonColor || preset?.primary || '#16A34A';
-    const textColor = ds?.buttonTextColor || '#FFFFFF';
+    const btnColor = ds?.buttonColor || preset?.button || preset?.primary || '#16A34A';
+    // Keep the chosen label colour when it reads on the fill; otherwise use one that does.
+    const textColor = getReadableButtonText(btnColor, ds?.buttonTextColor || preset?.buttonText, preset?.buttonText);
     const btnStyle = ds?.buttonStyle || 'solid';
 
     if (btnStyle === 'solid') {
@@ -536,14 +496,15 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
       style.color = textColor;
       style.border = '1px solid transparent';
     } else if (btnStyle === 'glass') {
-      style.backgroundColor = themeStyles.isDark ? 'rgba(255, 255, 255, 0.2)' : 'rgba(255, 255, 255, 0.7)';
+      const glass = getGlassButtonColors(preset, ds?.wallpaper, themeStyles.readableColors);
+      style.backgroundColor = glass.background;
       style.backdropFilter = 'blur(16px)';
       style.WebkitBackdropFilter = 'blur(16px)';
-      style.color = themeStyles.isDark ? '#FFFFFF' : (themeStyles.titleColor || '#333333');
-      style.border = themeStyles.isDark ? '1px solid rgba(255, 255, 255, 0.4)' : '1px solid rgba(255, 255, 255, 0.85)';
+      style.color = glass.color;
+      style.border = glass.border;
     } else if (btnStyle === 'outline') {
       style.backgroundColor = 'transparent';
-      style.color = btnColor;
+      style.color = getReadableOutlineColor(btnColor, preset, ds?.wallpaper, themeStyles.titleColor);
       style.borderColor = btnColor;
       style.borderWidth = '2px';
       style.borderStyle = 'solid';
@@ -1113,15 +1074,9 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
     }
   };
 
-  const getFontClass = () => {
-    switch (profile?.font) {
-      case 'Playfair Display': return 'font-playfair';
-      case 'DM Sans': return 'font-dmsans';
-      case 'Plus Jakarta Sans': return 'font-jakarta';
-      case 'Space Grotesk': return 'font-space';
-      default: return 'font-sans';
-    }
-  };
+  // Page font for everything; the title uses the alternative title font when one is set.
+  const pageFontStyle = profile?.font ? { '--profile-font': getFontStack(profile.font) } : {};
+  const titleFontFamily = getFontStack(getTitleFontName(profile?.alternativeTitleFont) || profile?.font);
 
   // Determine grid styling based on active device
   const getBentoGridClass = () => {
@@ -1259,11 +1214,11 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
             <h2 
               style={{
                 color: themeStyles.titleColor,
-                ...(getTitleFontName(profile.alternativeTitleFont) ? { fontFamily: getTitleFontName(profile.alternativeTitleFont) } : {})
+                ...(titleFontFamily ? { fontFamily: titleFontFamily } : {})
               }} 
               className={`${
                 isSplit ? 'text-lg mt-2' : deviceMode === 'tablet' ? 'text-xl mt-2.5' : 'text-base mt-2'
-              } font-bold tracking-tight flex items-center justify-center gap-1.5 ${getFontClass()}`}
+              } font-bold tracking-tight flex items-center justify-center gap-1.5`}
             >
               {profile.name || profile.title || 'Creator'}
             </h2>
@@ -1765,17 +1720,7 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
 
     const activeLinks = rawLinks.filter((l) => {
       if (l.disabled || l.isArchived) return false;
-      // Country & Geo-Targeting Rule check
-      if (l.geoTargeting?.enabled && Array.isArray(l.geoTargeting.countries) && l.geoTargeting.countries.length > 0) {
-        if (simCountry !== 'GLOBAL') {
-          const targetCountries = l.geoTargeting.countries.map(c => c.toUpperCase());
-          const isMatch = targetCountries.includes(simCountry);
-          const mode = l.geoTargeting.mode || 'include';
-          if (mode === 'include' && !isMatch) return false;
-          if (mode === 'exclude' && isMatch) return false;
-        }
-      }
-      return true;
+      return isLinkVisibleInCountry(l, simCountry);
     });
 
     const collections = (profile.collections || []).filter(c => c.active !== false);
@@ -1927,7 +1872,7 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
         </div>
       )}
       {!profile?.designSettings?.hideFooter && (
-        <p className="text-[9px] text-ink-500 font-mono tracking-wider uppercase font-bold">
+        <p style={{ color: themeStyles.mutedColor }} className="text-[9px] font-mono tracking-wider uppercase font-bold">
           Powered by TreeInBio
         </p>
       )}
@@ -2171,15 +2116,15 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
             type="button"
             onClick={() => setShowViewAsModal(true)}
             className={`px-2.5 py-1 rounded-md text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer border ${
-              simulation.location !== 'global' || simulation.platform !== 'all' || simulation.language !== 'en'
+              isSimulating
                 ? 'bg-brand-500 text-white border-brand-600 shadow-xs'
                 : 'bg-white hover:bg-surface-2 text-ink-700 border-line'
             }`}
-            title="Preview how this profile renders for visitors by Location, Device OS, or Language"
+            title="Preview the page as a visitor from another country (location-targeted links)"
           >
             <Eye className="w-3.5 h-3.5" />
             <span>View as...</span>
-            {(simulation.location !== 'global' || simulation.platform !== 'all' || simulation.language !== 'en') && (
+            {(isSimulating) && (
               <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
             )}
           </button>
@@ -2375,16 +2320,16 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
       )}
 
       {/* Active Audience Simulation Indicator Chip */}
-      {(simulation.location !== 'global' || simulation.platform !== 'all' || simulation.language !== 'en') && (
+      {(isSimulating) && (
         <div className="mb-3 px-3 py-1 rounded-full bg-brand-500/10 border border-brand-500/30 text-xs text-ink-700 flex items-center gap-2 shadow-xs animate-fadeIn">
           <Eye className="w-3.5 h-3.5 text-brand-500" />
-          <span className="font-semibold">Simulating Visitor:</span>
-          <span className="font-mono text-brand-500 font-bold">
-            {simulation.location.toUpperCase()} • {simulation.platform.toUpperCase()} • {simulation.language.toUpperCase()}
+          <span className="font-semibold">Viewing as a visitor from</span>
+          <span className="text-brand-500 font-bold">
+            {simulatedLocation ? `${simulatedLocation.flag} ${simulatedLocation.name}` : simulation.location}
           </span>
           <button
             type="button"
-            onClick={() => setSimulation({ location: 'global', platform: 'all', language: 'en' })}
+            onClick={() => setSimulation({ location: 'global' })}
             className="text-[10px] text-ink-500 hover:text-red-500 underline cursor-pointer ml-1"
           >
             Reset
@@ -2411,8 +2356,8 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
         {/* 1. MOBILE HARDWARE FRAME */}
         {deviceMode === 'mobile' && (
           <div 
-            className={`phone-frame ${getThemeClass()} ${getActiveThemePreset()?.bg && !getActiveThemePreset()?.bg?.startsWith('bg-[#') ? getActiveThemePreset()?.bg : ''} ${getActiveThemePreset()?.text || ''}`}
-            style={getWallpaperStyle()}
+            className={`phone-frame profile-typography`}
+            style={{ ...getWallpaperStyle(), ...pageFontStyle, color: themeStyles.bioColor }}
           >
             {/* Background Video if configured */}
             {profile?.designSettings?.wallpaper?.type === 'video' && profile.designSettings.wallpaper.videoUrl && (
@@ -2473,8 +2418,8 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
         {/* 2. TABLET HARDWARE FRAME */}
         {deviceMode === 'tablet' && (
           <div 
-            className={`tablet-frame ${getThemeClass()} ${getActiveThemePreset()?.bg && !getActiveThemePreset()?.bg?.startsWith('bg-[#') ? getActiveThemePreset()?.bg : ''} ${getActiveThemePreset()?.text || ''}`}
-            style={getWallpaperStyle()}
+            className={`tablet-frame profile-typography`}
+            style={{ ...getWallpaperStyle(), ...pageFontStyle, color: themeStyles.bioColor }}
           >
             {/* Background Video if configured */}
             {profile?.designSettings?.wallpaper?.type === 'video' && profile.designSettings.wallpaper.videoUrl && (
@@ -2530,8 +2475,8 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
           <div className="laptop-container">
             {/* Screen Lid */}
             <div 
-              className={`laptop-screen ${getThemeClass()} ${getActiveThemePreset()?.bg && !getActiveThemePreset()?.bg?.startsWith('bg-[#') ? getActiveThemePreset()?.bg : ''} ${getActiveThemePreset()?.text || ''}`}
-              style={getWallpaperStyle()}
+              className={`laptop-screen profile-typography`}
+              style={{ ...getWallpaperStyle(), ...pageFontStyle, color: themeStyles.bioColor }}
             >
               {/* Background Video if configured */}
               {profile?.designSettings?.wallpaper?.type === 'video' && profile.designSettings.wallpaper.videoUrl && (
@@ -2621,17 +2566,9 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
         isOpen={showViewAsModal}
         onClose={() => setShowViewAsModal(false)}
         simulation={simulation}
-        onUpdateSimulation={(key, value) => {
-          setSimulation(prev => ({ ...prev, [key]: value }));
-          // If platform simulation changes to desktop/tablet, automatically switch deviceMode
-          if (key === 'platform') {
-            if (value === 'desktop') setDeviceMode('laptop');
-            else if (value === 'ios' || value === 'android') setDeviceMode('mobile');
-          }
-        }}
-        onResetSimulation={() => {
-          setSimulation({ location: 'global', platform: 'all', language: 'en' });
-        }}
+        links={profile.links || []}
+        onUpdateSimulation={(key, value) => setSimulation((prev) => ({ ...prev, [key]: value }))}
+        onResetSimulation={() => setSimulation({ location: 'global' })}
       />
     </div>
   );

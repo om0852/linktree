@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { Play, Pause, Volume2, VolumeX, X, Sparkles } from '@/components/icons';
+import { AVATAR_SHAPES } from '@/constants/app';
 
 export default function StoryBubbleAvatar({ 
   avatarUrl, 
@@ -56,6 +57,13 @@ export default function StoryBubbleAvatar({
           ring: 'rounded-2xl',
           img: 'rounded-none object-contain'
         };
+      case 'blob':
+      case 'leaf':
+      case 'pentagon':
+      case 'octagon':
+      case 'star':
+      case 'shield':
+        return { container: '', ring: '', img: '' };
       case 'circle':
       default:
         return {
@@ -67,6 +75,8 @@ export default function StoryBubbleAvatar({
   };
 
   const shapeStyles = getShapeStyles(avatarShape);
+  // Masks defined as inline styles (blob, star, ...); none for the class-based shapes.
+  const maskStyle = AVATAR_SHAPES.find((shape) => shape.id === avatarShape)?.style;
 
   const handleAvatarClick = () => {
     if (hasStory) {
@@ -116,13 +126,13 @@ export default function StoryBubbleAvatar({
       >
         {/* Pulsing Gradient Ring if Story Bubble Active */}
         {hasStory && (
-          <div className={`absolute -inset-1 ${shapeStyles.ring} bg-gradient-to-tr from-amber-500 via-rose-500 to-violet-600 animate-spin-slow opacity-95 group-hover:opacity-100 group-hover:scale-105 transition-all shadow-lg shadow-rose-500/25 p-[2.5px]`}>
-            <div className={`w-full h-full bg-zinc-950 ${shapeStyles.ring}`} />
+          <div style={maskStyle} className={`absolute -inset-1 ${shapeStyles.ring} bg-gradient-to-tr from-amber-500 via-rose-500 to-violet-600 animate-spin-slow opacity-95 group-hover:opacity-100 group-hover:scale-105 transition-all shadow-lg shadow-rose-500/25 p-[2.5px]`}>
+            <div style={maskStyle} className={`w-full h-full bg-zinc-950 ${shapeStyles.ring}`} />
           </div>
         )}
 
         {/* Avatar Image */}
-        <div className={`relative ${sizeClasses} ${shapeStyles.container} overflow-hidden border-2 border-line bg-brand-500 shadow-md flex items-center justify-center transition-transform group-hover:scale-[1.02]`}>
+        <div style={maskStyle} className={`relative ${sizeClasses} ${shapeStyles.container} overflow-hidden border-2 border-line bg-brand-500 shadow-md flex items-center justify-center transition-transform group-hover:scale-[1.02]`}>
           {avatarUrl ? (
             <img 
               src={avatarUrl} 

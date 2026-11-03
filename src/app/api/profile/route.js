@@ -4,7 +4,7 @@ import connectToDatabase from '@/lib/mongodb';
 import Profile from '@/models/Profile';
 import User from '@/models/User';
 import { getAuthUser } from '@/lib/auth';
-import { INITIAL_USER_PROFILE } from '@/constants/app';
+import { INITIAL_USER_PROFILE, AVATAR_SHAPE_IDS } from '@/constants/app';
 import { toVisitorProfile, toOwnerProfile } from '@/lib/publicProfile';
 import { requireProfileOwner } from '@/lib/authorization';
 import { hashPassword } from '@/lib/auth';
@@ -169,7 +169,7 @@ export async function POST(request) {
       } : { enabled: false, url: '', altText: '', height: 40 },
       bio: body.bio || '',
       avatar: safeMediaUrl(body.avatar, { allowDataImage: true }),
-      avatarShape: ['circle', 'rounded', 'squircle', 'hexagon', 'arch', 'diamond', 'cutout'].includes(body.avatarShape) ? body.avatarShape : 'circle',
+      avatarShape: AVATAR_SHAPE_IDS.includes(body.avatarShape) ? body.avatarShape : 'circle',
       // The verified badge is granted by an administrator, never by the owner.
       verified: access.user.role === 'admin' ? Boolean(body.verified) : Boolean(existingProfile?.verified),
       location: body.location || '',
@@ -178,7 +178,13 @@ export async function POST(request) {
       layout: body.layout || 'bento',
       theme: body.theme || 'atelier',
       buttonShape: body.buttonShape || 'rounded',
-      font: body.font || 'Playfair Display',
+      font: typeof body.font === 'string' && body.font.trim() ? body.font.trim().slice(0, 80) : 'Playfair Display',
+      alternativeTitleFont: (() => {
+        const value = body.alternativeTitleFont;
+        const font = typeof value === 'string' ? value : value?.font;
+        const enabled = typeof value === 'string' ? Boolean(value) : Boolean(value?.enabled && value?.font);
+        return { enabled, font: typeof font === 'string' && font.trim() ? font.trim().slice(0, 80) : 'DM Sans' };
+      })(),
       headerLayout: ['classic', 'banner', 'hero', 'cutout', 'shape'].includes(body.headerLayout) ? body.headerLayout : 'classic',
       coverImage: safeMediaUrl(body.coverImage, { allowDataImage: true }),
       socialsPosition: ['top', 'bottom'].includes(body.socialsPosition) ? body.socialsPosition : 'top',

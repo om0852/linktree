@@ -6,6 +6,7 @@ import Profile from '@/models/Profile';
 import CustomDomain from '@/models/CustomDomain';
 import PublicBioView from '@/components/PublicBio/PublicBioView';
 import { toVisitorProfile } from '@/lib/publicProfile';
+import { getVisitorCountry } from '@/lib/geoTargeting';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -102,15 +103,19 @@ export async function generateMetadata({ params }) {
 export default async function PublicProfilePage({ params }) {
   const { username } = await params;
   let customDomainHeader = null;
+  let visitorCountry = '';
   try {
     const reqHeaders = await headers();
     customDomainHeader = reqHeaders.get('x-custom-domain');
+    // Location-targeted links need the visitor's country (CDN header).
+    visitorCountry = getVisitorCountry(reqHeaders);
   } catch {
     // fallback if headers unavailable
   }
 
   const profile = await resolveProfile(username, customDomainHeader);
-  const profileData = profile ? toVisitorProfile(profile) : null;
+  const visitorProfile = profile ? toVisitorProfile(profile) : null;
+  const profileData = visitorProfile ? { ...visitorProfile, visitorCountry } : null;
 
   if (!profileData) {
     const isDomain = username?.includes('.') || Boolean(customDomainHeader);

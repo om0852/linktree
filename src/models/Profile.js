@@ -76,7 +76,7 @@ const ProfileSchema = new mongoose.Schema({
   avatar: { type: String, default: '' },
   avatarShape: { 
     type: String, 
-    enum: ['circle', 'rounded', 'squircle', 'hexagon', 'arch', 'diamond', 'cutout'], 
+    enum: ['circle', 'rounded', 'squircle', 'hexagon', 'arch', 'diamond', 'cutout', 'blob', 'leaf', 'pentagon', 'octagon', 'star', 'shield'], 
     default: 'circle' 
   },
   verified: { type: Boolean, default: false },
@@ -218,6 +218,10 @@ const ProfileSchema = new mongoose.Schema({
     wallpaper: {
       type: { type: String, default: 'fill' }, // 'fill', 'gradient', 'blur', 'pattern', 'image', 'video'
       value: { type: String, default: '' },
+      gradient: { type: String, default: '' },
+      imageUrl: { type: String, default: '' },
+      blurImage: { type: String, default: '' },
+      videoUrl: { type: String, default: '' },
       blur: { type: Number, default: 0 },
     },
     buttonStyle: { type: String, enum: ['solid', 'glass', 'outline'], default: 'solid' },

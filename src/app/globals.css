@@ -15,6 +15,13 @@
   font-family: 'Space Grotesk', monospace !important;
 }
 
+/* Profile pages (Studio preview and public page) use the creator's page font.
+   Icon fonts keep their own family; an inline title font still wins. */
+.profile-typography,
+.profile-typography :is(h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, select, label, div):not(.material-symbols-outlined) {
+  font-family: var(--profile-font, var(--font-sans));
+}
+
 @theme {
   /* TreeInBio design system: Creatosaurus layout language, green theme.
      Brand colour appears only on primary actions, active/selected state,

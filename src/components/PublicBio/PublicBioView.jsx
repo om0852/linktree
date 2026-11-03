@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { getReadableThemeColors } from '@/lib/theme-contrast';
+import { isLinkVisibleInCountry } from '@/lib/geoTargeting';
+import { getReadableThemeColors, getGlassButtonColors, getReadableButtonText, getReadableOutlineColor, getThemeCardColor } from '@/lib/theme-contrast';
 import Link from 'next/link';
 import { 
   InstagramIcon, 
@@ -63,7 +64,7 @@ import TrackingPixels from './TrackingPixels';
 import AccessGateScreen from '../Common/AccessGateScreen';
 import CarouselSlider from '../Common/CarouselSlider';
 import StickerBlockLayer, { getBlockStickerPositionStyle } from '../Common/StickerBlockLayer';
-import { THEME_PRESETS, CURATED_THEMES, getTitleFontName, getStickerDeviceProps, getStickerCanvasPositionStyle, getStickerGraphicSizeStyle, isImageUrl, parseTailwindGradient } from '../../constants/app';
+import { THEME_PRESETS, CURATED_THEMES, getTitleFontName, getFontStack, loadGoogleFont, getStickerDeviceProps, getStickerCanvasPositionStyle, getStickerGraphicSizeStyle, isImageUrl, parseTailwindGradient } from '../../constants/app';
 import { safeLinkUrl } from '../../lib/safeUrl';
 
 const ICON_MAP = {
@@ -192,19 +193,11 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
     }
   }, [profile?.username, onBackToEditor]);
 
-  // Dynamic Google Font Loader for expressive alternative title fonts
+  // Load the page font and the optional title font from Google Fonts.
   React.useEffect(() => {
-    const font = getTitleFontName(profile?.alternativeTitleFont);
-    if (!font) return;
-    const fontId = `gfont-${font.replace(/\s+/g, '-').toLowerCase()}`;
-    if (typeof document !== 'undefined' && !document.getElementById(fontId)) {
-      const link = document.createElement('link');
-      link.id = fontId;
-      link.rel = 'stylesheet';
-      link.href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(font)}:wght@400;600;700;800&display=swap`;
-      document.head.appendChild(link);
-    }
-  }, [profile?.alternativeTitleFont]);
+    loadGoogleFont(profile?.font);
+    loadGoogleFont(getTitleFontName(profile?.alternativeTitleFont));
+  }, [profile?.font, profile?.alternativeTitleFont]);
 
   const handleLinkClick = (link) => {
     // If it's a locked lead magnet, trigger unlock modal
@@ -278,19 +271,6 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
     );
   };
 
-  const getThemeClass = () => {
-    switch (profile?.theme) {
-      case 'sunset': return 'theme-sunset';
-      case 'emerald': return 'theme-emerald';
-      case 'minimal-light': return 'theme-minimal-light';
-      case 'neon': return 'theme-neon';
-      case 'dark-glass': return 'theme-dark-glass';
-      case 'emerald-gold': return 'theme-emerald-gold';
-      case 'atelier': return 'theme-atelier';
-      default: return 'theme-atelier';
-    }
-  };
-
   // Dynamic Wallpaper Style based on Studio designSettings and active theme preset
   const getWallpaperStyle = () => {
     const wp = profile?.designSettings?.wallpaper;
@@ -356,33 +336,12 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
 
     // 3. Card Background & Border Style
     const cardStyle = {};
-    if (preset?.cardBg) {
-      if (preset.cardBg.startsWith('bg-[#') && preset.cardBg.endsWith(']')) {
-        cardStyle.backgroundColor = preset.cardBg.slice(4, -1);
-      } else if (preset.cardBg.startsWith('bg-white/')) {
-        const opacity = parseInt(preset.cardBg.split('/')[1], 10) / 100;
-        cardStyle.backgroundColor = `rgba(255, 255, 255, ${opacity || 0.15})`;
+    const cardColor = getThemeCardColor(preset, readableColors);
+    if (cardColor) {
+      cardStyle.backgroundColor = cardColor;
+      if (cardColor.startsWith('rgba')) {
         cardStyle.backdropFilter = 'blur(16px)';
         cardStyle.WebkitBackdropFilter = 'blur(16px)';
-      } else if (preset.cardBg.startsWith('bg-black/')) {
-        const opacity = parseInt(preset.cardBg.split('/')[1], 10) / 100;
-        cardStyle.backgroundColor = `rgba(0, 0, 0, ${opacity || 0.4})`;
-        cardStyle.backdropFilter = 'blur(16px)';
-        cardStyle.WebkitBackdropFilter = 'blur(16px)';
-      } else if (preset.cardBg.includes('/')) {
-        const parts = preset.cardBg.split('/');
-        const colorPart = parts[0].replace('bg-[', '').replace(']', '');
-        const op = parseInt(parts[1], 10) / 100;
-        if (colorPart.startsWith('#')) {
-          const r = parseInt(colorPart.slice(1, 3), 16);
-          const g = parseInt(colorPart.slice(3, 5), 16);
-          const b = parseInt(colorPart.slice(5, 7), 16);
-          cardStyle.backgroundColor = `rgba(${r}, ${g}, ${b}, ${op || 0.25})`;
-        }
-      } else if (preset.cardBg === 'bg-white') {
-        cardStyle.backgroundColor = '#FFFFFF';
-      } else if (preset.cardBg === 'bg-stone-50') {
-        cardStyle.backgroundColor = '#fafaf9';
       }
     }
 
@@ -445,7 +404,7 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
 
     // Icon Container Box Style
     const iconBoxStyle = {
-      backgroundColor: isDark ? 'rgba(255, 255, 255, 0.14)' : 'rgba(0, 0, 0, 0.05)',
+      backgroundColor: isDark ? 'rgba(0, 0, 0, 0.15)' : 'rgba(0, 0, 0, 0.05)',
       borderColor: cardStyle.borderColor,
       color: titleColor,
       borderRadius: btnRadius,
@@ -460,7 +419,8 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
       iconBoxStyle,
       btnRadius,
       cardRadius,
-      accentColor: preset?.accent || '#16A34A',
+      accentColor: readableColors.accent,
+      readableColors,
       primaryColor: preset?.primary || '#16A34A',
     };
   };
@@ -485,8 +445,9 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
       style.borderRadius = '16px';
     }
 
-    const btnColor = ds?.buttonColor || preset?.primary || '#16A34A';
-    const textColor = ds?.buttonTextColor || '#FFFFFF';
+    const btnColor = ds?.buttonColor || preset?.button || preset?.primary || '#16A34A';
+    // Keep the chosen label colour when it reads on the fill; otherwise use one that does.
+    const textColor = getReadableButtonText(btnColor, ds?.buttonTextColor || preset?.buttonText, preset?.buttonText);
     const btnStyle = ds?.buttonStyle || 'solid';
 
     if (btnStyle === 'solid') {
@@ -494,14 +455,15 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
       style.color = textColor;
       style.border = '1px solid transparent';
     } else if (btnStyle === 'glass') {
-      style.backgroundColor = themeStyles.isDark ? 'rgba(255, 255, 255, 0.2)' : 'rgba(255, 255, 255, 0.7)';
+      const glass = getGlassButtonColors(preset, ds?.wallpaper, themeStyles.readableColors);
+      style.backgroundColor = glass.background;
       style.backdropFilter = 'blur(16px)';
       style.WebkitBackdropFilter = 'blur(16px)';
-      style.color = themeStyles.isDark ? '#FFFFFF' : (themeStyles.titleColor || '#333333');
-      style.border = themeStyles.isDark ? '1px solid rgba(255, 255, 255, 0.4)' : '1px solid rgba(255, 255, 255, 0.85)';
+      style.color = glass.color;
+      style.border = glass.border;
     } else if (btnStyle === 'outline') {
       style.backgroundColor = 'transparent';
-      style.color = btnColor;
+      style.color = getReadableOutlineColor(btnColor, preset, ds?.wallpaper, themeStyles.titleColor);
       style.borderColor = btnColor;
       style.borderWidth = '2px';
       style.borderStyle = 'solid';
@@ -527,6 +489,11 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
 
   const themeStyles = getThemeStyles();
   const btnCustomStyle = getButtonCustomStyle();
+  // The floating "Connect" button wears the theme's button colours; outline
+  // buttons have no fill, so it uses the title colour as a solid fill instead.
+  const floatingCtaStyle = btnCustomStyle.backgroundColor && btnCustomStyle.backgroundColor !== 'transparent'
+    ? { backgroundColor: btnCustomStyle.backgroundColor, color: btnCustomStyle.color }
+    : { backgroundColor: themeStyles.titleColor, color: themeStyles.isDark ? '#111827' : '#ffffff' };
 
   const getBentoShapeClass = () => {
     switch (profile.buttonShape) {
@@ -548,15 +515,9 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
     }
   };
 
-  const getFontClass = () => {
-    switch (profile?.font) {
-      case 'Playfair Display': return 'font-playfair';
-      case 'DM Sans': return 'font-dmsans';
-      case 'Plus Jakarta Sans': return 'font-jakarta';
-      case 'Space Grotesk': return 'font-space';
-      default: return 'font-sans';
-    }
-  };
+  // Page font for everything; the title uses the alternative title font when one is set.
+  const pageFontStyle = profile?.font ? { '--profile-font': getFontStack(profile.font) } : {};
+  const titleFontFamily = getFontStack(getTitleFontName(profile?.alternativeTitleFont) || profile?.font);
 
   /* ========================================================
      MODULAR COMPONENT RENDERERS (Clean, Consistent & Responsive)
@@ -752,9 +713,9 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
             <h1 
               style={{
                 color: themeStyles.titleColor,
-                ...(getTitleFontName(profile?.alternativeTitleFont) ? { fontFamily: getTitleFontName(profile.alternativeTitleFont) } : {})
+                ...(titleFontFamily ? { fontFamily: titleFontFamily } : {})
               }} 
-              className={`${isMobileLayout ? 'text-base mt-2' : 'text-xl sm:text-2xl lg:text-3xl mt-3'} font-bold tracking-tight flex items-center justify-center gap-1.5 ${getFontClass()}`}
+              className={`${isMobileLayout ? 'text-base mt-2' : 'text-xl sm:text-2xl lg:text-3xl mt-3'} font-bold tracking-tight flex items-center justify-center gap-1.5`}
             >
               {profile?.name || profile?.title || profile?.username || 'Creator'}
             </h1>
@@ -1312,18 +1273,7 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
         if (link.schedule.startsAt && nowTime < new Date(link.schedule.startsAt).getTime()) return false;
         if (link.schedule.expiresAt && nowTime > new Date(link.schedule.expiresAt).getTime()) return false;
       }
-      // Geo-Targeting Rule check
-      if (link.geoTargeting?.enabled && Array.isArray(link.geoTargeting.countries) && link.geoTargeting.countries.length > 0) {
-        const country = (profile.visitorCountry || '').toUpperCase();
-        if (country && country !== 'GLOBAL') {
-          const targetCountries = link.geoTargeting.countries.map(c => c.toUpperCase());
-          const isMatch = targetCountries.includes(country);
-          const mode = link.geoTargeting.mode || 'include';
-          if (mode === 'include' && !isMatch) return false;
-          if (mode === 'exclude' && isMatch) return false;
-        }
-      }
-      return true;
+      return isLinkVisibleInCountry(link, profile.visitorCountry);
     });
 
     const collections = (profile.collections || []).filter(c => c.active !== false);
@@ -1485,7 +1435,7 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
         </div>
       )}
       {!profile?.designSettings?.hideFooter && (
-        <p className="text-[11px] text-ink-500 font-mono tracking-wider uppercase font-bold">
+        <p style={{ color: themeStyles.mutedColor }} className="text-[11px] font-mono tracking-wider uppercase font-bold">
           Powered by TreeInBio
         </p>
       )}
@@ -1501,8 +1451,8 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
 
   return (
     <div 
-      className={`min-h-screen w-full flex flex-col items-center justify-start ${getThemeClass()} ${getActiveThemePreset()?.bg && !getActiveThemePreset()?.bg?.startsWith('bg-[#') ? getActiveThemePreset()?.bg : ''} ${getActiveThemePreset()?.text || ''} relative`}
-      style={getWallpaperStyle()}
+      className={`min-h-screen w-full flex flex-col items-center justify-start profile-typography relative`}
+      style={{ ...getWallpaperStyle(), ...pageFontStyle, color: themeStyles.bioColor }}
     >
       {/* Background Video if configured */}
       {profile?.designSettings?.wallpaper?.type === 'video' && profile.designSettings.wallpaper.videoUrl && (
@@ -1915,7 +1865,8 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
         <button
           id="floating-lead-trigger-btn"
           onClick={() => setShowLeadModal(true)}
-          className="fixed bottom-6 right-6 z-40 px-4 py-2.5 rounded-full bg-brand-500 hover:bg-brand-600 text-white font-bold text-xs shadow-lg flex items-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95 border border-line/50"
+          style={floatingCtaStyle}
+          className="fixed bottom-6 right-6 z-40 px-4 py-2.5 rounded-full font-bold text-xs shadow-lg flex items-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95 border border-white/20 backdrop-blur-md"
           title={profile.leadCapture?.buttonText || "Exchange Contact"}
         >
           <PhoneCall className="w-4 h-4" />
