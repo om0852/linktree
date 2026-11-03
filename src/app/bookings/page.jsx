@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import AtelierHeader from '../../components/Atelier/AtelierHeader';
 import AuthModal from '../../components/Auth/AuthModal';
 import { DEFAULT_EMPTY_PROFILE } from '@/constants/app';
@@ -30,6 +31,7 @@ export default function BookingsPage() {
   const [updatingId, setUpdatingId] = useState(null);
   const [bookingError, setBookingError] = useState('');
   const [linkDraft, setLinkDraft] = useState({ booking: null, url: '' });
+  const [meetState, setMeetState] = useState({ loading: false, error: '', needsConnect: false });
 
   const username = currentProfile?.username || authUser?.username || '';
 
@@ -131,11 +133,36 @@ export default function BookingsPage() {
     }
   };
 
+  // Creates the event in the creator's Google Calendar with a Meet room and
+  // saves the link on the booking; the attendee gets the calendar invite.
+  const handleGenerateMeet = async () => {
+    if (!linkDraft.booking) return;
+    setMeetState({ loading: true, error: '', needsConnect: false });
+    try {
+      const res = await fetch(`/api/bookings/${linkDraft.booking._id}/meet`, { method: 'POST' });
+      const data = await res.json();
+      if (!data.success) {
+        setMeetState({ loading: false, error: data.error || 'Could not create the Google Meet link.', needsConnect: data.code === 'not_connected' });
+        return;
+      }
+      setBookings((prev) => prev.map((b) => (b._id === data.booking._id ? data.booking : b)));
+      setLinkDraft((d) => ({ ...d, booking: data.booking, url: data.booking.meetingUrl }));
+      setMeetState({ loading: false, error: '', needsConnect: false });
+    } catch (err) {
+      setMeetState({ loading: false, error: err.message || 'Could not create the Google Meet link.', needsConnect: false });
+    }
+  };
+
+  const closeLinkDraft = () => {
+    setLinkDraft({ booking: null, url: '' });
+    setMeetState({ loading: false, error: '', needsConnect: false });
+  };
+
   const handleSaveMeetingLink = async (e) => {
     e.preventDefault();
     if (!linkDraft.booking) return;
     const ok = await handleUpdateBooking(linkDraft.booking._id, { meetingUrl: linkDraft.url.trim() });
-    if (ok) setLinkDraft({ booking: null, url: '' });
+    if (ok) closeLinkDraft();
   };
 
   const handleCancelBooking = async (id) => {
@@ -213,11 +240,11 @@ export default function BookingsPage() {
 
         <Modal
           open={Boolean(linkDraft.booking)}
-          onClose={() => setLinkDraft({ booking: null, url: '' })}
+          onClose={closeLinkDraft}
           title="Add Meeting Link"
           footer={
             <>
-              <ModalButton variant="secondary" className="w-[50%]" onClick={() => setLinkDraft({ booking: null, url: '' })}>Cancel</ModalButton>
+              <ModalButton variant="secondary" className="w-[50%]" onClick={closeLinkDraft}>Cancel</ModalButton>
               <ModalButton type="submit" form="meeting-link-form" className="w-[50%]" disabled={!linkDraft.url.trim() || updatingId === linkDraft.booking?._id}>
                 Save
               </ModalButton>
@@ -228,6 +255,26 @@ export default function BookingsPage() {
             {linkDraft.booking && (
               <p className="text-[12px] text-[#808080]">{linkDraft.booking.clientName} · {linkDraft.booking.date} {linkDraft.booking.timeSlot}</p>
             )}
+            <button
+              type="button"
+              onClick={handleGenerateMeet}
+              disabled={meetState.loading}
+              className="flex h-[36px] w-full items-center justify-center gap-[8px] rounded-[5px] border-[0.5px] border-[#DCDCDC] bg-white text-[12px] font-medium text-[#1A1A1A] hover:bg-[#F8F8F9] disabled:opacity-60"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">
+                <path fill="#00832D" d="M3 7.5A1.5 1.5 0 0 1 4.5 6H14a1.5 1.5 0 0 1 1.5 1.5v9A1.5 1.5 0 0 1 14 18H4.5A1.5 1.5 0 0 1 3 16.5z" />
+                <path fill="#00AC47" d="M15.5 10.2 20.3 7c.5-.3 1.2 0 1.2.6v8.8c0 .6-.7.9-1.2.6l-4.8-3.2z" />
+              </svg>
+              {meetState.loading ? 'Creating Google Meet link...' : 'Generate Google Meet link'}
+            </button>
+            <p className="text-[10px] text-[#808080]">Creates the meeting in your Google Calendar and sends the attendee an invite.</p>
+            {meetState.error && (
+              <p role="alert" className="rounded-[5px] border-[0.5px] border-[#FF4359] bg-[#FF43591A] px-[10px] py-[8px] text-[12px] text-[#FF4359]">
+                {meetState.error}{' '}
+                {meetState.needsConnect && <Link href="/connectors" className="font-medium underline">Open Connectors</Link>}
+              </p>
+            )}
+            <div className="flex items-center gap-[8px] text-[10px] text-[#AAAAAA]"><span className="h-px flex-1 bg-[#EBEBEB]" />or paste a link<span className="h-px flex-1 bg-[#EBEBEB]" /></div>
             <Field label="Meeting URL" hint="Shared with the attendee. Must start with https://">
               <input
                 type="url"

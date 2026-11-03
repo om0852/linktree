@@ -103,7 +103,7 @@ export async function GET(request) {
 
       // H. City Aggregation
       AnalyticsEvent.aggregate([
-        { $match: { ...queryFilter, is_bot: false, city: { $nin: ['', 'Unknown City'] } } },
+        { $match: { ...queryFilter, is_bot: false, city: { $nin: ['', 'Unknown City', 'Local network'] } } },
         { $group: { _id: { city: '$city', region: '$region', country: '$country' }, count: { $sum: 1 } } },
         { $sort: { count: -1 } },
         { $limit: 8 }

@@ -82,6 +82,20 @@ test('Telemetry Engine Unit Suite', async (t) => {
     assert.equal(getCountryFlag('US'), '🇺🇸');
   });
 
+  await t.test('Geo from the client IP when there are no CDN headers (Caddy, custom domains)', () => {
+    const geo = extractGeoIntelligence({ headers: new Headers({ 'x-forwarded-for': '49.36.0.1, 10.0.0.2' }) });
+    assert.equal(geo.country_code, 'IN');
+    assert.equal(geo.country, 'India');
+    assert.equal(geo.city, 'Mumbai');
+
+    const local = extractGeoIntelligence({ headers: new Headers({ 'x-forwarded-for': '127.0.0.1' }) });
+    assert.equal(local.country_code, 'GL');
+    assert.equal(local.city, 'Local network');
+
+    const cdn = extractGeoIntelligence({ headers: new Headers({ 'cf-ipcountry': 'DE', 'x-forwarded-for': '49.36.0.1' }) });
+    assert.equal(cdn.country_code, 'DE', 'CDN headers win over the IP lookup');
+  });
+
   await t.test('Device & In-App WebView Detection', () => {
     // 1. Mobile & Instagram WebView
     const reqInsta = {

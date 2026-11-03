@@ -1,5 +1,38 @@
 import crypto from 'crypto';
+import { createRequire } from 'module';
 import { isbot } from 'isbot';
+
+// Offline GeoIP (GeoLite data shipped with geoip-lite): no visitor IP leaves
+// the server. Loaded on first use because the database is large.
+let geoipModule;
+function lookupIpLocation(ip) {
+  try {
+    if (geoipModule === undefined) geoipModule = createRequire(import.meta.url)('geoip-lite');
+    return geoipModule?.lookup(ip) || null;
+  } catch (error) {
+    if (geoipModule === undefined) geoipModule = null;
+    console.error('GeoIP lookup unavailable:', error.message);
+    return null;
+  }
+}
+
+// Loopback and private ranges have no public location (local development, LAN).
+export function isPrivateIp(ip) {
+  const value = String(ip || '').trim().replace(/^::ffff:/i, '');
+  return !value || value === '::1' || value === 'unknown'
+    || /^127\./.test(value) || /^10\./.test(value) || /^192\.168\./.test(value)
+    || /^172\.(1[6-9]|2\d|3[01])\./.test(value) || /^169\.254\./.test(value)
+    || /^f[cd][0-9a-f]{2}:/i.test(value) || /^fe80:/i.test(value);
+}
+
+function countryNameOf(code) {
+  if (COUNTRY_NAMES[code]) return COUNTRY_NAMES[code];
+  try {
+    return new Intl.DisplayNames(['en'], { type: 'region' }).of(code) || code;
+  } catch {
+    return code;
+  }
+}
 
 const TELEMETRY_SALT = process.env.TELEMETRY_SALT || 'treeinbio_telemetry_engine_salt_2026_secured';
 
@@ -122,11 +155,32 @@ export const COUNTRY_NAMES = {
 };
 
 /**
- * Extracts Country, Region, and City directly from Edge CDN Headers (Zero-Latency)
+ * Country, region and city of the visitor: CDN headers when the app runs
+ * behind Vercel or Cloudflare, otherwise a lookup of the client IP (servers
+ * behind Caddy/nginx, including custom domains proxied to this app).
  */
 export function extractGeoIntelligence(request) {
   const headers = request.headers;
-  
+  const fromHeaders = extractGeoFromHeaders(headers);
+  if (fromHeaders.country_code !== 'GL') return fromHeaders;
+
+  const ip = extractClientIp(request);
+  if (isPrivateIp(ip)) {
+    return { country_code: 'GL', country: 'Local network', region: 'Local network', city: 'Local network' };
+  }
+  const found = lookupIpLocation(ip.replace(/^::ffff:/i, ''));
+  if (!found?.country) return fromHeaders;
+  const code = String(found.country).toUpperCase();
+  return {
+    country_code: code,
+    country: countryNameOf(code),
+    region: found.region || 'Unknown Region',
+    city: found.city || 'Unknown City',
+  };
+}
+
+function extractGeoFromHeaders(headers) {
+
   let rawCode = (
     headers.get('x-vercel-ip-country') ||
     headers.get('cf-ipcountry') ||
