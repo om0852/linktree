@@ -8,7 +8,7 @@ import { SIDEBAR_NAV_ITEMS } from '@/constants/navigation';
 import WorkspaceSwitcher from './WorkspaceSwitcher';
 
 /** Global navigation card (Creatosaurus LeftBar.jsx). */
-export default function AtelierSidebar({ mobileOpen, onToggleMobile, authUser, currentUsername, onProfileSwitched }) {
+export default function AtelierSidebar({ mobileOpen, onToggleMobile, authUser, currentUsername, currentName, onProfileSwitched }) {
   const pathname = usePathname();
 
   const isItemActive = (item) => (item.matchExact ? pathname === '/' : pathname.startsWith(item.href));
@@ -39,7 +39,7 @@ export default function AtelierSidebar({ mobileOpen, onToggleMobile, authUser, c
           )}
         </div>
 
-        {authUser && <WorkspaceSwitcher currentUsername={currentUsername} onProfileSwitched={onProfileSwitched} />}
+        {authUser && <WorkspaceSwitcher currentUsername={currentUsername} currentName={currentName} onProfileSwitched={onProfileSwitched} />}
 
         {/* Nav */}
         <nav

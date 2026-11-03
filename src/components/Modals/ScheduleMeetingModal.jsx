@@ -7,8 +7,14 @@ import { PillTab } from '@/components/ui/patterns';
 
 const DAYS_OF_WEEK = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-// Generate formatted time slots between start and end hours
-function generateSlots(startHourStr = '09:00', endHourStr = '17:00', intervalMins = 30) {
+// Calendar date in the visitor's own timezone (toISOString would give the UTC date).
+function toLocalDateString(d) {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+// Start times every `intervalMins` where a meeting of `durationMins` still ends
+// by the end hour; the booking API rejects any other slot.
+function generateSlots(startHourStr = '09:00', endHourStr = '17:00', intervalMins = 30, durationMins = intervalMins) {
   const [startH, startM] = (startHourStr || '09:00').split(':').map(Number);
   const [endH, endM] = (endHourStr || '17:00').split(':').map(Number);
 
@@ -16,7 +22,7 @@ function generateSlots(startHourStr = '09:00', endHourStr = '17:00', intervalMin
   const endMinutes = endH * 60 + (endM || 0);
   const slots = [];
 
-  while (startMinutes + intervalMins <= endMinutes) {
+  while (startMinutes + durationMins <= endMinutes) {
     const h = Math.floor(startMinutes / 60);
     const m = startMinutes % 60;
     const ampm = h >= 12 ? 'PM' : 'AM';
@@ -45,7 +51,7 @@ export default function ScheduleMeetingModal({ profile, onClose, onBookingSucces
       const d = new Date();
       d.setDate(today.getDate() + i);
       const dayName = DAYS_OF_WEEK[d.getDay()];
-      const dateStr = d.toISOString().split('T')[0];
+      const dateStr = toLocalDateString(d);
       const isAvailableDay = allowedDays.includes(dayName);
       dates.push({
         dateObj: d,
@@ -83,9 +89,10 @@ export default function ScheduleMeetingModal({ profile, onClose, onBookingSucces
     return generateSlots(
       meetingConfig.startHour || '09:00',
       meetingConfig.endHour || '17:00',
-      meetingConfig.slotIntervalMinutes || 30
+      meetingConfig.slotIntervalMinutes || 30,
+      duration
     );
-  }, [meetingConfig.startHour, meetingConfig.endHour, meetingConfig.slotIntervalMinutes]);
+  }, [meetingConfig.startHour, meetingConfig.endHour, meetingConfig.slotIntervalMinutes, duration]);
 
   // Fetch booked slots for the selected date
   useEffect(() => {
@@ -94,10 +101,10 @@ export default function ScheduleMeetingModal({ profile, onClose, onBookingSucces
     async function fetchBooked() {
       try {
         setLoadingSlots(true);
-        const res = await fetch(`/api/bookings?creator=${profile.username}&date=${selectedDate}`);
+        const res = await fetch(`/api/bookings/availability?creator=${encodeURIComponent(profile.username)}&date=${selectedDate}`);
         const data = await res.json();
-        if (!cancelled && data.success && data.bookings) {
-          setBookedSlots(data.bookings.map(b => b.timeSlot));
+        if (!cancelled && data.success && Array.isArray(data.bookedSlots)) {
+          setBookedSlots(data.bookedSlots);
         } else if (!cancelled) {
           setBookedSlots([]);
         }

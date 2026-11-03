@@ -185,6 +185,21 @@ describe('Bookings API & Double-Booking Prevention End-to-End Suite', () => {
     };
   };
 
+  test('GET /api/bookings/availability - Shows the booked slot to visitors without attendee details', async () => {
+    const res = await fetch(`${BASE_URL}/api/bookings/availability?creator=emilyvance&date=${testDate}`);
+    assert.equal(res.status, 200);
+    const data = await res.json();
+    assert.equal(data.success, true);
+    assert.ok(data.bookedSlots.includes(testSlot));
+    assert.equal(data.bookings, undefined);
+    assert.equal(JSON.stringify(data).includes('@'), false, 'availability must not expose attendee emails');
+  });
+
+  test('GET /api/bookings/availability - Requires a creator and a YYYY-MM-DD date', async () => {
+    const res = await fetch(`${BASE_URL}/api/bookings/availability?creator=emilyvance&date=tomorrow`);
+    assert.equal(res.status, 400);
+  });
+
   test('GET /api/bookings - Retrieves creator bookings and includes booked slot', async () => {
     const res = await fetch(`${BASE_URL}/api/bookings?creator=emilyvance&date=${testDate}`, {
       headers: getAuthHeaders(),

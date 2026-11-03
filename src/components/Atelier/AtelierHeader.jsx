@@ -1,7 +1,8 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import AtelierSidebar from './AtelierSidebar';
+import { useWorkspaceSession, updateWorkspaceSession, clearWorkspaceSession } from '@/lib/workspaceStore';
 
 const pill = 'flex h-[23px] items-center px-[10px] rounded-[50px] text-[10px] whitespace-nowrap';
 const softPill = `${pill} bg-[#F8F8F9] text-[#333333] hover:bg-[#F0F0F0]`;
@@ -27,14 +28,35 @@ export default function AtelierHeader({
   onProfileSwitched,
 }) {
   const openAuth = onOpenAuth || onOpenAuthModal;
+  const session = useWorkspaceSession();
+  const signedInUsername = authUser?.username;
+  const profileUsername = currentProfile?.username;
+  const profileName = currentProfile?.name;
+
+  // Remember who is signed in and which workspace is active, so the sidebar
+  // on the next page shows them immediately instead of a placeholder.
+  useEffect(() => {
+    if (!signedInUsername) return;
+    updateWorkspaceSession({
+      authUser: { username: signedInUsername },
+      activeUsername: profileUsername || signedInUsername,
+      activeName: profileUsername ? profileName || '' : '',
+    });
+  }, [signedInUsername, profileUsername, profileName]);
+
+  const handleLogout = () => {
+    clearWorkspaceSession();
+    if (onLogout) onLogout();
+  };
 
   return (
     <>
       <AtelierSidebar
         mobileOpen={mobileOpen}
         onToggleMobile={onToggleMobile}
-        authUser={authUser}
-        currentUsername={currentProfile?.username || authUser?.username}
+        authUser={authUser || session.authUser}
+        currentUsername={(authUser && profileUsername) || session.activeUsername || signedInUsername}
+        currentName={(authUser && profileUsername && profileName) || session.activeName}
         onProfileSwitched={onProfileSwitched}
       />
 
@@ -78,7 +100,7 @@ export default function AtelierHeader({
             <span className={softPill} title={`Signed in as @${authUser.username}`}>
               <span className="max-w-[110px] truncate">@{authUser.username}</span>
               {onLogout && (
-                <button type="button" onClick={onLogout} aria-label="Sign out" title="Sign out" className="group ml-[6px]">
+                <button type="button" onClick={handleLogout} aria-label="Sign out" title="Sign out" className="group ml-[6px]">
                   <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
                     <path className="group-hover:stroke-[#FF4359]" d="M4.5 10.5H2.5C2.22 10.5 2 10.28 2 10V2C2 1.72 2.22 1.5 2.5 1.5H4.5M8 8.5L10.5 6L8 3.5M10.5 6H4.5" stroke="#333333" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>

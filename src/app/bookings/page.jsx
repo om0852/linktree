@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import AtelierHeader from '../../components/Atelier/AtelierHeader';
 import AuthModal from '../../components/Auth/AuthModal';
 import { DEFAULT_EMPTY_PROFILE } from '@/constants/app';
-import { Toolbar, InfoChip, SearchPill, RoundIconButton, KpiCard, KpiGrid, EmptyState, PrimaryPill, SkeletonRows, table } from '@/components/ui';
+import { Toolbar, InfoChip, SearchPill, RoundIconButton, KpiCard, KpiGrid, EmptyState, PrimaryPill, SkeletonRows, Modal, ModalButton, Field, inputClass, table } from '@/components/ui';
 import { Calendar, Clock, AlertCircle, CheckCircle2, RefreshCw, Trash2 } from '@/components/icons';
 
 const STATUS_STYLE = {
@@ -26,10 +26,14 @@ export default function BookingsPage() {
   const [copiedId, setCopiedId] = useState(null);
   const [cancellingId, setCancellingId] = useState(null);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [updatingId, setUpdatingId] = useState(null);
+  const [bookingError, setBookingError] = useState('');
+  const [linkDraft, setLinkDraft] = useState({ booking: null, url: '' });
 
   const username = currentProfile?.username || authUser?.username || '';
 
   const fetchBookings = async () => {
+    if (!username) return;
     try {
       setLoading(true);
       const res = await fetch(`/api/bookings?username=${encodeURIComponent(username)}`);
@@ -45,6 +49,7 @@ export default function BookingsPage() {
   };
 
   useEffect(() => {
+    if (!username) return undefined;
     let active = true;
     async function load() {
       try {
@@ -97,6 +102,35 @@ export default function BookingsPage() {
     navigator.clipboard.writeText(url);
     setCopiedId(id);
     setTimeout(() => setCopiedId(null), 2500);
+  };
+
+  // Confirm a request or attach the meeting link (PATCH /api/bookings/[id]).
+  const handleUpdateBooking = async (id, patch) => {
+    setUpdatingId(id);
+    setBookingError('');
+    try {
+      const res = await fetch(`/api/bookings/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(patch),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) throw new Error(data.error || 'Could not update the booking.');
+      setBookings((prev) => prev.map((b) => (b._id === id ? data.booking : b)));
+      return true;
+    } catch (err) {
+      setBookingError(err.message);
+      return false;
+    } finally {
+      setUpdatingId(null);
+    }
+  };
+
+  const handleSaveMeetingLink = async (e) => {
+    e.preventDefault();
+    if (!linkDraft.booking) return;
+    const ok = await handleUpdateBooking(linkDraft.booking._id, { meetingUrl: linkDraft.url.trim() });
+    if (ok) setLinkDraft({ booking: null, url: '' });
   };
 
   const handleCancelBooking = async (id) => {
@@ -165,6 +199,44 @@ export default function BookingsPage() {
           }
         />
 
+        {bookingError && (
+          <div className="flex items-center justify-between gap-[8px] rounded-[5px] border-[0.5px] border-[#FFC2CA] bg-[#FFEDEF] px-[12px] py-[8px] text-[11px] text-[#FF4359]">
+            <span>{bookingError}</span>
+            <button type="button" onClick={() => setBookingError('')} className="text-[#808080] hover:text-black">Dismiss</button>
+          </div>
+        )}
+
+        <Modal
+          open={Boolean(linkDraft.booking)}
+          onClose={() => setLinkDraft({ booking: null, url: '' })}
+          title="Add Meeting Link"
+          footer={
+            <>
+              <ModalButton variant="secondary" className="w-[50%]" onClick={() => setLinkDraft({ booking: null, url: '' })}>Cancel</ModalButton>
+              <ModalButton type="submit" form="meeting-link-form" className="w-[50%]" disabled={!linkDraft.url.trim() || updatingId === linkDraft.booking?._id}>
+                Save
+              </ModalButton>
+            </>
+          }
+        >
+          <form id="meeting-link-form" onSubmit={handleSaveMeetingLink} className="flex flex-col gap-[10px]">
+            {linkDraft.booking && (
+              <p className="text-[12px] text-[#808080]">{linkDraft.booking.clientName} · {linkDraft.booking.date} {linkDraft.booking.timeSlot}</p>
+            )}
+            <Field label="Meeting URL" hint="Shared with the attendee. Must start with https://">
+              <input
+                type="url"
+                required
+                autoFocus
+                placeholder="https://meet.google.com/..."
+                value={linkDraft.url}
+                onChange={(e) => setLinkDraft((d) => ({ ...d, url: e.target.value }))}
+                className={inputClass}
+              />
+            </Field>
+          </form>
+        </Modal>
+
         <KpiGrid>
           <KpiCard icon={Calendar} value={bookings.length} label="Bookings" />
           <KpiCard icon={Clock} value={upcomingCount} label="Upcoming" />
@@ -172,7 +244,7 @@ export default function BookingsPage() {
           <KpiCard icon={CheckCircle2} value={statusCount('confirmed')} label="Confirmed" />
         </KpiGrid>
 
-        {loading && bookings.length === 0 ? (
+        {loading && username && bookings.length === 0 ? (
           <div className={table.wrapper}><SkeletonRows rows={6} /></div>
         ) : bookings.length === 0 ? (
           <EmptyState
@@ -226,12 +298,26 @@ export default function BookingsPage() {
                             {copiedId === b._id ? 'Copied' : 'Copy link'}
                           </button>
                         </span>
-                      ) : <span className="text-[#AAAAAA]">—</span>}
+                      ) : b.status === 'cancelled' ? <span className="text-[#AAAAAA]">—</span> : (
+                        <button type="button" onClick={() => setLinkDraft({ booking: b, url: '' })} className="text-[12px] text-[#16A34A] hover:underline">
+                          Add link
+                        </button>
+                      )}
                     </td>
-                    <td className={table.td}>
+                    <td className={`${table.td} whitespace-nowrap`}>
                       <span className={`rounded-[4px] px-[6px] py-[2px] text-[10px] font-medium capitalize ${STATUS_STYLE[b.status] || STATUS_STYLE.pending}`}>
                         {b.status || 'pending'}
                       </span>
+                      {(b.status || 'pending') === 'pending' && (
+                        <button
+                          type="button"
+                          onClick={() => handleUpdateBooking(b._id, { status: 'confirmed' })}
+                          disabled={updatingId === b._id}
+                          className="ml-[8px] text-[12px] text-[#16A34A] hover:underline disabled:opacity-50"
+                        >
+                          {updatingId === b._id ? 'Saving...' : 'Confirm'}
+                        </button>
+                      )}
                     </td>
                     <td className={table.td}>
                       <RoundIconButton

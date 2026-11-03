@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { Search, X } from '@/components/icons';
+import { useWorkspaceSession, updateWorkspaceSession, clearWorkspaceSession } from '@/lib/workspaceStore';
 
 const initial = (ws) => (ws?.name || ws?.username || '?').charAt(0).toUpperCase();
 
@@ -21,9 +22,9 @@ function ChevronIcon({ open }) {
 }
 
 /** LeftBar workspace switcher (Creatosaurus LeftBar.jsx workspace dropdown). */
-export default function WorkspaceSwitcher({ currentUsername, onProfileSwitched }) {
+export default function WorkspaceSwitcher({ currentUsername, currentName, onProfileSwitched }) {
   const [isOpen, setIsOpen] = useState(false);
-  const [workspaces, setWorkspaces] = useState([]);
+  const { workspaces } = useWorkspaceSession();
   const [query, setQuery] = useState('');
   const [switching, setSwitching] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -35,6 +36,11 @@ export default function WorkspaceSwitcher({ currentUsername, onProfileSwitched }
 
   const fetchWorkspaces = useCallback(async () => {
     const res = await fetch('/api/profile/workspaces');
+    if (res.status === 401) {
+      // Session ended: drop the cached user so the sidebar stops showing it.
+      clearWorkspaceSession();
+      return null;
+    }
     if (!res.ok) return null;
     const data = await res.json();
     return data.success && data.workspaces ? data.workspaces : null;
@@ -43,14 +49,14 @@ export default function WorkspaceSwitcher({ currentUsername, onProfileSwitched }
   useEffect(() => {
     let cancelled = false;
     fetchWorkspaces()
-      .then((list) => { if (!cancelled && list) setWorkspaces(list); })
+      .then((list) => { if (!cancelled && list) updateWorkspaceSession({ workspaces: list }); })
       .catch((err) => { if (!cancelled) console.error('Failed to load workspaces:', err); });
     return () => { cancelled = true; };
   }, [currentUsername, fetchWorkspaces]);
 
   const loadWorkspaces = async () => {
     const list = await fetchWorkspaces().catch(() => null);
-    if (list) setWorkspaces(list);
+    if (list) updateWorkspaceSession({ workspaces: list });
   };
 
   useEffect(() => {
@@ -116,9 +122,10 @@ export default function WorkspaceSwitcher({ currentUsername, onProfileSwitched }
     }
   };
 
+  // Until the workspace list arrives, use the display name the page already has.
   const activeWs = workspaces.find((w) => w.username === currentUsername) || {
     username: currentUsername,
-    name: currentUsername,
+    name: currentName || currentUsername,
   };
   const filtered = workspaces.filter((ws) =>
     `${ws.name || ''} ${ws.username || ''}`.toLowerCase().includes(query.trim().toLowerCase())
