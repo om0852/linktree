@@ -2,6 +2,10 @@
 
 Universal developer tools and AI agent integrations for the **TreeInBio** creator bio platform.
 
+> **Most users should use the hosted MCP server instead:** `https://<your-domain>/api/mcp`
+> with an API key from the **AI Assistants** page (`/ai`). Nothing to install; see
+> [`docs/mcp.md`](../docs/mcp.md). The local stdio server below is for development.
+
 ---
 
 ## ⚡ Quick Start

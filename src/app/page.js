@@ -22,6 +22,7 @@ import { getReadableThemeColors, getReadableButtonText, getThemeAppearance, getP
 import ThemeCard from '../components/Builder/ThemeCard';
 import TemplateCard from '../components/Builder/TemplateCard';
 import { PROFILE_TEMPLATES } from '../constants/templates';
+import { applyThemeToProfile, applyTemplateToProfile } from '@/lib/profileDesign';
 import { GEO_COUNTRIES } from '@/lib/geoTargeting';
 import { 
   DEFAULT_EMPTY_PROFILE, 
@@ -691,73 +692,13 @@ export default function AtelierStudioPage() {
   };
 
   const handleApplyThemePreset = (preset) => {
-    const wallpaper = getPresetWallpaper(preset);
-    const look = getThemeAppearance(preset);
-
-    setCurrentProfile(prev => ({
-      ...prev,
-      theme: preset.id,
-      buttonShape: preset.buttonShape || prev.buttonShape || 'rounded',
-      font: preset.font || prev.font || 'Plus Jakarta Sans',
-      headerLayout: preset.headerLayout || prev.headerLayout || 'classic',
-      avatarShape: preset.avatarShape || prev.avatarShape || 'circle',
-      designSettings: {
-        ...(prev.designSettings || {}),
-        // A theme replaces the wallpaper and every colour, so nothing from the
-        // previous theme (a dark fill, a light title) survives the switch.
-        wallpaper: { ...(prev.designSettings?.wallpaper || {}), ...wallpaper, imageUrl: '', blurImage: '', videoUrl: '' },
-        buttonColor: look.button,
-        buttonTextColor: look.buttonText,
-        buttonStyle: preset.cardBg?.includes('/10') || preset.cardBg?.includes('/20') || preset.id === 'dark-glass'
-          ? 'glass'
-          : (prev.designSettings?.buttonStyle === 'glass' ? 'solid' : (prev.designSettings?.buttonStyle || 'solid')),
-        buttonRoundness: prev.designSettings?.buttonRoundness || 'rounded',
-        customColors: {
-          ...(prev.designSettings?.customColors || {}),
-          title: look.title,
-          pageText: look.body,
-        },
-      },
-    }));
+    setCurrentProfile((prev) => applyThemeToProfile(prev, preset));
   };
 
   // A template = theme + fonts + header + avatar + button corners, plus
   // starter links and bio for a profile that has none yet.
   const handleApplyTemplate = (template) => {
-    const theme = ALL_THEMES.find((t) => t.id === template.themeId);
-    if (theme) handleApplyThemePreset(theme);
-    setCurrentProfile((prev) => {
-      const hasLinks = (prev.links || []).some((l) => !l.isArchived);
-      const defaultBio = !prev.bio || prev.bio === DEFAULT_EMPTY_PROFILE.bio;
-      return {
-        ...prev,
-        font: template.font,
-        alternativeTitleFont: { enabled: true, font: template.titleFont },
-        headerLayout: template.headerLayout || prev.headerLayout,
-        avatarShape: template.avatarShape || prev.avatarShape,
-        bio: defaultBio ? template.bio : prev.bio,
-        designSettings: { ...(prev.designSettings || {}), buttonRoundness: template.buttonRoundness || 'rounded' },
-        links: hasLinks
-          ? prev.links
-          : [
-              ...template.links.map((item, index) => ({
-                id: `link_${Date.now()}_${index}`,
-                title: item.title,
-                subtitle: item.subtitle,
-                icon: item.icon,
-                highlight: item.highlight || 'none',
-                url: '#',
-                badge: '',
-                size: 'large',
-                clicks: 0,
-                active: true,
-                disabled: false,
-                isArchived: false,
-              })),
-              ...(prev.links || []),
-            ],
-      };
-    });
+    setCurrentProfile((prev) => applyTemplateToProfile(prev, template));
     setToastMessage({ type: 'success', text: `"${template.name}" template applied. Replace the starter links with your own.` });
     setTimeout(() => setToastMessage(null), 3500);
   };

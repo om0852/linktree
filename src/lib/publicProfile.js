@@ -23,7 +23,8 @@ function hideLeadMagnetDestination(link) {
 
 export function toPublicProfile(profile) {
   if (!profile) return null;
-  const plain = typeof profile.toObject === 'function' ? profile.toObject() : profile;
+  // flattenMaps: Map fields (socials) would otherwise serialise as {}.
+  const plain = typeof profile.toObject === 'function' ? profile.toObject({ flattenMaps: true }) : profile;
   const result = stripPrivateFields(plain);
   if (Array.isArray(result.links)) result.links = result.links.map(hideLeadMagnetDestination);
   return result;
@@ -64,7 +65,7 @@ export function toVisitorProfile(profile) {
 
 export function toOwnerProfile(profile) {
   if (!profile) return null;
-  const plain = typeof profile.toObject === 'function' ? profile.toObject() : { ...profile };
+  const plain = typeof profile.toObject === 'function' ? profile.toObject({ flattenMaps: true }) : { ...profile };
   if (plain.accessGate) plain.accessGate = { ...plain.accessGate, passcode: '' };
   return plain;
 }

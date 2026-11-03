@@ -1,0 +1,83 @@
+# TreeInBio MCP: let any AI assistant run your bio page
+
+TreeInBio exposes a **remote MCP server** so Claude, ChatGPT, Cursor, Gemini CLI
+or any other MCP client can design a profile, manage links, read analytics and
+handle leads, bookings and domains — with the same rules as the Studio.
+
+## What existed before
+
+- `cli/mcp.mjs`: a stdio MCP server (29 tools) that only runs from a local copy
+  of this repository with Node installed, so end users could not use it.
+- Writes fetched the whole profile and posted it back from the client.
+- API keys had a `permissions` field that nothing enforced, and an API key could
+  create new full-access API keys.
+- `GET /api/profile?username=` returned the visitor view for a second workspace
+  the caller owned.
+
+## Plan (v1, built)
+
+1. **Hosted endpoint** `POST /api/mcp` (MCP Streamable HTTP, stateless, JSON
+   responses). Users paste one URL and one API key; nothing to install.
+2. **One tool layer on the server** (`src/lib/mcp/`). Tools call the existing
+   route handlers in-process, so validation, sanitising, ownership checks and
+   contrast rules are exactly the Studio's. Profile edits are patches: the tool
+   reads the owner view, changes only the requested fields, and saves.
+3. **Scoped API keys**: `read` (look, never change) or `write` (full). Enforced
+   for every non-GET request made with a key. Keys cannot manage keys; that
+   needs a signed-in session.
+4. **Workspaces**: every tool takes an optional `workspace` (username); the
+   default is the key's account. Any workspace the account owns works.
+5. **AI Assistants page** (`/ai`): create read-only or full keys, revoke them,
+   and copy ready-made configs for Claude, Cursor, ChatGPT and others.
+6. **Discoverability**: `list_design_options` returns every theme, template,
+   font, shape, button style, highlight and icon an AI may choose from, and
+   `get_profile` reports readability, so an assistant can design without
+   guessing ids.
+
+## Tools
+
+| Tool | Scope | What it does |
+|---|---|---|
+| `whoami` | read | Account, workspaces and public URLs |
+| `get_profile` | read | Profile, design, links, widgets and readable colours |
+| `list_design_options` | read | Themes, templates, fonts, shapes, buttons, highlights, icons |
+| `list_links` | read | Links in order (optionally archived ones) |
+| `get_analytics` | read | Views, clicks, CTR, locations, devices, top links |
+| `list_leads` | read | Captured leads (filter by status / search) |
+| `list_bookings` | read | Bookings (optionally for one date) |
+| `list_domains` | read | Custom domains and DNS status |
+| `update_profile` | write | Name, bio, location, avatar, cover, socials, layouts |
+| `apply_theme` | write | Apply a theme (or a random one) with readable colours |
+| `apply_template` | write | Apply a full template; starter links only if none exist |
+| `update_design` | write | Fonts, wallpaper, buttons, colours, footer |
+| `add_link` / `update_link` / `delete_link` | write | Manage links |
+| `set_link_archived` / `reorder_links` | write | Archive or reorder links |
+| `update_widgets` | write | Contact form, booking, tip jar, newsletter, stats |
+| `update_booking` | write | Confirm / cancel a booking, set its meeting URL |
+| `create_meet_link` | write | Google Meet link for a booking (needs Google Calendar) |
+| `add_domain` / `verify_domain` | write | Connect a custom domain |
+
+Changes are saved and live immediately, the same as pressing Publish.
+
+## Connecting
+
+Create a key on the **AI Assistants** page, then:
+
+- **Claude (claude.ai / Desktop) and ChatGPT connectors**: add a custom
+  connector with URL `https://<your-domain>/api/mcp` and header
+  `Authorization: Bearer <key>`.
+- **Cursor** (`.cursor/mcp.json`):
+  ```json
+  { "mcpServers": { "treeinbio": { "url": "https://<your-domain>/api/mcp", "headers": { "Authorization": "Bearer <key>" } } } }
+  ```
+- **Clients that only speak stdio**:
+  ```json
+  { "mcpServers": { "treeinbio": { "command": "npx", "args": ["-y", "mcp-remote", "https://<your-domain>/api/mcp", "--header", "Authorization:Bearer <key>"] } } }
+  ```
+
+## Next steps (not built yet)
+
+- OAuth sign-in for connectors that require it instead of API keys.
+- Sticker placement and collections tools.
+- Point the stdio CLI server at `/api/mcp` so both share one tool list.
+- Per-key rate limits and an audit log of AI changes.

@@ -58,6 +58,12 @@ export async function POST(request) {
     if (access.error) return access.error;
     const authUser = access.user;
 
+    // A leaked key must not be able to mint more keys: managing keys needs a
+    // signed-in session.
+    if (access.session?.isApiKey) {
+      return NextResponse.json({ success: false, error: 'API keys cannot create API keys. Sign in to manage keys.' }, { status: 403 });
+    }
+
     const body = await request.json();
     const { name, permissions, username: customUser } = body;
 
@@ -80,9 +86,10 @@ export async function POST(request) {
     const keyPrefix = fullKey.substring(0, 16);
     const keyHash = crypto.createHash('sha256').update(fullKey).digest('hex');
 
-    const perms = Array.isArray(permissions) && permissions.length > 0
-      ? permissions
-      : ['*'];
+    // 'read' = look only, 'write' = full access (legacy '*' means full).
+    const allowed = ['read', 'write', '*'];
+    const requested = Array.isArray(permissions) ? permissions.filter((perm) => allowed.includes(perm)) : [];
+    const perms = requested.length ? [...new Set(requested)] : ['write'];
 
     const newKey = await ApiKey.create({
       name: name.trim(),
@@ -121,6 +128,9 @@ export async function DELETE(request) {
     const access = await requireAuth(request);
     if (access.error) return access.error;
     const authUser = access.user;
+    if (access.session?.isApiKey) {
+      return NextResponse.json({ success: false, error: 'API keys cannot revoke API keys. Sign in to manage keys.' }, { status: 403 });
+    }
 
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');

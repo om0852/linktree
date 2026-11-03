@@ -6,7 +6,7 @@ import User from '@/models/User';
 import { getAuthUser } from '@/lib/auth';
 import { INITIAL_USER_PROFILE, AVATAR_SHAPE_IDS, LINK_HIGHLIGHT_IDS } from '@/constants/app';
 import { toVisitorProfile, toOwnerProfile } from '@/lib/publicProfile';
-import { requireProfileOwner } from '@/lib/authorization';
+import { requireAuth, requireProfileOwner, userOwnsProfile } from '@/lib/authorization';
 import { hashPassword } from '@/lib/auth';
 import { safeLinkUrl, safeMediaUrl } from '@/lib/safeUrl';
 
@@ -55,7 +55,12 @@ export async function GET(request) {
     }
 
     const authUser = await getAuthUser(request);
-    const isOwner = authUser && (authUser.role === 'admin' || authUser.username === targetUsername);
+    // Owners of a linked workspace get the owner view too, not only the primary account.
+    let isOwner = Boolean(authUser && (authUser.role === 'admin' || authUser.username === targetUsername));
+    if (!isOwner && authUser) {
+      const access = await requireAuth(request);
+      isOwner = Boolean(access.user && (await userOwnsProfile(access.user, targetUsername)));
+    }
     if (isOwner) {
       return NextResponse.json({ success: true, profile: toOwnerProfile(profile) });
     }

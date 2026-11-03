@@ -5,7 +5,8 @@ import {
   BarChart3, 
   Share2, 
   Zap, 
-  Globe 
+  Globe,
+  Bot
 } from '@/components/icons';
 
 export const SIDEBAR_NAV_ITEMS = [
@@ -45,5 +46,11 @@ export const SIDEBAR_NAV_ITEMS = [
     label: 'Custom Domains',
     sub: 'Branded URLs & SSL',
     icon: Globe,
+  },
+  {
+    href: '/ai',
+    label: 'AI Assistants',
+    sub: 'Claude, ChatGPT & MCP',
+    icon: Bot,
   },
 ];
