@@ -57,7 +57,7 @@ import TrackingPixels from './TrackingPixels';
 import AccessGateScreen from '../Common/AccessGateScreen';
 import CarouselSlider from '../Common/CarouselSlider';
 import StickerBlockLayer, { getBlockStickerPositionStyle } from '../Common/StickerBlockLayer';
-import { THEME_PRESETS, CURATED_THEMES, getTitleFontName, getFontStack, loadGoogleFont, getStickerDeviceProps, getStickerCanvasPositionStyle, getStickerGraphicSizeStyle, isImageUrl, parseTailwindGradient } from '../../constants/app';
+import { THEME_PRESETS, CURATED_THEMES, getTitleFontName, getFontStack, loadGoogleFont, linkHighlightClass, getStickerDeviceProps, getStickerCanvasPositionStyle, getStickerGraphicSizeStyle, isImageUrl, parseTailwindGradient } from '../../constants/app';
 import { safeLinkUrl } from '../../lib/safeUrl';
 
 const ICON_MAP = {
@@ -401,6 +401,7 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
     // Keep the chosen label colour when it reads on the fill; otherwise use one that does.
     const textColor = getReadableButtonText(btnColor, ds?.buttonTextColor || preset?.buttonText, preset?.buttonText);
     const btnStyle = ds?.buttonStyle || 'solid';
+    style['--link-fx-color'] = btnColor;
 
     if (btnStyle === 'solid') {
       style.backgroundColor = btnColor;
@@ -877,7 +878,7 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
       <div data-sticker-block={`link:${link.id}`}
         key={link.id}
         style={btnCustomStyle}
-        className={`phone-stack-card ${getStackShapeClass()} w-full flex flex-col text-left transition-all duration-150 hover:scale-[1.01] active:scale-[0.99] p-3.5`}
+        className={`phone-stack-card ${getStackShapeClass()} ${linkHighlightClass(link)} w-full flex flex-col text-left transition-all duration-150 hover:scale-[1.01] active:scale-[0.99] p-3.5`}
       >
         <div 
           onClick={() => handleLinkClick(link)}
@@ -952,7 +953,7 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
       <div data-sticker-block={`link:${link.id}`}
         key={link.id}
         style={btnCustomStyle}
-        className={`phone-bento-card ${getBentoShapeClass()} ${
+        className={`phone-bento-card ${getBentoShapeClass()} ${linkHighlightClass(link)} ${
           isCarousel ? '' : spanTwo ? 'col-span-1 sm:col-span-2' : 'col-span-1'
         } w-full text-left relative flex flex-col justify-between transition-all duration-150 hover:scale-[1.01] active:scale-[0.99] p-4`}
       >

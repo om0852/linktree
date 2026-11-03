@@ -10,7 +10,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test:unit": "node --test tests/collections.test.mjs tests/preview_sync.test.mjs tests/security_helpers.test.mjs tests/telemetry_engine.test.mjs tests/workspace_creation.test.mjs tests/sticker_positioning.test.mjs tests/theme_design.test.mjs tests/meet_link.test.mjs",
+    "test:unit": "node --test tests/collections.test.mjs tests/preview_sync.test.mjs tests/security_helpers.test.mjs tests/telemetry_engine.test.mjs tests/workspace_creation.test.mjs tests/sticker_positioning.test.mjs tests/theme_design.test.mjs tests/meet_link.test.mjs tests/templates.test.mjs",
     "test:cli": "node --test tests/cli_and_mcp.test.mjs",
     "test": "node --env-file=.env.local --test tests/*.test.mjs",
     "cli": "node ./cli/index.mjs",

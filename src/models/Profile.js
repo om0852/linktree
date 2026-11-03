@@ -13,6 +13,7 @@ const LinkSchema = new mongoose.Schema({
   disabled: { type: Boolean, default: false },
   isArchived: { type: Boolean, default: false },
   subtitle: { type: String, default: '' },
+  highlight: { type: String, enum: ['none', 'glow', 'shimmer', 'ring'], default: 'none' },
   leadMagnet: {
     enabled: { type: Boolean, default: false },
     assetUrl: { type: String, default: '' },

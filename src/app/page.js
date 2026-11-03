@@ -20,6 +20,8 @@ import { endSignedOutSession } from '@/lib/workspaceStore';
 import PhoneMockup from '../components/Preview/PhoneMockup';
 import { getReadableThemeColors, getReadableButtonText, getThemeAppearance, getPresetWallpaper } from '@/lib/theme-contrast';
 import ThemeCard from '../components/Builder/ThemeCard';
+import TemplateCard from '../components/Builder/TemplateCard';
+import { PROFILE_TEMPLATES } from '../constants/templates';
 import { GEO_COUNTRIES } from '@/lib/geoTargeting';
 import { 
   DEFAULT_EMPTY_PROFILE, 
@@ -31,6 +33,7 @@ import {
   getTitleFontName,
   getFontStack,
   PAGE_FONTS,
+  LINK_HIGHLIGHTS,
   getStickerDeviceProps
 } from '../constants/app';
 import { calculateCTRScore, PERSONA_RECOMMENDATIONS, PERSONA_TAGLINES } from '../utils/aiScoring';
@@ -130,6 +133,21 @@ const ICON_LIST = [
   { id: 'mail', label: 'Mail', symbol: 'mail' },
   { id: 'link', label: 'Link', symbol: 'link' },
 ];
+
+// Links store the renderer's icon names (ICON_MAP keys such as "Music"); the
+// editor list draws Material Symbols, which need their own names.
+const MATERIAL_SYMBOLS = {
+  Video: 'videocam', Star: 'star', Mail: 'mail', FileText: 'description', Music: 'music_note',
+  ShoppingBag: 'shopping_bag', Zap: 'bolt', Briefcase: 'work', BookOpen: 'menu_book', Calendar: 'calendar_month',
+  MessageSquare: 'chat', TrendingUp: 'trending_up', Ticket: 'confirmation_number', Globe: 'public',
+  Youtube: 'smart_display', Instagram: 'photo_camera', Twitter: 'alternate_email', Linkedin: 'work',
+  Spotify: 'headphones', Imdb: 'movie',
+};
+function toMaterialSymbol(icon) {
+  if (!icon) return 'link';
+  if (MATERIAL_SYMBOLS[icon]) return MATERIAL_SYMBOLS[icon];
+  return /^[a-z_]+$/.test(icon) ? icon : 'link';
+}
 
 // Random theme other than the active one (called from the shuffle button).
 function pickRandomTheme(themes, currentId) {
@@ -659,7 +677,7 @@ export default function AtelierStudioPage() {
   // Phase 2: Theme Shuffle and Theme Preset handlers
   const ALL_THEMES = [...THEME_PRESETS, ...CURATED_THEMES];
   const DESIGN_SECTION_TITLES = {
-    profile: 'Profile & header', theme: 'Theme', wallpaper: 'Wallpaper', buttons: 'Buttons',
+    templates: 'Templates', profile: 'Profile & header', theme: 'Theme', wallpaper: 'Wallpaper', buttons: 'Buttons',
     text: 'Fonts', colors: 'Colors', stickers: 'Stickers', footer: 'Footer',
   };
 
@@ -701,6 +719,47 @@ export default function AtelierStudioPage() {
         },
       },
     }));
+  };
+
+  // A template = theme + fonts + header + avatar + button corners, plus
+  // starter links and bio for a profile that has none yet.
+  const handleApplyTemplate = (template) => {
+    const theme = ALL_THEMES.find((t) => t.id === template.themeId);
+    if (theme) handleApplyThemePreset(theme);
+    setCurrentProfile((prev) => {
+      const hasLinks = (prev.links || []).some((l) => !l.isArchived);
+      const defaultBio = !prev.bio || prev.bio === DEFAULT_EMPTY_PROFILE.bio;
+      return {
+        ...prev,
+        font: template.font,
+        alternativeTitleFont: { enabled: true, font: template.titleFont },
+        headerLayout: template.headerLayout || prev.headerLayout,
+        avatarShape: template.avatarShape || prev.avatarShape,
+        bio: defaultBio ? template.bio : prev.bio,
+        designSettings: { ...(prev.designSettings || {}), buttonRoundness: template.buttonRoundness || 'rounded' },
+        links: hasLinks
+          ? prev.links
+          : [
+              ...template.links.map((item, index) => ({
+                id: `link_${Date.now()}_${index}`,
+                title: item.title,
+                subtitle: item.subtitle,
+                icon: item.icon,
+                highlight: item.highlight || 'none',
+                url: '#',
+                badge: '',
+                size: 'large',
+                clicks: 0,
+                active: true,
+                disabled: false,
+                isArchived: false,
+              })),
+              ...(prev.links || []),
+            ],
+      };
+    });
+    setToastMessage({ type: 'success', text: `"${template.name}" template applied. Replace the starter links with your own.` });
+    setTimeout(() => setToastMessage(null), 3500);
   };
 
   const setDesignColor = (key, value) => {
@@ -882,6 +941,7 @@ export default function AtelierStudioPage() {
       icon: link.icon || 'link',
       size: link.size || 'large',
       subtitle: link.subtitle || '',
+      highlight: link.highlight || 'none',
       leadMagnet: link.leadMagnet || {
         enabled: false,
         assetUrl: '',
@@ -1334,6 +1394,28 @@ export default function AtelierStudioPage() {
                             value={linkForm.badge}
                             onChange={(e) => setLinkForm({ ...linkForm, badge: e.target.value })}
                           />
+                        </div>
+
+                        <div className="md:col-span-2">
+                          <Label className="mb-1.5 block">Highlight</Label>
+                          <div className="flex flex-wrap gap-[8px]" role="radiogroup" aria-label="Link highlight">
+                            {LINK_HIGHLIGHTS.map((fx) => {
+                              const active = (linkForm.highlight || 'none') === fx.id;
+                              return (
+                                <button
+                                  key={fx.id}
+                                  type="button"
+                                  role="radio"
+                                  aria-checked={active}
+                                  onClick={() => setLinkForm({ ...linkForm, highlight: fx.id })}
+                                  className={`flex h-[30px] items-center rounded-[50px] border-[0.5px] px-[12px] text-[12px] ${active ? 'border-black bg-[#F8F8F9BF] text-black' : 'border-[#DCDCDC] bg-white text-[#333333] hover:bg-[#F8F8F9BF]'}`}
+                                >
+                                  <span className={fx.id === 'none' ? '' : `link-fx link-fx-${fx.id} rounded-[50px] px-[6px]`} style={{ '--link-fx-color': '#16A34A' }}>{fx.label}</span>
+                                </button>
+                              );
+                            })}
+                          </div>
+                          <p className="text-[10px] text-[#808080] mt-1">Draws attention to this link on your page. Use it on one or two links.</p>
                         </div>
 
                         <div>
@@ -2065,89 +2147,61 @@ export default function AtelierStudioPage() {
 
                   {/* Links & Content Section */}
                   <div className="bg-white border-[0.5px] border-line rounded-[10px] p-[15px] flex flex-col gap-5">
-                    {/* Content Sub-Tabs: Links | Shop */}
-                    <div className="flex items-center justify-between pb-3.5 border-b-[0.5px] border-line flex-wrap gap-3">
-                      <div className="inline-flex items-center p-1 bg-surface-2 border-[0.5px] border-line rounded-[10px] gap-1 shadow-2xs">
-                        <button
-                          type="button"
-                          onClick={() => handleContentSubTabSwitch('links')}
-                          className={`px-3.5 py-1.5 rounded-[5px] text-[12px] font-semibold flex items-center gap-2 transition-all cursor-pointer ${
-                            contentSubTab === 'links'
-                              ? 'bg-brand-500 text-white '
-                              : 'text-ink-500 hover:text-ink-700'
-                          }`}
-                        >
-                          <Share2 className="w-3.5 h-3.5" />
-                          <span>Links &amp; Content</span>
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleContentSubTabSwitch('shop')}
-                          className={`px-3.5 py-1.5 rounded-[5px] text-[12px] font-semibold flex items-center gap-2 transition-all cursor-pointer ${
-                            contentSubTab === 'shop'
-                              ? 'bg-brand-500 text-white '
-                              : 'text-ink-500 hover:text-ink-700'
-                          }`}
-                        >
-                          <ShoppingBag className="w-3.5 h-3.5" />
-                          <span>Shop</span>
-                          {(currentProfile.shop?.products || []).length > 0 && (
-                            <span className={`px-1.5 py-0.2 rounded-full text-[10px]  ${
-                              contentSubTab === 'shop' ? 'bg-white/20 text-white' : 'bg-brand-100 text-ink-700'
-                            }`}>
-                              {(currentProfile.shop?.products || []).length}
-                            </span>
-                          )}
-                        </button>
+                    {/* Content toolbar: Links | Shop on the left, Active | Archived (or Add Product) on the right */}
+                    <div className="flex items-center justify-between gap-[10px] flex-wrap pb-[15px] border-b-[0.5px] border-line">
+                      <div className="flex items-center gap-[8px]">
+                        {[
+                          { id: 'links', label: 'Links', icon: Share2, count: (currentProfile.links || []).filter((l) => !l.isArchived).length },
+                          { id: 'shop', label: 'Shop', icon: ShoppingBag, count: (currentProfile.shop?.products || []).length },
+                        ].map((tab) => {
+                          const TabIcon = tab.icon;
+                          const active = contentSubTab === tab.id;
+                          return (
+                            <PillTab key={tab.id} active={active} onClick={() => handleContentSubTabSwitch(tab.id)} className="gap-[6px] !px-[12px]">
+                              <TabIcon className={`w-[14px] h-[14px] ${active ? 'text-black' : 'text-[#808080]'}`} />
+                              <span>{tab.label}</span>
+                              <span className={`min-w-[18px] rounded-[50px] px-[5px] text-center text-[10px] leading-[16px] ${active ? 'bg-black text-white' : 'bg-[#F0F0F0] text-[#808080]'}`}>
+                                {tab.count}
+                              </span>
+                            </PillTab>
+                          );
+                        })}
                       </div>
 
                       {contentSubTab === 'links' ? (
-                        <div className="inline-flex items-center p-0.5 bg-surface-2 border-[0.5px] border-line rounded-[5px] text-[12px] font-semibold">
-                          <button
-                            type="button"
-                            onClick={() => setLinkFilterTab('active')}
-                            className={`px-3 py-1 rounded-[5px] transition-all cursor-pointer flex items-center gap-1.5 ${
-                              linkFilterTab === 'active'
-                                ? 'bg-brand-500 text-white '
-                                : 'text-ink-500 hover:text-ink-700'
-                            }`}
-                          >
-                            <span>Active Links</span>
-                            <span className={`px-1.5 py-0.2 rounded-full text-[10px]  ${
-                              linkFilterTab === 'active' ? 'bg-white/20 text-white' : 'bg-brand-100/50 text-ink-700'
-                            }`}>
-                              {(currentProfile.links || []).filter(l => !l.isArchived).length}
-                            </span>
-                          </button>
-
-                          <button
-                            type="button"
-                            onClick={() => setLinkFilterTab('archived')}
-                            className={`px-3 py-1 rounded-[5px] transition-all cursor-pointer flex items-center gap-1.5 ${
-                              linkFilterTab === 'archived'
-                                ? 'bg-brand-500 text-white '
-                                : 'text-ink-500 hover:text-ink-700'
-                            }`}
-                          >
-                            <Archive className="w-3.5 h-3.5" />
-                            <span>Archived</span>
-                            <span className={`px-1.5 py-0.2 rounded-full text-[10px]  ${
-                              linkFilterTab === 'archived' ? 'bg-white/20 text-white' : 'bg-brand-100/50 text-ink-700'
-                            }`}>
-                              {(currentProfile.links || []).filter(l => l.isArchived).length}
-                            </span>
-                          </button>
+                        <div className="flex items-center rounded-[50px] border-[0.5px] border-[#DCDCDC] bg-[#FAFAFA] p-[3px]" role="tablist" aria-label="Link filter">
+                          {[
+                            { id: 'active', label: 'Active', icon: null, count: (currentProfile.links || []).filter((l) => !l.isArchived).length },
+                            { id: 'archived', label: 'Archived', icon: Archive, count: (currentProfile.links || []).filter((l) => l.isArchived).length },
+                          ].map((filter) => {
+                            const FilterIcon = filter.icon;
+                            const active = linkFilterTab === filter.id;
+                            return (
+                              <button
+                                key={filter.id}
+                                type="button"
+                                role="tab"
+                                aria-selected={active}
+                                onClick={() => setLinkFilterTab(filter.id)}
+                                className={`flex h-[26px] items-center gap-[5px] rounded-[50px] px-[10px] text-[11px] transition-colors ${
+                                  active ? 'bg-white text-black shadow-[0_1px_3px_rgba(0,0,0,0.08)] border-[0.5px] border-[#DCDCDC]' : 'text-[#808080] hover:text-[#333333]'
+                                }`}
+                              >
+                                {FilterIcon ? <FilterIcon className="w-[12px] h-[12px]" /> : <span className={`h-[6px] w-[6px] rounded-full ${active ? 'bg-[#16A34A]' : 'bg-[#C4C4C4]'}`} />}
+                                <span>{filter.label}</span>
+                                <span className="text-[10px] text-[#AAAAAA]">{filter.count}</span>
+                              </button>
+                            );
+                          })}
                         </div>
                       ) : (
-                        <Button
-                          variant="primary"
-                          size="xs"
-                          leftIcon={Plus}
+                        <button
+                          type="button"
                           onClick={() => setShowAddProductModal(true)}
-                          className="bg-brand-500 text-white"
+                          className="flex h-[30px] items-center gap-[6px] rounded-[50px] bg-[#16A34A] px-[12px] text-[12px] text-white hover:bg-[#15803D]"
                         >
-                          Add Product
-                        </Button>
+                          <Plus className="w-[14px] h-[14px]" /> Add product
+                        </button>
                       )}
                     </div>
 
@@ -2193,7 +2247,7 @@ export default function AtelierStudioPage() {
                           </div>
                         ) : (
                           (currentProfile.links || []).filter(l => !l.isArchived).map((link, idx, activeLinks) => {
-                            const iconSymbol = link.icon || 'link';
+                            const iconSymbol = toMaterialSymbol(link.icon);
                             const isEditingTitle = inlineEditingLinkId === link.id;
 
                             return (
@@ -2651,6 +2705,13 @@ export default function AtelierStudioPage() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       {[
                         {
+                          id: 'templates',
+                          title: 'Templates',
+                          desc: 'Complete starter looks for creators, coaches, shops, music and more',
+                          icon: Sparkles,
+                          badge: `${PROFILE_TEMPLATES.length} looks`,
+                        },
+                        {
                           id: 'profile',
                           title: 'Profile & header',
                           desc: 'Name, bio, logo, avatar shape, header layout and story video',
@@ -2737,6 +2798,20 @@ export default function AtelierStudioPage() {
                           </button>
                         );
                       })}
+                    </div>
+                  )}
+
+                  {/* SUB-MENU: TEMPLATES */}
+                  {designSubMenu === 'templates' && (
+                    <div className="space-y-4 animate-fadeIn">
+                      <p className="text-[12px] text-ink-500">
+                        Each template sets the theme, fonts, header, avatar shape and buttons together. If your page has no links yet, it also adds starter links you can edit.
+                      </p>
+                      <div className="grid grid-cols-2 xl:grid-cols-3 gap-2.5">
+                        {PROFILE_TEMPLATES.map((template) => (
+                          <TemplateCard key={template.id} template={template} onApply={handleApplyTemplate} />
+                        ))}
+                      </div>
                     </div>
                   )}
 

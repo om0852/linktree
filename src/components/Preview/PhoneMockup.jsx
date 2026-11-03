@@ -67,7 +67,7 @@ import SocialProofTicker from '../PublicBio/SocialProofTicker';
 import CarouselSlider from '../Common/CarouselSlider';
 import StickerBlockLayer, { getBlockStickerPositionStyle, findStickerBlockAt } from '../Common/StickerBlockLayer';
 import ScaledCanvas from '../Common/ScaledCanvas';
-import { THEME_PRESETS, CURATED_THEMES, getTitleFontName, getFontStack, loadGoogleFont, getStickerDeviceProps, getStickerPlacementKey, getStickerCanvasPositionStyle, getStickerGraphicSizeStyle, isImageUrl, parseTailwindGradient } from '../../constants/app';
+import { THEME_PRESETS, CURATED_THEMES, getTitleFontName, getFontStack, loadGoogleFont, linkHighlightClass, getStickerDeviceProps, getStickerPlacementKey, getStickerCanvasPositionStyle, getStickerGraphicSizeStyle, isImageUrl, parseTailwindGradient } from '../../constants/app';
 
 const ICON_MAP = {
   Video, Star, Mail, FileText, Music, ShoppingBag, Zap, Briefcase, BookOpen, Calendar, MessageSquare, TrendingUp, Ticket, Globe,
@@ -511,6 +511,7 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
     // Keep the chosen label colour when it reads on the fill; otherwise use one that does.
     const textColor = getReadableButtonText(btnColor, ds?.buttonTextColor || preset?.buttonText, preset?.buttonText);
     const btnStyle = ds?.buttonStyle || 'solid';
+    style['--link-fx-color'] = btnColor;
 
     if (btnStyle === 'solid') {
       style.backgroundColor = btnColor;
@@ -1449,7 +1450,7 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
         key={link.id}
         onClick={() => handleLinkClick(link)}
         style={btnCustomStyle}
-        className={`phone-stack-card ${getStackShapeClass()} w-full transition-all duration-150 hover:scale-[1.01] active:scale-[0.99] flex items-center justify-between p-3.5`}
+        className={`phone-stack-card ${getStackShapeClass()} ${linkHighlightClass(link)} w-full transition-all duration-150 hover:scale-[1.01] active:scale-[0.99] flex items-center justify-between p-3.5`}
       >
         <div className="flex items-center gap-3 min-w-0">
           {iconElement && (
@@ -1506,7 +1507,7 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
         type="button"
         onClick={() => handleLinkClick(link)}
         style={btnCustomStyle}
-        className={`phone-bento-card ${getBentoShapeClass()} ${
+        className={`phone-bento-card ${getBentoShapeClass()} ${linkHighlightClass(link)} ${
           isCarousel ? '' : isLarge ? 'col-span-2' : 'col-span-1'
         } w-full text-left transition-all duration-150 hover:scale-[1.01] active:scale-[0.99] p-3.5 relative flex flex-col justify-between`}
       >

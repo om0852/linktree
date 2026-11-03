@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import AuthModal from '@/components/Auth/AuthModal';
+import { clearWorkspaceSession } from '@/lib/workspaceStore';
 import { THEME_PRESETS, CURATED_THEMES, parseTailwindGradient } from '@/constants/app';
 import { getThemeAppearance } from '@/lib/theme-contrast';
 import { ArrowRight, Check } from '@/components/icons';
@@ -265,7 +266,11 @@ export default function LandingPage({ initialAuth = '', next: requestedNext = ''
           initialMode={auth.mode}
           initialUsername={auth.username}
           onClose={() => setAuth(null)}
-          onSuccess={() => window.location.replace(next)}
+          onSuccess={() => {
+            // A new sign-in must not show the previous account's cached workspace.
+            clearWorkspaceSession();
+            window.location.replace(next);
+          }}
         />
       )}
     </div>

@@ -4,7 +4,7 @@ import connectToDatabase from '@/lib/mongodb';
 import Profile from '@/models/Profile';
 import User from '@/models/User';
 import { getAuthUser } from '@/lib/auth';
-import { INITIAL_USER_PROFILE, AVATAR_SHAPE_IDS } from '@/constants/app';
+import { INITIAL_USER_PROFILE, AVATAR_SHAPE_IDS, LINK_HIGHLIGHT_IDS } from '@/constants/app';
 import { toVisitorProfile, toOwnerProfile } from '@/lib/publicProfile';
 import { requireProfileOwner } from '@/lib/authorization';
 import { hashPassword } from '@/lib/auth';
@@ -105,6 +105,7 @@ export async function POST(request) {
           disabled: Boolean(link.disabled),
           isArchived: Boolean(link.isArchived),
           subtitle: link.subtitle || '',
+          highlight: LINK_HIGHLIGHT_IDS.includes(link.highlight) ? link.highlight : 'none',
           leadMagnet: link.leadMagnet ? { ...link.leadMagnet, assetUrl: link.leadMagnet.assetUrl ? safeLinkUrl(link.leadMagnet.assetUrl) : '' } : {
             enabled: false,
             assetUrl: '',

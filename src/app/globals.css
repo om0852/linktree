@@ -20,6 +20,41 @@
   body:has(.platform-phone-notice) { overflow: hidden; }
 }
 
+/* Link highlights (LINK_HIGHLIGHTS): glow, shimmer and ring never move the
+   card, so stickers pinned to it stay in place. */
+.link-fx { position: relative; isolation: isolate; }
+.link-fx-glow { animation: tib-link-glow 2.4s ease-in-out infinite; }
+@keyframes tib-link-glow {
+  0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--link-fx-color, #16A34A) 0%, transparent); }
+  50% { box-shadow: 0 0 22px 3px color-mix(in srgb, var(--link-fx-color, #16A34A) 55%, transparent); }
+}
+.link-fx-shimmer { overflow: hidden; }
+.link-fx-shimmer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(110deg, transparent 30%, rgba(255, 255, 255, 0.5) 50%, transparent 70%);
+  transform: translateX(-120%);
+  animation: tib-link-shimmer 3.2s ease-in-out infinite;
+}
+@keyframes tib-link-shimmer { 0%, 35% { transform: translateX(-120%); } 75%, 100% { transform: translateX(120%); } }
+.link-fx-ring::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  pointer-events: none;
+  border: 2px solid var(--link-fx-color, #16A34A);
+  animation: tib-link-ring 2s ease-out infinite;
+}
+@keyframes tib-link-ring { 0% { opacity: 0.8; transform: scale(1); } 100% { opacity: 0; transform: scale(1.06, 1.25); } }
+@media (prefers-reduced-motion: reduce) {
+  .link-fx-glow, .link-fx-shimmer::after, .link-fx-ring::after { animation: none; }
+  .link-fx-glow { box-shadow: 0 0 16px 2px color-mix(in srgb, var(--link-fx-color, #16A34A) 45%, transparent); }
+}
+
 /* Landing page motion (disabled for reduced motion below). */
 @keyframes tib-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
 @keyframes tib-marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }

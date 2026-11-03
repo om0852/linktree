@@ -171,6 +171,19 @@ export const THEME_PRESETS = [
   { id: 'twilight', name: 'Twilight Deep', bg: 'bg-gradient-to-b from-[#0F2027] via-[#203A43] to-[#2C5364]', cardBg: 'bg-white/10', text: 'text-[#E0EAFC]', border: 'border-white/20', accent: '#6DD5ED', primary: '#6DD5ED', tag: 'Night', button: '#6DD5ED', buttonText: '#0F2027' },
 ];
 
+// Effects that draw attention to one link. They never move the card itself
+// (pseudo-elements and shadows only), so pinned stickers stay put.
+export const LINK_HIGHLIGHTS = [
+  { id: 'none', label: 'None' },
+  { id: 'glow', label: 'Glow' },
+  { id: 'shimmer', label: 'Shimmer' },
+  { id: 'ring', label: 'Ring' },
+];
+export const LINK_HIGHLIGHT_IDS = LINK_HIGHLIGHTS.map((item) => item.id);
+export const linkHighlightClass = (link) => (
+  link?.highlight && link.highlight !== 'none' && LINK_HIGHLIGHT_IDS.includes(link.highlight) ? `link-fx link-fx-${link.highlight}` : ''
+);
+
 export const AVATAR_SHAPES = [
   { id: 'circle', name: 'Circle', label: 'Circle', class: 'rounded-full' },
   { id: 'rounded', name: 'Rounded', label: 'Rounded', class: 'rounded-2xl' },
