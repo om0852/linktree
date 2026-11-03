@@ -115,7 +115,7 @@ test('Linktree-Grade Full Capabilities & Zero-Gating Test Suite', async (t) => {
   });
 
   await t.test('validates /api/scrape-product OpenGraph auto-scraper endpoint', async () => {
-    const unauthenticated = await fetch('http://localhost:3000/api/scrape-product', {
+    const unauthenticated = await fetch(`${process.env.TEST_BASE_URL || 'http://localhost:3000'}/api/scrape-product`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ url: 'https://example.com' }),
@@ -125,7 +125,7 @@ test('Linktree-Grade Full Capabilities & Zero-Gating Test Suite', async (t) => {
     const jwtSecret = process.env.TEST_JWT_SECRET || process.env.JWT_SECRET;
     assert.ok(jwtSecret && jwtSecret.length >= 32, 'Set TEST_JWT_SECRET (and use the same JWT_SECRET on the test server) to run authenticated API cases.');
     const token = jwt.sign({ id: 'test_admin_id', username: 'emilyvance', role: 'admin' }, jwtSecret, { expiresIn: '7d' });
-    const res = await fetch('http://localhost:3000/api/scrape-product', {
+    const res = await fetch(`${process.env.TEST_BASE_URL || 'http://localhost:3000'}/api/scrape-product`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
       body: JSON.stringify({ url: 'https://example.com' }),
@@ -161,10 +161,11 @@ test('Linktree-Grade Full Capabilities & Zero-Gating Test Suite', async (t) => {
     const content = fs.readFileSync('src/app/page.js', 'utf8');
 
     assert.ok(content.includes('MoreVertical'), 'Includes MoreVertical 3-dot trigger');
-    assert.ok(content.includes('Edit Title (X/35)'), 'Has Edit title action');
-    assert.ok(content.includes('Move to Collection'), 'Has Move to collection action');
-    assert.ok(content.includes('Hide Block') && content.includes('Unhide Block'), 'Has Hide/Unhide action');
-    assert.ok(content.includes('Archive (Keep Clicks)') && content.includes('Delete Permanently'), 'Has Archive and Delete actions');
+    // Menu: Rename, Hide/Show, Collection, Archive, Delete.
+    assert.ok(content.includes('handleStartInlineEdit(link)') && content.includes('Rename'), 'Has Rename action');
+    assert.ok(content.includes('handleAssignLinkToCollection(link.id'), 'Has Move to collection action');
+    assert.ok(content.includes("{link.disabled ? 'Show' : 'Hide'}"), 'Has Hide/Show action');
+    assert.ok(content.includes('handleArchiveLink(link.id)') && content.includes('handleDeleteLink(link.id)'), 'Has Archive and Delete actions');
   });
 
   await t.test('validates ThumbnailPopover 4 Square Source Action Cards (Upload, Canva, GIPHY, AI)', async () => {
@@ -175,8 +176,8 @@ test('Linktree-Grade Full Capabilities & Zero-Gating Test Suite', async (t) => {
     assert.ok(content.includes('Canva'), 'Has Canva action card');
     assert.ok(content.includes('GIPHY'), 'Has GIPHY action card');
     assert.ok(content.includes('AI Icon'), 'Has AI Icon generator action card');
-    assert.ok(content.includes('EyeOff'), 'Uses EyeOff icon');
-    assert.ok(content.includes('No thumbnail will be displayed for this link.'), 'Has exact None tab subtext');
+    assert.ok(content.includes("setActiveTab('none')"), 'Has a None tab');
+    assert.ok(content.includes('No thumbnail will be shown for this link.'), 'Has None tab subtext');
   });
 
   await t.test('validates PublicBioView & PhoneMockup alternativeTitleFont dynamic rendering', async () => {
@@ -186,15 +187,18 @@ test('Linktree-Grade Full Capabilities & Zero-Gating Test Suite', async (t) => {
 
     assert.ok(publicBio.includes('alternativeTitleFont'), 'PublicBioView applies alternativeTitleFont');
     assert.ok(phoneMockup.includes('alternativeTitleFont'), 'PhoneMockup applies alternativeTitleFont');
-    assert.ok(publicBio.includes('https://fonts.googleapis.com/css2?family='), 'PublicBioView dynamically loads Google Fonts');
-    assert.ok(phoneMockup.includes('https://fonts.googleapis.com/css2?family='), 'PhoneMockup dynamically loads Google Fonts');
+    // Both load the chosen fonts through loadGoogleFont (src/constants/app.js).
+    const constants = fs.readFileSync('src/constants/app.js', 'utf8');
+    assert.ok(constants.includes('https://fonts.googleapis.com/css2?family='), 'loadGoogleFont requests Google Fonts');
+    assert.ok(publicBio.includes('loadGoogleFont(getTitleFontName(profile?.alternativeTitleFont))'), 'PublicBioView dynamically loads Google Fonts');
+    assert.ok(phoneMockup.includes('loadGoogleFont(getTitleFontName(profile?.alternativeTitleFont))'), 'PhoneMockup dynamically loads Google Fonts');
   });
 
   await t.test('validates AddProductModal omni-input clear button and auto-fill', async () => {
     const fs = await import('node:fs');
     const modalContent = fs.readFileSync('src/components/Modals/AddProductModal.jsx', 'utf8');
 
-    assert.ok(modalContent.includes('Search for products or paste a link'), 'Has correct omni-input placeholder');
+    assert.ok(modalContent.includes('Paste an Amazon, Shopify or Etsy link'), 'Has correct omni-input placeholder');
     assert.ok(modalContent.includes('title="Clear link"'), 'Has clear button on omni-input');
     assert.ok(modalContent.includes('/api/scrape-product'), 'Calls /api/scrape-product scraper');
   });

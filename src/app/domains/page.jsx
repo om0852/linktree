@@ -218,10 +218,10 @@ export default function DomainsPage() {
   return (
     <div className="min-h-screen bg-canvas text-ink-700">
 
-      <div className="lg:pl-[280px] h-screen overflow-hidden flex flex-col">
+      <div className="lg:pl-[280px] h-dvh overflow-hidden flex flex-col">
 
         {/* Main Domains Content Workspace */}
-        <main style={{ height: 'calc(100vh - 20px)' }} className="mt-[10px] mx-[10px] lg:ml-0 min-w-0 rounded-[10px] bg-white p-[15px] flex flex-col overflow-hidden">
+        <main style={{ height: 'calc(100dvh - 20px)' }} className="mt-[10px] mx-[10px] lg:ml-0 min-w-0 rounded-[10px] bg-white p-[15px] flex flex-col overflow-hidden">
         <AtelierHeader
           title="Custom Domains"
           mobileOpen={mobileOpen}
@@ -279,11 +279,12 @@ export default function DomainsPage() {
             <RoundIconButton icon={RefreshCw} title="Refresh" onClick={() => refreshDomains()} iconClassName={loading ? 'animate-spin' : ''} />
           </div>
 
+          {/* On phones the number and status columns fold into the name column. */}
           <div>
-            <div className="grid grid-cols-7 border-b-[0.5px] border-[#C4C4C466] text-[12px] font-medium">
-              <div className="flex items-center justify-center border-r-[0.5px] border-[#C4C4C466] px-[12px] py-[12px]">Sr. No.</div>
-              <div className="col-span-3 flex items-center border-r-[0.5px] border-[#C4C4C466] px-[12px] py-[12px]">Domain</div>
-              <div className="flex items-center justify-center border-r-[0.5px] border-[#C4C4C466] px-[12px] py-[12px]">Status</div>
+            <div className="grid grid-cols-7 max-md:grid-cols-[minmax(0,1fr)_96px_52px] border-b-[0.5px] border-[#C4C4C466] text-[12px] font-medium">
+              <div className="flex items-center justify-center border-r-[0.5px] border-[#C4C4C466] px-[12px] py-[12px] max-md:hidden">Sr. No.</div>
+              <div className="col-span-3 max-md:col-span-1 flex items-center border-r-[0.5px] border-[#C4C4C466] px-[12px] py-[12px]">Domain</div>
+              <div className="flex items-center justify-center border-r-[0.5px] border-[#C4C4C466] px-[12px] py-[12px] max-md:hidden">Status</div>
               <div className="flex items-center justify-center border-r-[0.5px] border-[#C4C4C466] px-[12px] py-[12px]">DNS</div>
               <div className="flex items-center justify-center px-[12px] py-[12px]">Remove</div>
             </div>
@@ -296,15 +297,15 @@ export default function DomainsPage() {
               domains.map((d, index) => {
                 const active = d.verified || d.status === 'active';
                 return (
-                  <div key={d._id || d.hostname} className={`group grid grid-cols-7 hover:bg-[#F8F8F9] ${index === domains.length - 1 ? '' : 'border-b-[0.5px] border-[#C4C4C466]'}`}>
-                    <div className="flex items-center justify-center border-r-[0.5px] border-[#C4C4C466] px-[12px] py-[8px] text-[12px]">{index + 1}</div>
-                    <div className="col-span-3 flex min-w-0 flex-col justify-center border-r-[0.5px] border-[#C4C4C466] px-[12px] py-[8px]">
+                  <div key={d._id || d.hostname} className={`group grid grid-cols-7 max-md:grid-cols-[minmax(0,1fr)_96px_52px] hover:bg-[#F8F8F9] ${index === domains.length - 1 ? '' : 'border-b-[0.5px] border-[#C4C4C466]'}`}>
+                    <div className="flex items-center justify-center border-r-[0.5px] border-[#C4C4C466] px-[12px] py-[8px] text-[12px] max-md:hidden">{index + 1}</div>
+                    <div className="col-span-3 max-md:col-span-1 flex min-w-0 flex-col justify-center border-r-[0.5px] border-[#C4C4C466] px-[12px] py-[8px]">
                       <a href={`https://${d.hostname}`} target="_blank" rel="noopener noreferrer" className="truncate text-[14px] hover:underline" title={`Open ${d.hostname}`}>
                         {d.hostname}
                       </a>
-                      <span className="truncate text-[10px] text-[#808080]">@{d.username}</span>
+                      <span className="truncate text-[10px] text-[#808080]">@{d.username}<span className="md:hidden"> · {active ? 'Active' : 'Pending'}</span></span>
                     </div>
-                    <div className="flex items-center justify-center border-r-[0.5px] border-[#C4C4C466] px-[12px] py-[8px] text-[12px]">
+                    <div className="flex items-center justify-center border-r-[0.5px] border-[#C4C4C466] px-[12px] py-[8px] text-[12px] max-md:hidden">
                       {active ? 'Active' : <span className="text-[#92400E]">Pending</span>}
                     </div>
                     <div className="flex items-center justify-center border-r-[0.5px] border-[#C4C4C466] px-[12px] py-[8px]">
@@ -321,7 +322,7 @@ export default function DomainsPage() {
                       <RoundIconButton icon={Trash2} tone="danger" title="Remove domain" onClick={() => handleDelete(d._id, d.hostname)} />
                     </div>
                     {!active && d.verificationToken && (
-                      <div className="col-span-7 border-t-[0.5px] border-[#F0F0F0] px-[12px] py-[8px] text-[11px] text-[#808080]">
+                      <div className="col-span-7 max-md:col-span-3 border-t-[0.5px] border-[#F0F0F0] px-[12px] py-[8px] text-[11px] text-[#808080]">
                         Add TXT record <span className="text-[#333333]">{domainVerificationRecordName(d.hostname)}</span> with value{' '}
                         <button type="button" onClick={() => handleCopy(d.verificationToken, `txt_${d._id}`)} className="text-[#333333] hover:underline" title="Copy value">
                           {d.verificationToken}

@@ -1,0 +1,87 @@
+# Every push and pull request: lint, unit and CLI tests, a production build,
+# then the API integration and end-to-end suites against that build with a
+# throwaway MongoDB. Nothing here touches production data or secrets.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    services:
+      mongo:
+        image: mongo:7
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --quiet --eval 'db.runCommand({ ping: 1 })'"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+
+    env:
+      MONGODB_URI: mongodb://127.0.0.1:27017/treeinbio_ci
+      # Disposable secrets for the throwaway CI database only.
+      JWT_SECRET: ci-only-jwt-secret-not-used-anywhere-else
+      TEST_JWT_SECRET: ci-only-jwt-secret-not-used-anywhere-else
+      TELEMETRY_SALT: ci-only-telemetry-salt
+      NEXT_PUBLIC_APP_URL: http://127.0.0.1:3000
+      TEST_BASE_URL: http://127.0.0.1:3000
+      NEXT_TELEMETRY_DISABLED: 1
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Unit tests
+        run: npm run test:unit
+
+      - name: CLI and MCP helper tests
+        run: npm run test:cli
+
+      - name: Build
+        run: npm run build
+
+      - name: Start the app
+        run: |
+          npm run start -- -p 3000 > server.log 2>&1 &
+          for i in $(seq 1 60); do
+            curl -fs -o /dev/null http://127.0.0.1:3000/welcome && exit 0
+            sleep 2
+          done
+          echo "The app did not start"; cat server.log; exit 1
+
+      - name: Seed the test database
+        run: node tests/e2e/seed-ci.mjs
+
+      - name: API integration tests
+        run: npm run test:integration
+
+      - name: End-to-end tests (MCP, security, photo wallpapers)
+        run: npm run test:e2e
+
+      - name: Server log
+        if: failure()
+        run: tail -n 200 server.log || true

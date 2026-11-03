@@ -3,7 +3,6 @@
 import React, { useEffect } from 'react';
 import AtelierSidebar from './AtelierSidebar';
 import { useWorkspaceSession, updateWorkspaceSession, clearWorkspaceSession } from '@/lib/workspaceStore';
-import PhoneScreenNotice from '../Common/PhoneScreenNotice';
 
 const pill = 'flex h-[23px] items-center px-[10px] rounded-[50px] text-[10px] whitespace-nowrap';
 const softPill = `${pill} bg-[#F8F8F9] text-[#333333] hover:bg-[#F0F0F0]`;
@@ -54,7 +53,6 @@ export default function AtelierHeader({
 
   return (
     <>
-      <PhoneScreenNotice username={(authUser && profileUsername) || session.activeUsername || signedInUsername} />
       <AtelierSidebar
         mobileOpen={mobileOpen}
         onToggleMobile={onToggleMobile}

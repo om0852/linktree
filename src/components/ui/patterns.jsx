@@ -118,8 +118,8 @@ export function Delta({ value }) {
 /** KPI card (OverViewTopBar): 40px icon tile, value, delta, label. */
 export function KpiCard({ icon: Icon, value, label, delta, tooltip }) {
   const card = (
-    <div className="flex min-w-0 items-center rounded-[10px] border-[0.5px] border-[#dcdcdc] p-[15px]">
-      <div className="flex size-[40px] shrink-0 items-center justify-center rounded-[5px] bg-[#F8F8F9]">
+    <div className="flex min-w-0 items-center rounded-[10px] border-[0.5px] border-[#dcdcdc] p-[12px] sm:p-[15px]">
+      <div className="flex size-[34px] shrink-0 items-center justify-center rounded-[5px] bg-[#F8F8F9] sm:size-[40px]">
         {Icon && <Icon size={24} color="#333333" strokeWidth={1.25} />}
       </div>
       <div className="ml-[10px] flex min-w-0 flex-col">
@@ -137,7 +137,7 @@ export function KpiCard({ icon: Icon, value, label, delta, tooltip }) {
 const KPI_COLUMNS = { 2: 'lg:grid-cols-2', 3: 'lg:grid-cols-3', 4: 'lg:grid-cols-4', 5: 'lg:grid-cols-5' };
 
 export function KpiGrid({ children, columns = 4 }) {
-  return <div className={`grid grid-cols-1 gap-[15px] sm:grid-cols-2 ${KPI_COLUMNS[columns] || KPI_COLUMNS[4]}`}>{children}</div>;
+  return <div className={`grid grid-cols-2 gap-[10px] sm:gap-[15px] ${KPI_COLUMNS[columns] || KPI_COLUMNS[4]}`}>{children}</div>;
 }
 
 /** Settings row: title + one helper sentence left, control right. */

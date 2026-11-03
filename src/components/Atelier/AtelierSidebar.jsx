@@ -19,7 +19,7 @@ export default function AtelierSidebar({ mobileOpen, onToggleMobile, authUser, c
       {mobileOpen && <div onClick={onToggleMobile} className="fixed inset-0 z-40 bg-black/40 backdrop-blur-[2px] lg:hidden" />}
 
       <aside
-        style={{ height: 'calc(100vh - 20px)' }}
+        style={{ height: 'calc(100dvh - 20px)' }}
         className={`fixed left-[10px] top-[10px] z-50 w-[260px] min-w-[260px] rounded-[10px] bg-white py-[15px] transition-transform duration-200 ${mobileOpen ? 'translate-x-0' : '-translate-x-[calc(100%_+_20px)] lg:translate-x-0'}`}
       >
         {/* Logo row */}
@@ -44,7 +44,7 @@ export default function AtelierSidebar({ mobileOpen, onToggleMobile, authUser, c
         {/* Nav */}
         <nav
           className="customScrollBar mr-[3px] mt-[15px] overflow-y-auto pl-[13px] pr-[4px] text-[14px]"
-          style={{ height: authUser ? 'calc(100vh - 162px)' : 'calc(100vh - 118px)' }}
+          style={{ height: authUser ? 'calc(100dvh - 162px)' : 'calc(100dvh - 118px)' }}
         >
           {SIDEBAR_NAV_ITEMS.map((item) => {
             const active = isItemActive(item);

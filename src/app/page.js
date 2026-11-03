@@ -118,6 +118,7 @@ import {
 } from '@/components/icons';
 import PaletteSuggester from '../components/Builder/PaletteSuggester';
 import WallpaperPhotoPanel from '../components/Builder/WallpaperPhotoPanel';
+import StudioMobileTabs from '../components/Atelier/StudioMobileTabs';
 import { detectEmbed } from '../utils/embedDetector';
 
 /** Creatosaurus secondary button (AccountDeletePopup Cancel). */
@@ -163,6 +164,8 @@ export default function AtelierStudioPage() {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [authModalMode, setAuthModalMode] = useState('login');
   const [activeTab, setActiveTab] = useState('links'); // 'links', 'style', 'widgets'
+  // Phones show the editor or the preview, switched from the bottom tab bar.
+  const [mobilePreview, setMobilePreview] = useState(false);
   const [deviceMode, setDeviceMode] = useState('mobile'); // 'mobile', 'tablet', 'desktop'
   const [rankerDismissed, setRankerDismissed] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
@@ -1133,11 +1136,11 @@ export default function AtelierStudioPage() {
       {/* Atelier Left Navigation Sidebar */}
 
       {/* Main Content Workspace Container */}
-      <div className="lg:pl-[280px] h-screen overflow-hidden bg-canvas flex flex-col">
+      <div className="lg:pl-[280px] h-dvh overflow-hidden bg-canvas flex flex-col">
         {/* TreeInBio Top Header */}
 
         {/* Main Studio Viewport */}
-        <main style={{ height: 'calc(100vh - 20px)' }} className="mt-[10px] mx-[10px] lg:ml-0 min-w-0 rounded-[10px] bg-white p-[15px] flex flex-col overflow-hidden">
+        <main style={{ height: 'calc(100dvh - 20px)' }} className="mt-[10px] mx-[10px] lg:ml-0 min-w-0 rounded-[10px] bg-white p-[15px] flex flex-col overflow-hidden">
         <AtelierHeader
           title="Studio"
           mobileOpen={mobileSidebarOpen}
@@ -1173,13 +1176,13 @@ export default function AtelierStudioPage() {
             }
           }}
         />
-        <div className="customScrollBar mt-[15px] min-h-0 flex-1 overflow-y-auto pr-[6px] -mr-[9px] flex flex-col gap-[15px]">
+        <div className="customScrollBar mt-[15px] min-h-0 flex-1 overflow-y-auto pr-[6px] -mr-[9px] max-md:pb-[76px] flex flex-col gap-[15px]">
           <Toolbar
             left={
               <>
-                <PillTab active={activeTab === 'links'} onClick={() => setActiveTab('links')}>Links</PillTab>
-                <PillTab active={activeTab === 'style'} onClick={() => setActiveTab('style')}>Design</PillTab>
-                <PillTab active={activeTab === 'widgets'} onClick={() => setActiveTab('widgets')}>Widgets</PillTab>
+                <PillTab className="max-md:hidden" active={activeTab === 'links'} onClick={() => setActiveTab('links')}>Links</PillTab>
+                <PillTab className="max-md:hidden" active={activeTab === 'style'} onClick={() => setActiveTab('style')}>Design</PillTab>
+                <PillTab className="max-md:hidden" active={activeTab === 'widgets'} onClick={() => setActiveTab('widgets')}>Widgets</PillTab>
               </>
             }
             right={
@@ -1201,7 +1204,7 @@ export default function AtelierStudioPage() {
           />
 
           {activeTab === 'links' && (
-            <div className="flex flex-wrap items-center gap-[10px]">
+            <div className={`flex flex-wrap items-center gap-[10px] max-md:grid max-md:grid-cols-2 max-md:[&>button]:justify-center ${mobilePreview ? 'max-md:hidden' : ''}`}>
               <button
                 type="button"
                 onClick={() => setShowMarketplace(true)}
@@ -1274,7 +1277,7 @@ export default function AtelierStudioPage() {
           {/* 12-Column Responsive Split */}
           <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
             {/* Left 7 Columns: Architecture & Parameters */}
-            <div className="xl:col-span-7 flex flex-col gap-6">
+            <div className={`xl:col-span-7 flex min-w-0 flex-col gap-6 ${mobilePreview ? 'max-md:hidden' : ''}`}>
               {/* Tab 1: Links & Cards */}
               {activeTab === 'links' && (
                 <>
@@ -3891,8 +3894,8 @@ export default function AtelierStudioPage() {
             </div>
 
             {/* Right 5 Columns: Live Bio Preview */}
-            <div className="xl:col-span-5 flex flex-col gap-2">
-              <div className="bg-white border-[0.5px] border-line rounded-[10px] p-[15px] flex flex-col items-center">
+            <div className={`xl:col-span-5 flex min-w-0 flex-col gap-2 ${mobilePreview ? '' : 'max-md:hidden'}`}>
+              <div className="bg-white border-[0.5px] border-line rounded-[10px] p-[15px] max-md:px-0 max-md:border-0 flex flex-col items-center">
                 <PhoneMockup
                   profile={currentProfile}
                   onIncrementClick={handleMockupLinkClick}
@@ -3912,6 +3915,19 @@ export default function AtelierStudioPage() {
         </div>
         </main>
       </div>
+
+      <StudioMobileTabs
+        activeTab={activeTab}
+        showPreview={mobilePreview}
+        onSelect={(tab) => {
+          if (tab === 'preview') {
+            setMobilePreview(true);
+          } else {
+            setMobilePreview(false);
+            setActiveTab(tab);
+          }
+        }}
+      />
 
       {/* Interactive Global Modals */}
 

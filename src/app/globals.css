@@ -15,10 +15,6 @@
   font-family: 'Space Grotesk', monospace !important;
 }
 
-/* Platform pages on phones: the notice covers the page, so stop it scrolling. */
-@media (max-width: 767px) {
-  body:has(.platform-phone-notice) { overflow: hidden; }
-}
 
 /* Link highlights (LINK_HIGHLIGHTS): glow, shimmer and ring never move the
    card, so stickers pinned to it stay in place. */

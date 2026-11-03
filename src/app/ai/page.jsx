@@ -182,8 +182,8 @@ export default function AiAssistantsPage() {
 
   return (
     <div className="min-h-screen bg-canvas text-ink-700">
-      <div className="lg:pl-[280px] h-screen overflow-hidden flex flex-col">
-        <main style={{ height: 'calc(100vh - 20px)' }} className="mt-[10px] mx-[10px] lg:ml-0 min-w-0 rounded-[10px] bg-white p-[15px] flex flex-col overflow-hidden">
+      <div className="lg:pl-[280px] h-dvh overflow-hidden flex flex-col">
+        <main style={{ height: 'calc(100dvh - 20px)' }} className="mt-[10px] mx-[10px] lg:ml-0 min-w-0 rounded-[10px] bg-white p-[15px] flex flex-col overflow-hidden">
           <AtelierHeader
             title="AI Assistants"
             mobileOpen={mobileOpen}

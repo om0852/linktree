@@ -323,11 +323,11 @@ export default function ConnectorsPage() {
   return (
     <div className="min-h-screen bg-canvas text-ink-700 antialiased font-sans">
 
-      <div className="lg:pl-[280px] h-screen overflow-hidden flex flex-col">
+      <div className="lg:pl-[280px] h-dvh overflow-hidden flex flex-col">
 
 
         {/* Main Content Viewport */}
-        <main style={{ height: 'calc(100vh - 20px)' }} className="mt-[10px] mx-[10px] lg:ml-0 min-w-0 rounded-[10px] bg-white p-[15px] flex flex-col overflow-hidden">
+        <main style={{ height: 'calc(100dvh - 20px)' }} className="mt-[10px] mx-[10px] lg:ml-0 min-w-0 rounded-[10px] bg-white p-[15px] flex flex-col overflow-hidden">
         <AtelierHeader
           title="Connectors"
           mobileOpen={mobileOpen} 
@@ -379,11 +379,12 @@ export default function ConnectorsPage() {
             <InfoChip>Connected ({connectedAccounts.length}/{AVAILABLE_CONNECTORS.length})</InfoChip>
           </div>
 
+          {/* On phones the number and status columns fold into the name column. */}
           <div>
-            <div className="grid grid-cols-7 border-b-[0.5px] border-[#C4C4C466] text-[12px] font-medium">
-              <div className="flex items-center justify-center border-r-[0.5px] border-[#C4C4C466] px-[12px] py-[12px]">Sr. No.</div>
-              <div className="col-span-3 flex items-center border-r-[0.5px] border-[#C4C4C466] px-[12px] py-[12px]">Connector</div>
-              <div className="flex items-center justify-center border-r-[0.5px] border-[#C4C4C466] px-[12px] py-[12px]">Status</div>
+            <div className="grid grid-cols-7 max-md:grid-cols-[minmax(0,1fr)_96px_52px] border-b-[0.5px] border-[#C4C4C466] text-[12px] font-medium">
+              <div className="flex items-center justify-center border-r-[0.5px] border-[#C4C4C466] px-[12px] py-[12px] max-md:hidden">Sr. No.</div>
+              <div className="col-span-3 max-md:col-span-1 flex items-center border-r-[0.5px] border-[#C4C4C466] px-[12px] py-[12px]">Connector</div>
+              <div className="flex items-center justify-center border-r-[0.5px] border-[#C4C4C466] px-[12px] py-[12px] max-md:hidden">Status</div>
               <div className="flex items-center justify-center border-r-[0.5px] border-[#C4C4C466] px-[12px] py-[12px]">Action</div>
               <div className="flex items-center justify-center px-[12px] py-[12px]">Remove</div>
             </div>
@@ -401,10 +402,10 @@ export default function ConnectorsPage() {
               return (
                 <div
                   key={connector.id}
-                  className={`group grid grid-cols-7 hover:bg-[#F8F8F9] ${index === filteredConnectors.length - 1 ? '' : 'border-b-[0.5px] border-[#C4C4C466]'}`}
+                  className={`group grid grid-cols-7 max-md:grid-cols-[minmax(0,1fr)_96px_52px] hover:bg-[#F8F8F9] ${index === filteredConnectors.length - 1 ? '' : 'border-b-[0.5px] border-[#C4C4C466]'}`}
                 >
-                  <div className="flex items-center justify-center border-r-[0.5px] border-[#C4C4C466] px-[12px] py-[8px] text-[12px]">{index + 1}</div>
-                  <div className="col-span-3 flex min-w-0 items-center gap-[10px] border-r-[0.5px] border-[#C4C4C466] px-[12px] py-[8px]" title={`${connector.description} ${connector.bioIntegration || ''}`.trim()}>
+                  <div className="flex items-center justify-center border-r-[0.5px] border-[#C4C4C466] px-[12px] py-[8px] text-[12px] max-md:hidden">{index + 1}</div>
+                  <div className="col-span-3 max-md:col-span-1 flex min-w-0 items-center gap-[10px] border-r-[0.5px] border-[#C4C4C466] px-[12px] py-[8px]" title={`${connector.description} ${connector.bioIntegration || ''}`.trim()}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={connector.iconUrl}
@@ -414,10 +415,10 @@ export default function ConnectorsPage() {
                     />
                     <span className="min-w-0">
                       <span className="block truncate text-[14px]">{connector.name}</span>
-                      <span className="block truncate text-[10px] text-[#808080]">{connector.category}</span>
+                      <span className="block truncate text-[10px] text-[#808080]">{connector.category}<span className="md:hidden">{isConnected ? ' · Active' : ''}</span></span>
                     </span>
                   </div>
-                  <div className="flex items-center justify-center border-r-[0.5px] border-[#C4C4C466] px-[12px] py-[8px] text-[12px]">
+                  <div className="flex items-center justify-center border-r-[0.5px] border-[#C4C4C466] px-[12px] py-[8px] text-[12px] max-md:hidden">
                     {isConnected ? 'Active' : <span className="text-[#808080]">Not connected</span>}
                   </div>
                   <div className="flex items-center justify-center border-r-[0.5px] border-[#C4C4C466] px-[12px] py-[8px]">

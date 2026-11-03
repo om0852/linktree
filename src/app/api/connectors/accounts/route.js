@@ -15,6 +15,7 @@ export async function GET(req) {
     if (!isComposioConfigured()) {
       return NextResponse.json({
         configured: false,
+        userId,
         accounts: [],
         error: 'COMPOSIO_API_KEY is not configured in .env.local'
       });
