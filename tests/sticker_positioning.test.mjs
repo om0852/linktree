@@ -50,3 +50,36 @@ test('sticker artwork has the same pixel size on every device', () => {
     assert.deepEqual(getStickerGraphicSizeStyle(mode, 'emoji'), { fontSize: '30px', lineHeight: '36px' });
   }
 });
+
+test('a block-pinned content sticker follows its block, not the page top', async () => {
+  const { getBlockStickerPositionStyle } = await import('../src/lib/stickerBlocks.js');
+  const props = { anchorType: 'CONTENT', blockKey: 'lead-capture', blockX: 80, blockY: 25 };
+
+  // Studio preview: the card is 308x62 and starts 277px down.
+  assert.deepEqual(
+    getBlockStickerPositionStyle(props, { 'lead-capture': { left: 0, top: 277, width: 308, height: 62 } }),
+    { left: '246.4px', top: '292.5px' },
+  );
+  // Public phone page: the same card is 326x128 and starts 292px down.
+  assert.deepEqual(
+    getBlockStickerPositionStyle(props, { 'lead-capture': { left: 24, top: 292, width: 326, height: 128 } }),
+    { left: '284.8px', top: '324px' },
+  );
+});
+
+test('a sticker whose block is gone falls back to its page position', async () => {
+  const { getBlockStickerPositionStyle } = await import('../src/lib/stickerBlocks.js');
+  assert.equal(getBlockStickerPositionStyle({ blockKey: 'link:deleted', blockX: 10, blockY: 10 }, {}), null);
+  assert.equal(getBlockStickerPositionStyle({ x: 10, y: 10 }, { 'lead-capture': { left: 0, top: 0, width: 1, height: 1 } }), null);
+});
+
+test('device props carry the block pin from the per-device placement', () => {
+  const sticker = {
+    anchorType: 'CONTENT',
+    devices: { mobile: { x: 80, y: 300, anchorType: 'CONTENT', coordinateMode: 'pixel-offset', blockKey: 'link:l_1', blockX: 90, blockY: 50 } },
+  };
+  const props = getStickerDeviceProps(sticker, 'mobile');
+  assert.equal(props.blockKey, 'link:l_1');
+  assert.equal(props.blockX, 90);
+  assert.equal(props.blockY, 50);
+});

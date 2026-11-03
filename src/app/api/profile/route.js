@@ -12,6 +12,8 @@ import { safeLinkUrl, safeMediaUrl } from '@/lib/safeUrl';
 
 const STICKER_ANCHORS = ['HEADER', 'PROFILE_HEADER', 'CONTENT'];
 const STICKER_COORDINATE_MODES = ['height-percent', 'pixel-offset'];
+// Block a content sticker is pinned to, e.g. "lead-capture" or "link:l_123".
+const STICKER_BLOCK_KEY = /^[a-z][a-z-]{0,30}(:[A-Za-z0-9_-]{1,80})?$/;
 
 // GET profile by ?username=xyz or current authenticated user
 export async function GET(request) {
@@ -270,6 +272,13 @@ export async function POST(request) {
                 ? stk.coordinateMode
                 : (STICKER_COORDINATE_MODES.includes(mobilePlacement.coordinateMode) ? mobilePlacement.coordinateMode : 'height-percent');
               const refWidth = Number(stk.refWidth ?? mobilePlacement.refWidth);
+              const blockKey = stk.blockKey ?? mobilePlacement.blockKey;
+              const blockX = Number(stk.blockX ?? mobilePlacement.blockX);
+              const blockY = Number(stk.blockY ?? mobilePlacement.blockY);
+              const blockPin = anchorType === 'CONTENT' && typeof blockKey === 'string' && STICKER_BLOCK_KEY.test(blockKey)
+                && Number.isFinite(blockX) && Number.isFinite(blockY)
+                ? { blockKey, blockX, blockY }
+                : {};
 
               return {
                 id: stk.id || `stk_${Date.now()}_${sIdx}`,
@@ -287,6 +296,7 @@ export async function POST(request) {
                 anchorType,
                 coordinateMode,
                 ...(refWidth > 0 && refWidth < 5000 ? { refWidth } : {}),
+                ...blockPin,
                 devices: stk.devices && typeof stk.devices === 'object' ? stk.devices : {},
               };
             })

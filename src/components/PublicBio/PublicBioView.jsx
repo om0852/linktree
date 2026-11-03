@@ -62,6 +62,7 @@ import SocialProofTicker from './SocialProofTicker';
 import TrackingPixels from './TrackingPixels';
 import AccessGateScreen from '../Common/AccessGateScreen';
 import CarouselSlider from '../Common/CarouselSlider';
+import StickerBlockLayer, { getBlockStickerPositionStyle } from '../Common/StickerBlockLayer';
 import { THEME_PRESETS, CURATED_THEMES, getTitleFontName, getStickerDeviceProps, getStickerCanvasPositionStyle, getStickerGraphicSizeStyle, isImageUrl, parseTailwindGradient } from '../../constants/app';
 import { safeLinkUrl } from '../../lib/safeUrl';
 
@@ -597,7 +598,7 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
   };
 
   // Section-anchored stickers rendering (HEADER vs CONTENT)
-  const renderStickersSection = (targetMode, anchorFilter = 'HEADER') => {
+  const renderStickersSection = (targetMode, anchorFilter = 'HEADER', blockRects = null) => {
     // Resolve the anchor the same way the editor does (per-device placement
     // first); profiles saved before the fix lost the top-level anchorType.
     const stickersList = (profile?.designSettings?.stickers || []).filter((stk) => (
@@ -614,7 +615,7 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
               key={stk.id}
               className="absolute z-30 pointer-events-none select-none"
               style={{
-                ...getStickerCanvasPositionStyle(p),
+                ...(getBlockStickerPositionStyle(p, blockRects) || getStickerCanvasPositionStyle(p)),
                 transform: `translate(-50%, -50%) scale(${p.scale}) rotate(${p.rotate}deg)`,
               }}
             >
@@ -813,7 +814,7 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
     const btnCustomStyle = getButtonCustomStyle();
     const themeStyles = getThemeStyles();
     return (
-      <div 
+      <div data-sticker-block="lead-capture" 
         onClick={() => setShowLeadModal(true)}
         style={themeStyles.cardStyle}
         className="p-4 sm:p-5 border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 w-full transition-all cursor-pointer group hover:scale-[1.01]"
@@ -856,7 +857,7 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
     const btnCustomStyle = getButtonCustomStyle();
     const themeStyles = getThemeStyles();
     return (
-      <div 
+      <div data-sticker-block="schedule-meeting" 
         style={themeStyles.cardStyle}
         className="p-4 sm:p-5 border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 w-full transition-all hover:scale-[1.01]"
       >
@@ -941,7 +942,7 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
   const renderHeroVideo = () => {
     if (!profile.heroVideo) return null;
     return (
-      <div className="phone-video-card w-full">
+      <div data-sticker-block="hero-video" className="phone-video-card w-full">
         <iframe 
           src={profile.heroVideo} 
           title="Showreel Video Player" 
@@ -959,7 +960,7 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
     const textColor = btnCustomStyle.color || '#333333';
 
     return (
-      <div
+      <div data-sticker-block={`link:${link.id}`}
         key={link.id}
         style={btnCustomStyle}
         className={`phone-stack-card ${getStackShapeClass()} w-full flex flex-col text-left transition-all duration-150 hover:scale-[1.01] active:scale-[0.99] p-3.5`}
@@ -1034,7 +1035,7 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
     const textColor = btnCustomStyle.color || '#333333';
 
     return (
-      <div
+      <div data-sticker-block={`link:${link.id}`}
         key={link.id}
         style={btnCustomStyle}
         className={`phone-bento-card ${getBentoShapeClass()} ${
@@ -1108,7 +1109,7 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
     // 1. CAROUSEL SLIDER VIEW MODE (Horizontal Scroll Slider with Navigation)
     if (viewMode === 'carousel') {
       return (
-        <div key={collection.id} className="w-full pt-1 min-w-0">
+        <div data-sticker-block={`collection:${collection.id}`} key={collection.id} className="w-full pt-1 min-w-0">
           <CarouselSlider
             collection={collection}
             links={collectionLinks}
@@ -1122,7 +1123,7 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
     // 2. 2-COLUMN GRID (Bento Style) VIEW MODE
     if (viewMode === 'grid') {
       return (
-        <div key={collection.id} className="w-full space-y-3 pt-2 min-w-0">
+        <div data-sticker-block={`collection:${collection.id}`} key={collection.id} className="w-full space-y-3 pt-2 min-w-0">
           <div className="w-full flex items-center justify-between px-2 py-1 text-left">
             <div className="flex items-center gap-2">
               <div className="w-6 h-6 rounded-lg bg-brand-500/15 flex items-center justify-center text-brand-500">
@@ -1150,7 +1151,7 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
     if (viewMode === 'showcase') {
       const [featuredLink, ...remainingLinks] = collectionLinks;
       return (
-        <div key={collection.id} className="w-full space-y-3 pt-2 min-w-0">
+        <div data-sticker-block={`collection:${collection.id}`} key={collection.id} className="w-full space-y-3 pt-2 min-w-0">
           <div className="w-full flex items-center justify-between px-2 py-1 text-left">
             <div className="flex items-center gap-2">
               <div className="w-6 h-6 rounded-lg bg-brand-500/15 flex items-center justify-center text-brand-500">
@@ -1180,7 +1181,7 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
     // 3. 2-COLUMN GRID (Bento Style) VIEW MODE
     if (viewMode === 'grid') {
       return (
-        <div key={collection.id} className="w-full space-y-3 pt-2 min-w-0">
+        <div data-sticker-block={`collection:${collection.id}`} key={collection.id} className="w-full space-y-3 pt-2 min-w-0">
           <div className="w-full flex items-center justify-between px-2 py-1 text-left">
             <div className="flex items-center gap-2">
               <div className="w-6 h-6 rounded-lg bg-brand-500/15 flex items-center justify-center text-brand-500">
@@ -1207,7 +1208,7 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
     // 4. VERTICAL LIST (Stacked Cards) VIEW MODE
     const themeStyles = getThemeStyles();
     return (
-      <div key={collection.id} className="w-full space-y-3 pt-2 min-w-0">
+      <div data-sticker-block={`collection:${collection.id}`} key={collection.id} className="w-full space-y-3 pt-2 min-w-0">
         <div className="w-full flex items-center justify-between px-2 py-1 text-left">
           <div className="flex items-center gap-2">
             <div style={themeStyles.iconBoxStyle} className="w-6 h-6 rounded-lg flex items-center justify-center border">
@@ -1251,7 +1252,7 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
     const themeStyles = getThemeStyles();
     if (products.length === 0) {
       return (
-        <div 
+        <div data-sticker-block="shop" 
           style={themeStyles.cardStyle}
           className="p-8 text-center border text-sm w-full"
         >
@@ -1262,7 +1263,7 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
       );
     }
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 w-full">
+      <div data-sticker-block="shop" className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 w-full">
         {products.map((prod) => (
           <a
             key={prod.id}
@@ -1391,7 +1392,7 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
     const btnCustomStyle = getButtonCustomStyle();
     const themeStyles = getThemeStyles();
     return (
-      <div 
+      <div data-sticker-block="tip-jar" 
         style={themeStyles.cardStyle}
         className="p-4 sm:p-5 border flex flex-col gap-3 text-center w-full"
       >
@@ -1416,7 +1417,7 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
     const btnCustomStyle = getButtonCustomStyle();
     const themeStyles = getThemeStyles();
     return (
-      <div 
+      <div data-sticker-block="newsletter" 
         style={themeStyles.cardStyle}
         className="p-4 sm:p-5 border flex flex-col gap-3 text-center w-full"
       >
@@ -1703,7 +1704,7 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
               <div className="w-full max-w-[420px] mx-auto transition-all duration-300">
                 <div className="relative w-full flex flex-col gap-3.5 pb-8" style={{ containerType: 'inline-size' }}>
                   {/* Floating Stickers Overlay for CONTENT section */}
-                  {renderStickersSection('mobile', 'CONTENT')}
+                  <StickerBlockLayer>{(rects) => renderStickersSection('mobile', 'CONTENT', rects)}</StickerBlockLayer>
                   {renderProfileHeader({ isSplit: false })}
                   {renderLeadCapture()}
                   {renderScheduleMeeting()}
@@ -1754,7 +1755,7 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
               <div className="w-full max-w-[580px] mx-auto transition-all duration-300">
                 <div className="relative w-full flex flex-col gap-3.5 pb-8" style={{ containerType: 'inline-size' }}>
                   {/* Floating Stickers Overlay for CONTENT section */}
-                  {renderStickersSection('tablet', 'CONTENT')}
+                  <StickerBlockLayer>{(rects) => renderStickersSection('tablet', 'CONTENT', rects)}</StickerBlockLayer>
                   {renderProfileHeader({ isSplit: false })}
                   {renderLeadCapture()}
                   {renderScheduleMeeting()}
@@ -1806,7 +1807,7 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
             {deviceMode === 'laptop' && (
                 <div className="w-full transition-all duration-300 relative" style={{ containerType: 'inline-size' }}>
                 {/* Floating Stickers Overlay for CONTENT section */}
-                {renderStickersSection('laptop', 'CONTENT')}
+                <StickerBlockLayer>{(rects) => renderStickersSection('laptop', 'CONTENT', rects)}</StickerBlockLayer>
 
                 {desktopLayout === 'split' ? (
                   /* 2-Column Split Bento Layout: Creator Profile on Left, Actions & Links on Right */

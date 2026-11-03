@@ -64,6 +64,7 @@ import AccessGateScreen from '../Common/AccessGateScreen';
 import StoryBubbleAvatar from '../PublicBio/StoryBubbleAvatar';
 import SocialProofTicker from '../PublicBio/SocialProofTicker';
 import CarouselSlider from '../Common/CarouselSlider';
+import StickerBlockLayer, { getBlockStickerPositionStyle, findStickerBlockAt } from '../Common/StickerBlockLayer';
 import { THEME_PRESETS, CURATED_THEMES, getTitleFontName, getStickerDeviceProps, getStickerCanvasPositionStyle, getStickerGraphicSizeStyle, isImageUrl, parseTailwindGradient } from '../../constants/app';
 
 const ICON_MAP = {
@@ -601,6 +602,9 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
       const coordinateMode = 'pixel-offset';
       const y = Number((relativeY * targetEl.offsetHeight / targetRect.height).toFixed(2));
       const refWidth = targetEl.offsetWidth;
+      const pin = anchorType === 'CONTENT'
+        ? (findStickerBlockAt(canvasEl, clientX, clientY) || { blockKey: null })
+        : {};
 
       const stickerSequence = ++stickerSequenceRef.current;
       const baseSticker = {
@@ -613,6 +617,7 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
         y,
         coordinateMode,
         refWidth,
+        ...pin,
         scale: 1,
         rotate: ((stickerSequence * 7) % 20) - 10,
         flipX: false,
@@ -621,9 +626,9 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
       const newSticker = {
         ...baseSticker,
         devices: {
-          mobile: { x: xPct, y, scale: 1, rotate: baseSticker.rotate, flipX: false, anchorType, coordinateMode, refWidth },
-          tablet: { x: xPct, y, scale: 1, rotate: baseSticker.rotate, flipX: false, anchorType, coordinateMode, refWidth },
-          laptop: { x: xPct, y, scale: 1, rotate: baseSticker.rotate, flipX: false, anchorType, coordinateMode, refWidth },
+          mobile: { x: xPct, y, scale: 1, rotate: baseSticker.rotate, flipX: false, anchorType, coordinateMode, refWidth, ...pin },
+          tablet: { x: xPct, y, scale: 1, rotate: baseSticker.rotate, flipX: false, anchorType, coordinateMode, refWidth, ...pin },
+          laptop: { x: xPct, y, scale: 1, rotate: baseSticker.rotate, flipX: false, anchorType, coordinateMode, refWidth, ...pin },
           [deviceMode]: {
             x: xPct,
             y,
@@ -633,6 +638,7 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
             anchorType,
             coordinateMode,
             refWidth,
+            ...pin,
           },
         },
       };
@@ -780,6 +786,10 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
       // Canvas px, independent of the preview zoom.
       const y = Number((centerY * (targetEl.offsetHeight / (targetRect.height || 1))).toFixed(2));
 
+      const pin = stickerAnchor === 'CONTENT'
+        ? (findStickerBlockAt(targetEl, moveEvent.clientX - grabDX, moveEvent.clientY - grabDY) || { blockKey: null, blockX: null, blockY: null })
+        : {};
+
       updateStickerWithMode(stickerId, (props) => ({
         ...props,
         x: xPct,
@@ -787,6 +797,7 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
         anchorType: stickerAnchor,
         coordinateMode: 'pixel-offset',
         refWidth,
+        ...pin,
       }));
     });
   };
@@ -830,6 +841,12 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
     const screenScaleX = anchorRect && anchorWidth ? anchorRect.width / anchorWidth : 1;
     const screenScaleY = anchorRect && anchorHeight ? anchorRect.height / anchorHeight : 1;
 
+    const pinnedBlock = startProps.blockKey
+      ? canvasEl?.querySelector(`[data-sticker-block="${CSS.escape(startProps.blockKey)}"]`)
+      : null;
+    const blockWidth = pinnedBlock?.offsetWidth || 0;
+    const blockHeight = pinnedBlock?.offsetHeight || 0;
+
     const handleRect = e.currentTarget.getBoundingClientRect();
     const grabOffsetX = e.clientX - (handleRect.left + handleRect.width / 2);
     const grabOffsetY = e.clientY - (handleRect.top + handleRect.height / 2);
@@ -859,7 +876,14 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
         ? startY + centerDeltaY
         : startY + (centerDeltaY / anchorHeight) * 100;
 
-      updateStickerWithMode(stickerId, (props) => ({ ...props, x: nextX, y: nextY, scale: newScale }));
+      const blockShift = blockWidth && blockHeight && typeof startProps.blockX === 'number'
+        ? {
+            blockX: Number((startProps.blockX + (centerDeltaX / blockWidth) * 100).toFixed(2)),
+            blockY: Number((startProps.blockY + (centerDeltaY / blockHeight) * 100).toFixed(2)),
+          }
+        : {};
+
+      updateStickerWithMode(stickerId, (props) => ({ ...props, x: nextX, y: nextY, scale: newScale, ...blockShift }));
     };
 
     trackPointerDrag(e, onMouseMove);
@@ -940,7 +964,7 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
 
   // Placed Stickers Component anchored to scrollable content canvas
   // Placed Stickers Component anchored to header or content canvas
-  const renderStickers = (targetCanvasRef, sectionFilter = 'HEADER') => {
+  const renderStickers = (targetCanvasRef, sectionFilter = 'HEADER', blockRects = null) => {
     const stickersList = profile?.designSettings?.stickers || [];
     if (!stickersList.length) return null;
 
@@ -964,7 +988,7 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
                 isSelected ? 'shadow-xs' : ''
               }`}
               style={{
-                ...getStickerCanvasPositionStyle(props),
+                ...(getBlockStickerPositionStyle(props, blockRects) || getStickerCanvasPositionStyle(props)),
                 transform: `translate(-50%, -50%) scale(${props.scale}) rotate(${props.rotate}deg)`,
                 touchAction: 'none',
                 borderWidth: isSelected ? `${Math.max(0.75, scaleInv)}px` : '0px',
@@ -1287,7 +1311,7 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
     const btnCustomStyle = getButtonCustomStyle();
     const themeStyles = getThemeStyles();
     return (
-      <div 
+      <div data-sticker-block="lead-capture" 
         onClick={() => setShowLeadModal(true)}
         style={themeStyles.cardStyle}
         className="p-3.5 border flex items-center justify-between gap-3 w-full transition-all cursor-pointer group hover:scale-[1.01]"
@@ -1329,7 +1353,7 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
     const btnCustomStyle = getButtonCustomStyle();
     const themeStyles = getThemeStyles();
     return (
-      <div 
+      <div data-sticker-block="schedule-meeting" 
         style={themeStyles.cardStyle}
         className="p-3.5 border flex items-center justify-between gap-3 w-full transition-all hover:scale-[1.01]"
       >
@@ -1414,7 +1438,7 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
   const renderHeroVideo = () => {
     if (!profile.heroVideo) return null;
     return (
-      <div className="phone-video-card w-full">
+      <div data-sticker-block="hero-video" className="phone-video-card w-full">
         <iframe 
           src={profile.heroVideo} 
           title="Showreel Video Player" 
@@ -1432,7 +1456,7 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
     const textColor = btnCustomStyle.color || '#333333';
 
     return (
-      <button
+      <button data-sticker-block={`link:${link.id}`}
         key={link.id}
         onClick={() => handleLinkClick(link)}
         style={btnCustomStyle}
@@ -1488,7 +1512,7 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
     const textColor = btnCustomStyle.color || '#333333';
 
     return (
-      <button
+      <button data-sticker-block={`link:${link.id}`}
         key={link.id}
         type="button"
         onClick={() => handleLinkClick(link)}
@@ -1558,7 +1582,7 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
     // 1. CAROUSEL SLIDER VIEW MODE (Horizontal Scroll Slider with Navigation)
     if (viewMode === 'carousel') {
       return (
-        <div key={collection.id} className="w-full pt-1 min-w-0">
+        <div data-sticker-block={`collection:${collection.id}`} key={collection.id} className="w-full pt-1 min-w-0">
           <CarouselSlider
             collection={collection}
             links={collectionLinks}
@@ -1573,7 +1597,7 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
     if (viewMode === 'showcase') {
       const [featuredLink, ...remainingLinks] = collectionLinks;
       return (
-        <div key={collection.id} className="w-full space-y-2 pt-1 min-w-0">
+        <div data-sticker-block={`collection:${collection.id}`} key={collection.id} className="w-full space-y-2 pt-1 min-w-0">
           <div className="w-full flex items-center justify-between px-1.5 py-1 text-left">
             <div className="flex items-center gap-1.5">
               <div className="w-5 h-5 rounded-md bg-brand-500/15 flex items-center justify-center text-brand-500">
@@ -1603,7 +1627,7 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
     // 3. 2-COLUMN GRID (Bento Style) VIEW MODE
     if (viewMode === 'grid') {
       return (
-        <div key={collection.id} className="w-full space-y-2 pt-1 min-w-0">
+        <div data-sticker-block={`collection:${collection.id}`} key={collection.id} className="w-full space-y-2 pt-1 min-w-0">
           <div className="w-full flex items-center justify-between px-1.5 py-1 text-left">
             <div className="flex items-center gap-1.5">
               <div className="w-5 h-5 rounded-md bg-brand-500/15 flex items-center justify-center text-brand-500">
@@ -1630,7 +1654,7 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
     // 4. VERTICAL LIST (Stacked Cards) VIEW MODE
     const themeStyles = getThemeStyles();
     return (
-      <div key={collection.id} className="w-full space-y-2 pt-1 min-w-0">
+      <div data-sticker-block={`collection:${collection.id}`} key={collection.id} className="w-full space-y-2 pt-1 min-w-0">
         <div className="w-full flex items-center justify-between px-1.5 py-1 text-left">
           <div className="flex items-center gap-1.5">
             <div style={themeStyles.iconBoxStyle} className="w-5 h-5 rounded-md flex items-center justify-center border">
@@ -1674,7 +1698,7 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
     const themeStyles = getThemeStyles();
     if (products.length === 0) {
       return (
-        <div 
+        <div data-sticker-block="shop" 
           style={themeStyles.cardStyle}
           className="p-6 text-center border text-xs w-full"
         >
@@ -1685,7 +1709,7 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
       );
     }
     return (
-      <div className="grid grid-cols-2 gap-2.5 w-full">
+      <div data-sticker-block="shop" className="grid grid-cols-2 gap-2.5 w-full">
         {products.map((prod) => (
           <a
             key={prod.id}
@@ -1800,7 +1824,7 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
     const btnCustomStyle = getButtonCustomStyle();
     const themeStyles = getThemeStyles();
     return (
-      <div 
+      <div data-sticker-block="tip-jar" 
         style={themeStyles.cardStyle}
         className="p-3 border flex flex-col gap-2 text-center w-full"
       >
@@ -1825,7 +1849,7 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
     const btnCustomStyle = getButtonCustomStyle();
     const themeStyles = getThemeStyles();
     return (
-      <div 
+      <div data-sticker-block="newsletter" 
         style={themeStyles.cardStyle}
         className="p-3 border flex flex-col gap-2 text-center w-full"
       >
@@ -2361,7 +2385,7 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
                 style={{ containerType: 'inline-size' }}
               >
                 {/* Placed Stickers inside the scrollable content canvas */}
-                {renderStickers(contentCanvasRef, 'CONTENT')}
+                <StickerBlockLayer>{(rects) => renderStickers(contentCanvasRef, 'CONTENT', rects)}</StickerBlockLayer>
 
                 {renderProfileContent()}
               </div>
@@ -2417,7 +2441,7 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
                 className="relative w-full min-h-full flex flex-col gap-3.5 pb-6"
                 style={{ containerType: 'inline-size' }}
               >
-                {renderStickers(contentCanvasTabletRef, 'CONTENT')}
+                <StickerBlockLayer>{(rects) => renderStickers(contentCanvasTabletRef, 'CONTENT', rects)}</StickerBlockLayer>
                 {renderProfileContent()}
               </div>
             </div>
@@ -2477,7 +2501,7 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
                   className="relative w-full min-h-full flex flex-col gap-3.5 pb-6"
                   style={{ containerType: 'inline-size' }}
                 >
-                  {renderStickers(contentCanvasLaptopRef, 'CONTENT')}
+                  <StickerBlockLayer>{(rects) => renderStickers(contentCanvasLaptopRef, 'CONTENT', rects)}</StickerBlockLayer>
                   {renderProfileContent()}
                 </div>
               </div>

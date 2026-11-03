@@ -323,6 +323,18 @@ export const isImageUrl = (val) => {
  * Mathematically projects sticker coordinates and transforms across devices
  * (Mobile, Tablet, and Laptop in Split or Centered modes).
  */
+// Content stickers may be pinned to a block: its key and the sticker's spot
+// inside it, as percentages of the block's width and height.
+const blockPin = (placement, stk) => {
+  const blockKey = placement?.blockKey ?? stk?.blockKey;
+  if (!blockKey) return {};
+  return {
+    blockKey,
+    blockX: placement?.blockX ?? stk?.blockX,
+    blockY: placement?.blockY ?? stk?.blockY,
+  };
+};
+
 export const getStickerDeviceProps = (stk, targetMode = 'mobile', desktopLayout = 'split') => {
   if (!stk) return { x: 50, y: 50, scale: 1, rotate: 0, flipX: false, anchorType: 'HEADER', coordinateMode: 'height-percent' };
 
@@ -340,6 +352,7 @@ export const getStickerDeviceProps = (stk, targetMode = 'mobile', desktopLayout 
       coordinateMode: override.coordinateMode ?? stk.coordinateMode ?? 'height-percent',
       anchorType: override.anchorType ?? anchorType,
       refWidth: override.refWidth ?? stk.refWidth,
+      ...blockPin(override, stk),
     };
   }
 
@@ -362,6 +375,7 @@ export const getStickerDeviceProps = (stk, targetMode = 'mobile', desktopLayout 
       coordinateMode,
       anchorType,
       refWidth: mobileOverride?.refWidth ?? stk.refWidth,
+      ...blockPin(mobileOverride, stk),
     };
   }
 
