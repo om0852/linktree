@@ -67,7 +67,7 @@ import SocialProofTicker from '../PublicBio/SocialProofTicker';
 import CarouselSlider from '../Common/CarouselSlider';
 import StickerBlockLayer, { getBlockStickerPositionStyle, findStickerBlockAt } from '../Common/StickerBlockLayer';
 import ScaledCanvas from '../Common/ScaledCanvas';
-import { THEME_PRESETS, CURATED_THEMES, getTitleFontName, getFontStack, loadGoogleFont, linkHighlightClass, getStickerDeviceProps, getStickerPlacementKey, getStickerCanvasPositionStyle, getStickerGraphicSizeStyle, isImageUrl, parseTailwindGradient } from '../../constants/app';
+import { THEME_PRESETS, CURATED_THEMES, getTitleFontName, getFontStack, loadGoogleFont, linkHighlightClass, bentoWideFlags, getStickerDeviceProps, getStickerPlacementKey, getStickerCanvasPositionStyle, getStickerGraphicSizeStyle, isImageUrl, parseTailwindGradient } from '../../constants/app';
 
 const ICON_MAP = {
   Video, Star, Mail, FileText, Music, ShoppingBag, Zap, Briefcase, BookOpen, Calendar, MessageSquare, TrendingUp, Ticket, Globe,
@@ -1221,7 +1221,8 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
         </div>
 
         <div className={`w-full flex flex-col items-center ${
-          layoutMode === 'banner' ? 'px-3 pb-2' : isSplit ? 'p-1' : 'p-1'
+          // Vertical padding only: the stats box below must line up with the cards.
+          layoutMode === 'banner' ? 'pb-2' : 'py-1'
         }`}>
 
           {profile.titleLogo?.enabled && profile.titleLogo?.url ? (
@@ -1495,6 +1496,10 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
   };
 
   // Helper for single bento card in mockup
+  // A multi-line card with "pill" corners would turn into an oval; cards keep
+  // a generous radius instead, single-line buttons stay pills.
+  const bentoCardStyle = (style) => (style.borderRadius === '9999px' ? { ...style, borderRadius: '24px' } : style);
+
   const renderBentoCard = (link, isLarge = false, isCarousel = false) => {
     const iconElement = renderLinkThumbnail(link);
     const btnCustomStyle = getButtonCustomStyle();
@@ -1506,7 +1511,7 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
         key={link.id}
         type="button"
         onClick={() => handleLinkClick(link)}
-        style={btnCustomStyle}
+        style={bentoCardStyle(btnCustomStyle)}
         className={`phone-bento-card ${getBentoShapeClass()} ${linkHighlightClass(link)} ${
           isCarousel ? '' : isLarge ? 'col-span-2' : 'col-span-1'
         } w-full text-left transition-all duration-150 hover:scale-[1.01] active:scale-[0.99] p-3.5 relative flex flex-col justify-between`}
@@ -1551,12 +1556,9 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
           >
             {link.title}
           </h4>
-          {link.clicks !== undefined && (
-            <p 
-              className="text-[9px] mt-1 font-mono font-semibold"
-              style={{ color: textColor, opacity: 0.75 }}
-            >
-              {link.clicks.toLocaleString()} clicks
+          {link.subtitle && (
+            <p className="text-[9px] mt-1 truncate" style={{ color: textColor, opacity: 0.8 }}>
+              {link.subtitle}
             </p>
           )}
         </div>
@@ -1762,8 +1764,7 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
               {profile.layout === 'bento' ? (
                 <div className={`grid gap-2.5 w-full ${ungroupedLinks.length === 1 ? 'grid-cols-1' : 'grid-cols-2'}`}>
                   {ungroupedLinks.map((link, idx) => {
-                    const isOddLast = ungroupedLinks.length > 2 && ungroupedLinks.length % 2 !== 0 && idx === ungroupedLinks.length - 1;
-                    const isLarge = link.size === 'large' || link.type === 'featured' || isOddLast;
+                    const isLarge = bentoWideFlags(ungroupedLinks)[idx];
                     return renderBentoCard(link, isLarge);
                   })}
                 </div>
@@ -1790,8 +1791,7 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
     return (
       <div className={`grid gap-2.5 w-full ${linksCount === 1 ? 'grid-cols-1' : 'grid-cols-2'}`}>
         {activeLinks.map((link, idx) => {
-          const isOddLast = linksCount > 2 && linksCount % 2 !== 0 && idx === linksCount - 1;
-          const isLarge = link.size === 'large' || link.type === 'featured' || isOddLast;
+          const isLarge = bentoWideFlags(activeLinks)[idx];
           return renderBentoCard(link, isLarge);
         })}
       </div>

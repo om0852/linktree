@@ -57,7 +57,7 @@ import TrackingPixels from './TrackingPixels';
 import AccessGateScreen from '../Common/AccessGateScreen';
 import CarouselSlider from '../Common/CarouselSlider';
 import StickerBlockLayer, { getBlockStickerPositionStyle } from '../Common/StickerBlockLayer';
-import { THEME_PRESETS, CURATED_THEMES, getTitleFontName, getFontStack, loadGoogleFont, linkHighlightClass, getStickerDeviceProps, getStickerCanvasPositionStyle, getStickerGraphicSizeStyle, isImageUrl, parseTailwindGradient } from '../../constants/app';
+import { THEME_PRESETS, CURATED_THEMES, getTitleFontName, getFontStack, loadGoogleFont, linkHighlightClass, bentoWideFlags, getStickerDeviceProps, getStickerCanvasPositionStyle, getStickerGraphicSizeStyle, isImageUrl, parseTailwindGradient } from '../../constants/app';
 import { safeLinkUrl } from '../../lib/safeUrl';
 
 const ICON_MAP = {
@@ -651,7 +651,8 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
         </div>
 
         <div className={`w-full flex flex-col items-center ${
-          layoutMode === 'banner' ? 'px-3 pb-2' : isSplit ? 'p-1' : isMobileLayout ? 'p-1' : 'p-2'
+          // Vertical padding only: the stats box below must line up with the cards.
+          layoutMode === 'banner' ? 'pb-2' : isSplit ? 'py-1' : isMobileLayout ? 'py-1' : 'py-2'
         }`}>
 
           {profile?.titleLogo?.enabled && profile?.titleLogo?.url ? (
@@ -943,6 +944,10 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
   };
 
   // Helper to render a single link card in bento/grid mode
+  // A multi-line card with "pill" corners would turn into an oval; cards keep
+  // a generous radius instead, single-line buttons stay pills.
+  const bentoCardStyle = (style) => (style.borderRadius === '9999px' ? { ...style, borderRadius: '24px' } : style);
+
   const renderBentoCard = (link, spanTwo = false, isCarousel = false) => {
     const iconElement = link.leadMagnet?.enabled ? <Lock size={16} className="text-brand-500" /> : getIcon(link.icon);
     const btnCustomStyle = getButtonCustomStyle();
@@ -952,9 +957,9 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
     return (
       <div data-sticker-block={`link:${link.id}`}
         key={link.id}
-        style={btnCustomStyle}
+        style={bentoCardStyle(btnCustomStyle)}
         className={`phone-bento-card ${getBentoShapeClass()} ${linkHighlightClass(link)} ${
-          isCarousel ? '' : spanTwo ? 'col-span-1 sm:col-span-2' : 'col-span-1'
+          isCarousel ? '' : spanTwo ? 'col-span-2' : 'col-span-1'
         } w-full text-left relative flex flex-col justify-between transition-all duration-150 hover:scale-[1.01] active:scale-[0.99] p-4`}
       >
         <div 
@@ -980,30 +985,35 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
 
           <div className="flex items-center justify-between mb-3 w-full">
             {iconElement ? (
-              <div className="p-2.5 rounded-xl bg-surface-2 border border-line text-brand-500">
+              <div
+                className="p-2.5 rounded-xl"
+                style={{
+                  backgroundColor: isSolid ? 'rgba(255, 255, 255, 0.2)' : '#F8F8F9',
+                  color: textColor,
+                  border: '1px solid rgba(0, 0, 0, 0.08)',
+                }}
+              >
                 {iconElement}
               </div>
             ) : (
               <div />
             )}
-            <ExternalLink className="w-3.5 h-3.5 text-ink-500 ml-auto" />
+            <ExternalLink className="w-3.5 h-3.5 ml-auto" style={{ color: textColor, opacity: 0.8 }} />
           </div>
 
+        {/* Text uses the button's own label colour so it reads on any fill.
+            Click counts are the creator's analytics, never shown to visitors. */}
         <div>
-          <h3 className="text-sm sm:text-base font-bold line-clamp-2 leading-tight text-ink-700">
+          <h3 className="text-sm sm:text-base font-bold line-clamp-2 leading-tight" style={{ color: textColor }}>
             {link.title}
           </h3>
           {link.leadMagnet?.enabled ? (
-            <p className="text-[10px] sm:text-xs text-ink-500 font-semibold mt-1 flex items-center gap-1">
+            <p className="text-[10px] sm:text-xs font-semibold mt-1 flex items-center gap-1" style={{ color: textColor, opacity: 0.8 }}>
               <span>🎁</span> {link.leadMagnet.previewText || 'Unlock Download'}
             </p>
           ) : link.subtitle ? (
-            <p className="text-[10px] sm:text-xs text-ink-500 mt-1 truncate">
+            <p className="text-[10px] sm:text-xs mt-1 truncate" style={{ color: textColor, opacity: 0.8 }}>
               {link.subtitle}
-            </p>
-          ) : link.clicks !== undefined ? (
-            <p className="text-[10px] sm:text-xs text-ink-500 mt-1 font-mono font-semibold">
-              {link.clicks.toLocaleString()} clicks
             </p>
           ) : null}
         </div>
@@ -1248,11 +1258,10 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
             <div className="space-y-3 pt-1 w-full">
               {profile.layout === 'bento' ? (
                 <div className={`grid gap-3.5 w-full ${
-                  ungroupedLinks.length === 1 ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-2'
+                  ungroupedLinks.length === 1 ? 'grid-cols-1' : 'grid-cols-2'
                 }`}>
                   {ungroupedLinks.map((link, idx) => {
-                    const isOddLast = ungroupedLinks.length > 2 && ungroupedLinks.length % 2 !== 0 && idx === ungroupedLinks.length - 1;
-                    const isLarge = link.size === 'large' || link.type === 'featured' || isOddLast || link.embed?.enabled;
+                    const isLarge = bentoWideFlags(ungroupedLinks)[idx];
                     return renderBentoCard(link, isLarge);
                   })}
                 </div>
@@ -1279,11 +1288,10 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
     const linksCount = activeLinks.length;
     return (
       <div className={`grid gap-3.5 w-full ${
-        linksCount === 1 ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-2'
+        linksCount === 1 ? 'grid-cols-1' : 'grid-cols-2'
       }`}>
         {activeLinks.map((link, idx) => {
-          const isOddLast = linksCount > 2 && linksCount % 2 !== 0 && idx === linksCount - 1;
-          const isLarge = link.size === 'large' || link.type === 'featured' || isOddLast || link.embed?.enabled;
+          const isLarge = bentoWideFlags(activeLinks)[idx];
           return renderBentoCard(link, isLarge);
         })}
       </div>
@@ -1447,7 +1455,7 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
       </button>
 
       {/* Main Bio Container: Adapts Dynamically to Active Device Mode & Zoom Scale */}
-      <main className="w-full flex-1 flex flex-col items-center justify-start overflow-x-auto py-6 sm:py-8 px-2 sm:px-4">
+      <main className="w-full flex-1 flex flex-col items-center justify-start overflow-x-auto pt-6 pb-24 sm:pt-8 sm:pb-24 px-2 sm:px-4">
         {/* Profile Access Gate Check (Passcode or 18+ Sensitive Shield) */}
         {!onBackToEditor && profile.accessGate?.enabled && profile.accessGate?.type !== 'none' && !isGateUnlocked ? (
           <div className="w-full max-w-md mx-auto my-auto">
@@ -1685,11 +1693,13 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
           id="floating-lead-trigger-btn"
           onClick={() => setShowLeadModal(true)}
           style={floatingCtaStyle}
-          className="fixed bottom-6 right-6 z-40 px-4 py-2.5 rounded-full font-bold text-xs shadow-lg flex items-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95 border border-white/20 backdrop-blur-md"
+          // Icon-only on phones so it does not cover the cards while scrolling.
+          className="fixed bottom-5 right-5 sm:bottom-6 sm:right-6 z-40 h-[46px] w-[46px] sm:h-auto sm:w-auto justify-center sm:px-4 sm:py-2.5 rounded-full font-bold text-xs shadow-lg flex items-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95 border border-white/20 backdrop-blur-md"
           title={profile.leadCapture?.buttonText || "Exchange Contact"}
+          aria-label={profile.leadCapture?.buttonText || "Exchange Contact"}
         >
           <PhoneCall className="w-4 h-4" />
-          <span>{profile.leadCapture?.buttonText || "Connect"}</span>
+          <span className="hidden sm:inline">{profile.leadCapture?.buttonText || "Connect"}</span>
         </button>
       )}
 

@@ -2,7 +2,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import Profile from '../src/models/Profile.js';
 import { PROFILE_TEMPLATES } from '../src/constants/templates.js';
-import { THEME_PRESETS, CURATED_THEMES, AVATAR_SHAPE_IDS, GOOGLE_FONTS_LIST, PAGE_FONTS, LINK_HIGHLIGHT_IDS, linkHighlightClass } from '../src/constants/app.js';
+import { THEME_PRESETS, CURATED_THEMES, AVATAR_SHAPE_IDS, GOOGLE_FONTS_LIST, PAGE_FONTS, LINK_HIGHLIGHT_IDS, linkHighlightClass, bentoWideFlags } from '../src/constants/app.js';
 
 const THEME_IDS = [...THEME_PRESETS, ...CURATED_THEMES].map((t) => t.id);
 const TITLE_FONTS = [...GOOGLE_FONTS_LIST.suggested, ...GOOGLE_FONTS_LIST.other].map((f) => f.name);
@@ -36,5 +36,18 @@ describe('Profile templates', () => {
     assert.equal(linkHighlightClass({ highlight: 'ring' }), 'link-fx link-fx-ring');
     assert.equal(linkHighlightClass({ highlight: 'none' }), '');
     assert.equal(linkHighlightClass({ highlight: 'explode' }), '');
+  });
+
+  it('packs bento cards so no row is left half empty', () => {
+    const L = { size: 'large' };
+    const S = { size: 'small' };
+    // wide, small (alone before the next wide), wide
+    assert.deepEqual(bentoWideFlags([L, S, L]), [true, true, true]);
+    // two smalls share a row; an odd small at the end widens
+    assert.deepEqual(bentoWideFlags([S, S, S]), [false, false, true]);
+    assert.deepEqual(bentoWideFlags([S, S, L, S, S]), [false, false, true, false, false]);
+    // a single card never spans (its grid has one column)
+    assert.deepEqual(bentoWideFlags([L]), [false]);
+    assert.deepEqual(bentoWideFlags([S, { embed: { enabled: true } }]), [true, true]);
   });
 });

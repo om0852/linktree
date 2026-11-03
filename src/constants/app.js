@@ -184,6 +184,26 @@ export const linkHighlightClass = (link) => (
   link?.highlight && link.highlight !== 'none' && LINK_HIGHLIGHT_IDS.includes(link.highlight) ? `link-fx link-fx-${link.highlight}` : ''
 );
 
+// Bento grid packing (2 columns): which cards span the full row. Wide cards
+// (large, featured, embeds) always do; a small card left alone in a row
+// (before a wide card, or last) widens too, so no row has an empty half.
+export const isWideBentoLink = (link) => link?.size === 'large' || link?.type === 'featured' || Boolean(link?.embed?.enabled);
+export function bentoWideFlags(links) {
+  const wide = links.map(isWideBentoLink);
+  if (links.length < 2) return wide.map(() => false);
+  let openSmall = -1; // index of a small card waiting for a partner
+  wide.forEach((isWide, index) => {
+    if (isWide) {
+      if (openSmall >= 0) wide[openSmall] = true;
+      openSmall = -1;
+    } else {
+      openSmall = openSmall >= 0 ? -1 : index;
+    }
+  });
+  if (openSmall >= 0) wide[openSmall] = true;
+  return wide;
+}
+
 export const AVATAR_SHAPES = [
   { id: 'circle', name: 'Circle', label: 'Circle', class: 'rounded-full' },
   { id: 'rounded', name: 'Rounded', label: 'Rounded', class: 'rounded-2xl' },
