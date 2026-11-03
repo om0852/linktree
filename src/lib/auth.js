@@ -1,7 +1,10 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
 import { cookies } from 'next/headers';
 import { AUTH_COOKIE_NAME, AUTH_TOKEN_EXPIRY_DAYS } from '@/constants/app';
+import connectToDatabase from '@/lib/mongodb';
+import ApiKey from '@/models/ApiKey';
 
 function getJwtSecret() {
   const secret = process.env.JWT_SECRET;
@@ -48,12 +51,72 @@ export function verifyToken(token) {
 }
 
 /**
- * Extract authenticated user payload from request cookies or Authorization header
+ * Extract authenticated user payload from request cookies, Authorization header, or API key
  */
 export async function getAuthUser(request) {
+  // 1. Check for API Key in x-api-key header or Bearer token
+  if (request?.headers) {
+    const rawApiKey = request.headers.get('x-api-key') || request.headers.get('X-API-Key');
+    const authHeader = request.headers.get('authorization') || request.headers.get('Authorization');
+
+    let candidateKey = rawApiKey?.trim() || null;
+    if (!candidateKey && authHeader && authHeader.startsWith('Bearer ')) {
+      const bearerCandidate = authHeader.substring(7).trim();
+      if (bearerCandidate.startsWith('tree_live_') || bearerCandidate.startsWith('sk_live_')) {
+        candidateKey = bearerCandidate;
+      }
+    }
+
+    if (candidateKey) {
+      // A. Master Platform Key check via timingSafeEqual
+      const masterKey = process.env.TREEINBIO_API_KEY || process.env.PLATFORM_API_KEY;
+      if (masterKey) {
+        const bufA = Buffer.from(candidateKey);
+        const bufB = Buffer.from(masterKey);
+        if (bufA.length === bufB.length && crypto.timingSafeEqual(bufA, bufB)) {
+          const targetUser = request.headers.get('x-target-user') || request.headers.get('x-username') || 'admin';
+          return {
+            id: 'admin_master',
+            userId: 'admin_master',
+            _id: 'admin_master',
+            username: targetUser,
+            role: 'admin',
+            isApiKey: true,
+            isMasterKey: true,
+          };
+        }
+      }
+
+      // B. Scoped Database API Key check
+      try {
+        await connectToDatabase();
+        const keyHash = crypto.createHash('sha256').update(candidateKey).digest('hex');
+        const keyDoc = await ApiKey.findOne({ keyHash }).lean();
+        if (keyDoc) {
+          ApiKey.updateOne({ _id: keyDoc._id }, { $set: { lastUsed: new Date() } }).catch(() => {});
+          const resolvedId = keyDoc.userId ? keyDoc.userId.toString() : `key_${keyDoc._id.toString()}`;
+          return {
+            id: resolvedId,
+            userId: resolvedId,
+            _id: resolvedId,
+            username: keyDoc.username,
+            role: keyDoc.role || 'creator',
+            permissions: keyDoc.permissions || ['*'],
+            isApiKey: true,
+          };
+        }
+      } catch (err) {
+        console.error('API key verification error:', err);
+      }
+
+      // If an explicit API key was provided but failed validation, reject immediately
+      return null;
+    }
+  }
+
   let token = null;
 
-  // 1. Try Next.js server cookie store
+  // 2. Try Next.js server cookie store
   try {
     const cookieStore = await cookies();
     token = cookieStore.get(AUTH_COOKIE_NAME)?.value;
@@ -61,7 +124,7 @@ export async function getAuthUser(request) {
     // In environments where cookies() throws or isn't available
   }
 
-  // 2. Try request.cookies if available
+  // 3. Try request.cookies if available
   if (!token && request?.cookies) {
     if (typeof request.cookies.get === 'function') {
       token = request.cookies.get(AUTH_COOKIE_NAME)?.value;
@@ -70,7 +133,7 @@ export async function getAuthUser(request) {
     }
   }
 
-  // 3. Try Authorization: Bearer <token>
+  // 4. Try Authorization: Bearer <jwt_token>
   if (!token && request?.headers) {
     const authHeader = request.headers.get('authorization') || request.headers.get('Authorization');
     if (authHeader && authHeader.startsWith('Bearer ')) {

@@ -26,6 +26,9 @@ const protectedRequests = [
   ['GET', '/api/v1/analytics/export?username=__access_test__'],
   ['POST', '/api/v1/domains/verify', { hostname: 'bio.example.test' }],
   ['PATCH', '/api/media-kit/__access_test__', { enabled: true }],
+  ['GET', '/api/v1/api-keys'],
+  ['POST', '/api/v1/api-keys', { name: 'Test Key' }],
+  ['DELETE', '/api/v1/api-keys?id=000000000000000000000001'],
 ];
 
 test('protected API routes reject requests without an authenticated session', async (t) => {

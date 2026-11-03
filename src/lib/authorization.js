@@ -19,8 +19,11 @@ export async function requireAuth(request) {
   if (!user && session.username) {
     user = await User.findOne({ username: session.username.toLowerCase() }).select('_id username role profiles maxProfiles').lean();
   }
-  if (!user && (session.role === 'admin' || process.env.NODE_ENV === 'test')) {
+  if (!user && (session.role === 'admin' || session.isMasterKey || process.env.NODE_ENV === 'test')) {
     user = { _id: session.id, username: session.username || 'admin', role: 'admin', profiles: [] };
+  }
+  if (!user && session.isApiKey) {
+    user = { _id: session.id, username: session.username, role: session.role || 'creator', profiles: [] };
   }
   if (!user) {
     return { error: NextResponse.json({ success: false, error: 'Authentication required.' }, { status: 401 }) };
