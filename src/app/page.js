@@ -171,8 +171,8 @@ export default function AtelierStudioPage() {
   const isUndoingRedoingRef = useRef(false);
 
   // Link addition & editing state
-  const [isAddingLink, setIsAddingLink] = useState(false);
-  const [editingLinkId, setEditingLinkId] = useState(null);
+  const [isAddingLink, setIsAddingLinkState] = useState(false);
+  const [editingLinkId, setEditingLinkIdState] = useState(null);
   const [openLinkAccordion, setOpenLinkAccordion] = useState(null); // 'magnet' | 'embed' | 'schedule' | null
   const [linkForm, setLinkForm] = useState({
     title: '',
@@ -210,8 +210,47 @@ export default function AtelierStudioPage() {
   });
 
   // Collection addition & modal state
-  const [isAddingCollection, setIsAddingCollection] = useState(false);
-  const [editingCollectionId, setEditingCollectionId] = useState(null);
+  const [isAddingCollection, setIsAddingCollectionState] = useState(false);
+  const [editingCollectionId, setEditingCollectionIdState] = useState(null);
+
+  // The link form and the collection form share one slot: opening either one
+  // closes the other, so the form the user just asked for is the one shown.
+  const closeCollectionForm = () => {
+    setIsAddingCollectionState(false);
+    setEditingCollectionIdState(null);
+  };
+  const closeLinkForm = () => {
+    setIsAddingLinkState(false);
+    setEditingLinkIdState(null);
+  };
+  const setIsAddingLink = (value) => {
+    if (value) closeCollectionForm();
+    setIsAddingLinkState(value);
+  };
+  const setEditingLinkId = (id) => {
+    if (id) closeCollectionForm();
+    setEditingLinkIdState(id);
+  };
+  const setIsAddingCollection = (value) => {
+    if (value) closeLinkForm();
+    setIsAddingCollectionState(value);
+  };
+  const setEditingCollectionId = (id) => {
+    if (id) closeLinkForm();
+    setEditingCollectionIdState(id);
+  };
+  const linkFormRef = useRef(null);
+  const collectionFormRef = useRef(null);
+  const showLinkForm = Boolean(isAddingLink || editingLinkId);
+  const showCollectionForm = Boolean(isAddingCollection || editingCollectionId);
+
+  // Bring the form that just opened into view inside the page card.
+  useEffect(() => {
+    if (showLinkForm) linkFormRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, [showLinkForm, editingLinkId]);
+  useEffect(() => {
+    if (showCollectionForm) collectionFormRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, [showCollectionForm, editingCollectionId]);
   const [collectionForm, setCollectionForm] = useState({
     title: '',
     viewMode: 'list', // 'list' | 'grid' | 'carousel'
@@ -1224,10 +1263,11 @@ export default function AtelierStudioPage() {
               {activeTab === 'links' && (
                 <>
                   {/* Inline Link Creator/Editor Form */}
-                  {(isAddingLink || editingLinkId) && (
+                  {showLinkForm && (
                     <form
+                      ref={linkFormRef}
                       onSubmit={handleSaveLinkForm}
-                      className="bg-surface-2 border-2 border-brand-500 rounded-[10px] p-[15px] flex flex-col gap-3.5 animate-fadeIn"
+                      className="scroll-mt-[15px] bg-white border-[0.5px] border-[#dcdcdc] rounded-[10px] p-[15px] flex flex-col gap-[15px] animate-fade-in"
                     >
                       <div className="flex items-center justify-between pb-2 border-b-[0.5px] border-line">
                         <span className="font-sans font-semibold text-[12px] text-ink-700">
@@ -1809,10 +1849,11 @@ export default function AtelierStudioPage() {
                   )}
 
                   {/* Inline Collection Creator / Editor Form */}
-                  {(isAddingCollection || editingCollectionId) && (
+                  {showCollectionForm && (
                     <form
+                      ref={collectionFormRef}
                       onSubmit={handleSaveCollection}
-                      className="bg-surface-2 border-2 border-brand-500 rounded-[10px] p-[15px] flex flex-col gap-3.5 animate-fadeIn"
+                      className="scroll-mt-[15px] bg-white border-[0.5px] border-[#dcdcdc] rounded-[10px] p-[15px] flex flex-col gap-[15px] animate-fade-in"
                     >
                       <div className="flex items-center justify-between pb-2 border-b-[0.5px] border-line">
                         <div className="flex items-center gap-2">
