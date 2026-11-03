@@ -65,7 +65,8 @@ import StoryBubbleAvatar from '../PublicBio/StoryBubbleAvatar';
 import SocialProofTicker from '../PublicBio/SocialProofTicker';
 import CarouselSlider from '../Common/CarouselSlider';
 import StickerBlockLayer, { getBlockStickerPositionStyle, findStickerBlockAt } from '../Common/StickerBlockLayer';
-import { THEME_PRESETS, CURATED_THEMES, getTitleFontName, getStickerDeviceProps, getStickerCanvasPositionStyle, getStickerGraphicSizeStyle, isImageUrl, parseTailwindGradient } from '../../constants/app';
+import ScaledCanvas from '../Common/ScaledCanvas';
+import { THEME_PRESETS, CURATED_THEMES, getTitleFontName, getStickerDeviceProps, getStickerPlacementKey, getStickerCanvasPositionStyle, getStickerGraphicSizeStyle, isImageUrl, parseTailwindGradient } from '../../constants/app';
 
 const ICON_MAP = {
   Video, Star, Mail, FileText, Music, ShoppingBag, Zap, Briefcase, BookOpen, Calendar, MessageSquare, TrendingUp, Ticket, Globe,
@@ -85,6 +86,10 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
   const contentCanvasRef = React.useRef(null);
   const contentCanvasTabletRef = React.useRef(null);
   const contentCanvasLaptopRef = React.useRef(null);
+  // The public page shows laptops as a 2-column split or a centred column;
+  // each keeps its own sticker placement ('laptop' / 'laptop-centered').
+  const [laptopLayout, setLaptopLayout] = useState('split');
+  const placementKey = getStickerPlacementKey(deviceMode, laptopLayout);
   const phoneViewportRef = React.useRef(null);
   const ignoreNextViewportClickRef = React.useRef(false);
   const interactionTimerRef = React.useRef(null);
@@ -126,8 +131,12 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
     let changed = false;
 
     const migrated = stickers.map((sticker) => {
-      const props = getStickerDeviceProps(sticker, deviceMode, 'split');
+      const props = getStickerDeviceProps(sticker, deviceMode, laptopLayout);
       if (props.anchorType !== 'CONTENT') return sticker;
+      // Only the old percentage format needs upgrading. Stickers placed with
+      // pixel offsets or pinned to a block are already where the user put
+      // them; a taller tablet/laptop header must not capture them.
+      if (props.coordinateMode === 'pixel-offset' || props.blockKey) return sticker;
 
       const yInCanvas = props.coordinateMode === 'pixel-offset'
         ? props.y
@@ -149,8 +158,8 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
         ...sticker,
         devices: {
           ...(sticker.devices || {}),
-          [deviceMode]: {
-            ...(sticker.devices?.[deviceMode] || {}),
+          [placementKey]: {
+            ...(sticker.devices?.[placementKey] || {}),
             ...deviceProps,
           },
         },
@@ -158,7 +167,7 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
     });
 
     if (changed) onUpdateStickers(migrated);
-  }, [deviceMode, getActiveCanvasRef, onUpdateStickers, profile?.designSettings?.stickers]);
+  }, [deviceMode, laptopLayout, placementKey, getActiveCanvasRef, onUpdateStickers, profile?.designSettings?.stickers]);
 
   const handleViewportClick = (e) => {
     // If user just dragged, resized, rotated, or clicked a sticker, do NOT deselect!
@@ -629,7 +638,8 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
           mobile: { x: xPct, y, scale: 1, rotate: baseSticker.rotate, flipX: false, anchorType, coordinateMode, refWidth, ...pin },
           tablet: { x: xPct, y, scale: 1, rotate: baseSticker.rotate, flipX: false, anchorType, coordinateMode, refWidth, ...pin },
           laptop: { x: xPct, y, scale: 1, rotate: baseSticker.rotate, flipX: false, anchorType, coordinateMode, refWidth, ...pin },
-          [deviceMode]: {
+          'laptop-centered': { x: xPct, y, scale: 1, rotate: baseSticker.rotate, flipX: false, anchorType, coordinateMode, refWidth, ...pin },
+          [placementKey]: {
             x: xPct,
             y,
             scale: 1,
@@ -659,14 +669,14 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
     const currentStickers = profile?.designSettings?.stickers || [];
     const updated = currentStickers.map((s) => {
       if (s.id !== stickerId) return s;
-      const currentProps = getStickerDeviceProps(s, deviceMode, 'split');
+      const currentProps = getStickerDeviceProps(s, deviceMode, laptopLayout);
       const newProps = updater(currentProps, s);
 
       const existingDevices = s.devices || {};
       const newDevices = {
         ...existingDevices,
-        [deviceMode]: {
-          ...(existingDevices[deviceMode] || {}),
+        [placementKey]: {
+          ...(existingDevices[placementKey] || {}),
           ...newProps,
         },
       };
@@ -675,6 +685,7 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
       if (deviceMode === 'mobile') {
         newDevices.tablet = { ...(newDevices.tablet || {}), ...newProps };
         newDevices.laptop = { ...(newDevices.laptop || {}), ...newProps };
+        newDevices['laptop-centered'] = { ...(newDevices['laptop-centered'] || {}), ...newProps };
       }
 
       return {
@@ -693,7 +704,7 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
     const currentStickers = profile?.designSettings?.stickers || [];
     const updated = currentStickers.map((s) => {
       if (s.id !== stickerId) return s;
-      const currentProps = getStickerDeviceProps(s, deviceMode, 'split');
+      const currentProps = getStickerDeviceProps(s, deviceMode, laptopLayout);
 
       return {
         ...s,
@@ -702,6 +713,7 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
           mobile: { ...currentProps },
           tablet: { ...currentProps },
           laptop: { ...currentProps },
+          'laptop-centered': { ...currentProps },
         },
       };
     });
@@ -761,7 +773,7 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
 
     const currentStickers = profile?.designSettings?.stickers || [];
     const targetSticker = currentStickers.find((s) => s.id === stickerId);
-    const stickerAnchor = getStickerDeviceProps(targetSticker, deviceMode).anchorType || 'HEADER';
+    const stickerAnchor = getStickerDeviceProps(targetSticker, deviceMode, laptopLayout).anchorType || 'HEADER';
 
     const targetEl = stickerAnchor === 'PROFILE_HEADER'
       ? canvasEl.querySelector('[data-anchor-section="PROFILE_HEADER"]') || canvasEl
@@ -813,7 +825,7 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
     const targetSticker = currentStickers.find((s) => s.id === stickerId);
     if (!targetSticker) return;
 
-    const startProps = getStickerDeviceProps(targetSticker, deviceMode);
+    const startProps = getStickerDeviceProps(targetSticker, deviceMode, laptopLayout);
     const startScale = startProps.scale ?? 1;
     const stickerEl = e.currentTarget.closest('[data-sticker-id]');
     if (!stickerEl) return;
@@ -900,7 +912,7 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
     const targetSticker = currentStickers.find((s) => s.id === stickerId);
     if (!targetSticker) return;
 
-    const startProps = getStickerDeviceProps(targetSticker, deviceMode);
+    const startProps = getStickerDeviceProps(targetSticker, deviceMode, laptopLayout);
     const startRotate = startProps.rotate ?? 0;
     const stickerEl = e.currentTarget.closest('[data-sticker-id]');
     if (!stickerEl) return;
@@ -968,7 +980,7 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
     const stickersList = profile?.designSettings?.stickers || [];
     if (!stickersList.length) return null;
 
-    const filtered = stickersList.filter((s) => getStickerDeviceProps(s, deviceMode).anchorType === sectionFilter);
+    const filtered = stickersList.filter((s) => getStickerDeviceProps(s, deviceMode, laptopLayout).anchorType === sectionFilter);
 
     if (!filtered.length) return null;
 
@@ -976,7 +988,7 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
       <>
         {filtered.map((stk) => {
           const isSelected = selectedStickerId === stk.id;
-          const props = getStickerDeviceProps(stk, deviceMode);
+          const props = getStickerDeviceProps(stk, deviceMode, laptopLayout);
           const isFlipped = Boolean(props.flipX);
           const scaleInv = Number((1 / (props.scale || 1)).toFixed(3));
 
@@ -1167,11 +1179,11 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
     return (
       <div 
         style={isSplit ? themeStyles.cardStyle : undefined}
-        data-anchor-section="PROFILE_HEADER"
-        className={`relative flex flex-col items-center text-center w-full overflow-visible ${
-          isSplit ? 'p-4 border' : ''
+        className={`w-full ${
+          isSplit ? 'p-6 sm:p-7 border' : ''
         }`}
       >
+        <div data-anchor-section="PROFILE_HEADER" className="relative flex flex-col items-center text-center w-full overflow-visible">
         {renderStickers(getActiveCanvasRef(), 'PROFILE_HEADER')}
 
           {/* Visual Identity & Avatar Container */}
@@ -1300,6 +1312,7 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
               </div>
             </div>
           )}
+        </div>
         </div>
       </div>
     );
@@ -1936,20 +1949,63 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
       );
     }
 
-    if (deviceMode === 'laptop' || deviceMode === 'fluid') {
+    if ((deviceMode === 'laptop' || deviceMode === 'fluid') && laptopLayout === 'split') {
+      // Same structure and spacing as the public page's split layout.
       return (
-        <div className="flex flex-row items-start gap-4 w-full text-left">
-          {/* Left Column: Creator Identity & Tip Jar */}
-          <div className="w-[42%] shrink-0 space-y-3">
+        <div className="grid grid-cols-12 gap-6 items-start w-full text-left">
+          <div className="col-span-5 space-y-4 w-full">
             {renderProfileHeader({ isSplit: true })}
             {renderTipJar()}
           </div>
+          <div className="col-span-7 space-y-4 w-full">
+            <div style={themeStyles.cardStyle} className="p-6 sm:p-7 border space-y-4 w-full">
+              {renderLeadCapture()}
+              {renderScheduleMeeting()}
+              {renderHeroVideo()}
+              {profile.shop?.published && (
+                <div className="flex items-center justify-center gap-1 p-1 bg-surface-2/90 backdrop-blur-md rounded-xl border border-line w-full max-w-[200px] mx-auto shadow-2xs">
+                  <button
+                    type="button"
+                    onClick={() => setActiveBioTab('links')}
+                    className={`flex-1 py-1 px-2.5 rounded-lg text-xs font-bold transition-all ${
+                      activeBioTab === 'links'
+                        ? 'bg-brand-500 text-white shadow-xs'
+                        : 'text-ink-500 hover:text-ink-700'
+                    }`}
+                  >
+                    Links
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setActiveBioTab('shop')}
+                    className={`flex-1 py-1 px-2.5 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1 ${
+                      activeBioTab === 'shop'
+                        ? 'bg-brand-500 text-white shadow-xs'
+                        : 'text-ink-500 hover:text-ink-700'
+                    }`}
+                  >
+                    <ShoppingBag className="w-3 h-3" />
+                    <span>Shop</span>
+                  </button>
+                </div>
+              )}
+              {activeBioTab === 'shop' ? renderShopGrid() : renderActiveLinks()}
+              {renderNewsletter()}
+              {renderFooter()}
+            </div>
+          </div>
+        </div>
+      );
+    }
 
-          {/* Right Column: Actions, Meetings, Links & Newsletter */}
-          <div className="flex-1 min-w-0 space-y-3">
-            {renderLeadCapture()}
-            {renderScheduleMeeting()}
-            {renderHeroVideo()}
+    if (deviceMode === 'laptop' || deviceMode === 'fluid') {
+      // Public centred layout: one 580px column.
+      return (
+        <div className="w-full max-w-[580px] mx-auto flex flex-col gap-3.5">
+          {renderProfileHeader({ isSplit: false })}
+          {renderLeadCapture()}
+          {renderScheduleMeeting()}
+          {renderHeroVideo()}
             {profile.shop?.published && (
               <div className="flex items-center justify-center gap-1 p-1 bg-surface-2/90 backdrop-blur-md rounded-xl border border-line w-full max-w-[200px] mx-auto shadow-2xs">
                 <button
@@ -1977,10 +2033,14 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
                 </button>
               </div>
             )}
-            {activeBioTab === 'shop' ? renderShopGrid() : renderActiveLinks()}
-            {renderNewsletter()}
-            {renderFooter()}
-          </div>
+          {activeBioTab === 'shop' ? renderShopGrid() : renderActiveLinks()}
+          {(profile.widgets?.hasTipJar || profile.widgets?.hasNewsletter) && (
+            <div className="space-y-3 w-full">
+              {renderTipJar()}
+              {renderNewsletter()}
+            </div>
+          )}
+          {renderFooter()}
         </div>
       );
     }
@@ -2036,7 +2096,7 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
 
   const currentStickers = profile?.designSettings?.stickers || [];
   const selectedSticker = currentStickers.find((s) => s.id === selectedStickerId);
-  const selectedStickerProps = selectedSticker ? getStickerDeviceProps(selectedSticker, deviceMode) : null;
+  const selectedStickerProps = selectedSticker ? getStickerDeviceProps(selectedSticker, deviceMode, laptopLayout) : null;
 
   return (
     <div className="flex flex-col items-center justify-start w-full relative">
@@ -2086,6 +2146,23 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
             <span className="truncate">Laptop</span>
           </button>
         </div>
+
+        {deviceMode === 'laptop' && (
+          <div className="flex items-center justify-center gap-[10px]" title="The public page offers both laptop layouts; stickers keep a separate position in each.">
+            {[['split', 'Split'], ['centered', 'Centered']].map(([id, label]) => (
+              <button
+                key={id}
+                type="button"
+                onClick={() => setLaptopLayout(id)}
+                className={`flex h-[23px] items-center rounded-[50px] border-[0.5px] px-[10px] text-[10px] ${
+                  laptopLayout === id ? 'border-black bg-[#F8F8F9BF] text-black' : 'border-[#DCDCDC] bg-white text-[#333333]'
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        )}
 
         {/* Row 2: Zoom In / Zoom Out Controls, Audience View As & Direct Link */}
         <div className="flex items-center justify-between gap-2 px-0.5">
@@ -2437,8 +2514,8 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
               onDrop={(e) => handleCanvasDrop(e, contentCanvasTabletRef)}
             >
               <div 
-                ref={contentCanvasTabletRef} 
-                className="relative w-full min-h-full flex flex-col gap-3.5 pb-6"
+                ref={contentCanvasTabletRef}
+                className="relative w-full max-w-[580px] mx-auto min-h-full flex flex-col gap-3.5 pb-6"
                 style={{ containerType: 'inline-size' }}
               >
                 <StickerBlockLayer>{(rects) => renderStickers(contentCanvasTabletRef, 'CONTENT', rects)}</StickerBlockLayer>
@@ -2496,14 +2573,16 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
                 onDragOver={handleCanvasDragOver}
                 onDrop={(e) => handleCanvasDrop(e, contentCanvasLaptopRef)}
               >
-                <div 
-                  ref={contentCanvasLaptopRef} 
-                  className="relative w-full min-h-full flex flex-col gap-3.5 pb-6"
-                  style={{ containerType: 'inline-size' }}
-                >
-                  <StickerBlockLayer>{(rects) => renderStickers(contentCanvasLaptopRef, 'CONTENT', rects)}</StickerBlockLayer>
-                  {renderProfileContent()}
-                </div>
+                <ScaledCanvas width={1024}>
+                  <div
+                    ref={contentCanvasLaptopRef}
+                    className="relative w-full flex flex-col gap-3.5 pb-6"
+                    style={{ containerType: 'inline-size' }}
+                  >
+                    <StickerBlockLayer>{(rects) => renderStickers(contentCanvasLaptopRef, 'CONTENT', rects)}</StickerBlockLayer>
+                    {renderProfileContent()}
+                  </div>
+                </ScaledCanvas>
               </div>
             </div>
 

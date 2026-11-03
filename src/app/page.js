@@ -3752,6 +3752,7 @@ export default function AtelierStudioPage() {
                                         mobile: { ...placement },
                                         tablet: { ...placement },
                                         laptop: { ...placement },
+                                        'laptop-centered': { ...placement },
                                       },
                                     };
                                     return {

@@ -323,6 +323,13 @@ export const isImageUrl = (val) => {
  * Mathematically projects sticker coordinates and transforms across devices
  * (Mobile, Tablet, and Laptop in Split or Centered modes).
  */
+/** devices[] key for a sticker placement: 'mobile', 'tablet', 'laptop' or 'laptop-centered'. */
+export const getStickerPlacementKey = (targetMode = 'mobile', desktopLayout = 'split') => (
+  (targetMode === 'laptop' || targetMode === 'fluid' || targetMode === 'desktop') && desktopLayout === 'centered'
+    ? 'laptop-centered'
+    : targetMode
+);
+
 // Content stickers may be pinned to a block: its key and the sticker's spot
 // inside it, as percentages of the block's width and height.
 const blockPin = (placement, stk) => {
@@ -341,7 +348,10 @@ export const getStickerDeviceProps = (stk, targetMode = 'mobile', desktopLayout 
   const anchorType = stk?.devices?.mobile?.anchorType ?? stk?.anchorType ?? 'HEADER';
 
   // 1. If explicit override exists for this specific device mode, use it directly!
-  const override = stk?.devices?.[targetMode];
+  // The laptop has two layouts; the centred one keeps its own placement and
+  // falls back to the split placement for stickers saved before it existed.
+  const placementKey = getStickerPlacementKey(targetMode, desktopLayout);
+  const override = stk?.devices?.[placementKey] ?? (placementKey === 'laptop-centered' ? stk?.devices?.laptop : undefined);
   if (override && typeof override.x === 'number' && typeof override.y === 'number') {
     return {
       x: override.x,

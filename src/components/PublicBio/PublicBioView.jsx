@@ -669,12 +669,12 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
 
     return (
       <div 
-        data-anchor-section="PROFILE_HEADER"
         style={isSplit ? themeStyles.cardStyle : undefined}
-        className={`relative flex flex-col items-center text-center w-full overflow-visible ${
+        className={`w-full ${
           isSplit ? 'p-6 sm:p-7 border' : ''
         }`}
       >
+        <div data-anchor-section="PROFILE_HEADER" className="relative flex flex-col items-center text-center w-full overflow-visible">
         {renderStickersSection(isMobileLayout ? 'mobile' : deviceMode, 'PROFILE_HEADER')}
 
         {/* Visual Identity & Avatar Container (Constant Height Header Anchor) */}
@@ -803,6 +803,7 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
               </div>
             </div>
           )}
+        </div>
         </div>
       </div>
     );
