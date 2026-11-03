@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { FileCode, X, Copy, Check, Upload, Download, AlertTriangle } from '@/components/icons';
+import { Copy, Check, Download } from '@/components/icons';
+import { Modal, ModalButton, Field, inputClass, RoundIconButton } from '@/components/ui';
 
 export default function ExportImportModal({ profile, onImportProfile, onClose }) {
   const [copied, setCopied] = useState(false);
@@ -49,91 +50,69 @@ export default function ExportImportModal({ profile, onImportProfile, onClose })
   };
 
   return (
-    <div className="modal-overlay">
-      <div className="modal-content p-6 max-w-lg w-full relative border-[0.5px] border-line bg-white shadow-modal rounded-2xl">
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 p-1.5 rounded-full text-ink-500 hover:text-ink-700 hover:bg-surface-2 transition-all cursor-pointer"
-        >
-          <X className="w-4 h-4" />
-        </button>
-
-        <div className="flex items-center gap-3 border-b-[0.5px] border-line pb-4">
-          <div className="w-10 h-10 rounded-full bg-brand-500/10 text-brand-500 border border-brand-500/20 flex items-center justify-center">
-            <FileCode className="w-5 h-5" />
-          </div>
-          <div>
-            <h3 className="text-[14px] font-sans font-semibold text-ink-700">Production Profile Sync</h3>
-            <p className="text-xs text-ink-500">Export or import full profile schema JSON</p>
-          </div>
-        </div>
-
-        {/* Export Section */}
-        <div className="mt-4 space-y-2">
+    <Modal
+      open
+      onClose={onClose}
+      title="Export / Import"
+      width="md"
+      footer={
+        <>
+          <ModalButton variant="secondary" className="w-[50%]" onClick={onClose}>
+            Cancel
+          </ModalButton>
+          <ModalButton type="submit" form="tb-import-form" variant="primary" className="w-[50%]" disabled={!importText.trim()}>
+            Import
+          </ModalButton>
+        </>
+      }
+    >
+      <div className="flex flex-col gap-[15px]">
+        <div className="flex flex-col gap-[5px]">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-ink-700 uppercase tracking-wider">Current Config JSON</span>
-            <div className="flex gap-2">
-              <button
+            <span className="text-[14px] font-medium text-black">Export</span>
+            <div className="flex items-center gap-[4px]">
+              <RoundIconButton
+                icon={copied ? Check : Copy}
+                title={copied ? 'Copied' : 'Copy'}
+                tone="brand"
+                iconClassName={copied ? 'text-[#16A34A]' : ''}
                 onClick={handleCopy}
-                className="text-[11px] font-semibold text-brand-500 hover:text-brand-600 flex items-center gap-1 cursor-pointer"
-              >
-                {copied ? <Check className="w-3.5 h-3.5 text-brand-500" /> : <Copy className="w-3.5 h-3.5" />}
-                {copied ? 'Copied' : 'Copy'}
-              </button>
-              <button
-                onClick={handleDownload}
-                className="text-[11px] font-semibold text-brand-500 hover:text-brand-600 flex items-center gap-1 cursor-pointer"
-              >
-                <Download className="w-3.5 h-3.5" /> Download
-              </button>
+              />
+              <RoundIconButton icon={Download} title="Download" tone="brand" onClick={handleDownload} />
             </div>
           </div>
           <textarea
             readOnly
             value={jsonString}
             rows={5}
-            className="tb-input font-mono text-[11px] text-ink-700 select-all"
+            className={`${inputClass} resize-none select-all font-mono text-[11px]`}
           />
         </div>
 
-        {/* Import Section */}
-        <form onSubmit={handleApplyImport} className="mt-5 space-y-3 pt-4 border-t-[0.5px] border-line">
-          <div className="flex items-center gap-1.5">
-            <Upload className="w-4 h-4 text-brand-500" />
-            <span className="text-xs font-semibold text-ink-700 uppercase tracking-wider">Import Config JSON</span>
-          </div>
-
-          <textarea
-            placeholder='Paste exported JSON here to load a custom creator profile...'
-            value={importText}
-            onChange={(e) => setImportText(e.target.value)}
-            rows={4}
-            className="tb-input font-mono text-[11px]"
-          />
+        <form id="tb-import-form" onSubmit={handleApplyImport} className="flex flex-col gap-[10px] border-t-[0.5px] border-[#EBEBEB] pt-[15px]">
+          <Field label="Import">
+            <textarea
+              placeholder="Paste exported JSON"
+              value={importText}
+              onChange={(e) => setImportText(e.target.value)}
+              rows={4}
+              className={`${inputClass} resize-none font-mono text-[11px]`}
+            />
+          </Field>
 
           {importError && (
-            <div className="p-2.5 rounded-lg bg-rose-50 border border-rose-200 text-xs text-rose-700 flex items-center gap-2">
-              <AlertTriangle className="w-4 h-4 shrink-0 text-rose-600" />
-              <span>{importError}</span>
+            <div role="alert" className="rounded-[5px] border-[0.5px] border-[#FF4359] bg-[#FF43591A] px-[10px] py-[8px] text-[12px] text-[#FF4359]">
+              {importError}
             </div>
           )}
 
           {importSuccess && (
-            <div className="p-2.5 rounded-lg bg-brand-500/10 border border-brand-500/30 text-xs text-brand-500 flex items-center gap-2">
-              <Check className="w-4 h-4 shrink-0" />
-              <span>Profile imported successfully! Loading...</span>
+            <div className="rounded-[5px] border-[0.5px] border-[#16A34A] bg-[#E8F7EE] px-[10px] py-[8px] text-[12px] text-[#16A34A]">
+              Profile imported. Loading...
             </div>
           )}
-
-          <button
-            type="submit"
-            disabled={!importText.trim()}
-            className="w-full py-2.5 rounded-sm bg-brand-500 hover:bg-brand-600 text-white font-semibold text-xs disabled:opacity-40 transition-all cursor-pointer"
-          >
-            Apply Imported Profile Configuration
-          </button>
         </form>
       </div>
-    </div>
+    </Modal>
   );
 }

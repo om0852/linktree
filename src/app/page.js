@@ -40,7 +40,12 @@ import {
   Switch,
   Card, 
   CardHeader, 
-  CardTitle 
+  CardTitle,
+  Toolbar,
+  PillTab,
+  ToolbarPill,
+  SettingRow,
+  Toggle,
 } from '../components/ui';
 import { 
   Sparkles, 
@@ -53,6 +58,7 @@ import {
   Copy, 
   Check, 
   ChevronDown,
+  ChevronUp,
   GripVertical,
   BarChart3,
   Smartphone,
@@ -103,6 +109,10 @@ import {
 } from '@/components/icons';
 import PaletteSuggester from '../components/Builder/PaletteSuggester';
 import { detectEmbed } from '../utils/embedDetector';
+
+/** Creatosaurus secondary button (AccountDeletePopup Cancel). */
+const secondaryButton =
+  'flex h-[34px] items-center rounded-[5px] border-[0.5px] border-[#C4C4C4] bg-[#F8F8F9] px-[12px] text-[12px] font-medium text-[#333333] hover:border-[#404040] hover:text-black';
 
 const ICON_LIST = [
   { id: 'movie', label: 'Movie', symbol: 'movie' },
@@ -1026,7 +1036,7 @@ export default function AtelierStudioPage() {
       {/* High-Visibility Modern Toast Notification */}
       {toastMessage && (
         <div className="fixed bottom-6 right-6 z-[9999] max-w-sm w-full animate-fadeIn shadow-modal transition-all">
-          <div className={`p-4 rounded-xl border flex items-start gap-3 text-xs sm:text-sm font-medium ${
+          <div className={`p-[15px] rounded-[10px] border flex items-start gap-3 text-[12px]  font-medium ${
             toastMessage.type === 'success'
               ? 'bg-ink-900 border-brand-500 text-white'
               : toastMessage.type === 'info'
@@ -1047,7 +1057,7 @@ export default function AtelierStudioPage() {
                   href={toastMessage.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 text-brand-400 hover:text-brand-300 underline mt-1.5 font-mono text-xs"
+                  className="inline-flex items-center gap-1 text-brand-400 hover:text-brand-300 underline mt-1.5 text-[12px]"
                 >
                   <span>Open Live Bio</span>
                   <ExternalLink className="w-3 h-3" />
@@ -1109,178 +1119,102 @@ export default function AtelierStudioPage() {
           }}
         />
         <div className="customScrollBar mt-[15px] min-h-0 flex-1 overflow-y-auto pr-[6px] -mr-[9px] flex flex-col gap-[15px]">
-          {/* Top Bio Optimization Insights Banner */}
-          {!rankerDismissed && (
-            <div className="bg-surface-2 border-[0.5px] border-line/80 rounded-2xl p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 relative overflow-hidden">
-              <div className="absolute -right-16 -top-16 w-44 h-44 bg-brand-100/30 rounded-full blur-2xl pointer-events-none"></div>
-              
-              <div className="flex items-center gap-3.5 relative z-10">
-                <div className="w-10 h-10 rounded-xl bg-white border-[0.5px] border-line flex items-center justify-center text-brand-500 shrink-0">
-                  <Sparkles className="w-5 h-5 text-brand-500" />
-                </div>
-                <div className="flex flex-col gap-1">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-semibold text-brand-500 uppercase tracking-wider font-mono">
-                      Bio Optimization Insights
-                    </span>
-                    <Badge variant="mint" size="xs">
-                      PERFORMANCE TIP
-                    </Badge>
-                  </div>
-                  <p className="text-xs sm:text-sm text-ink-700 flex items-center gap-2 flex-wrap">
-                    <span>Engagement Score:</span>
-                    <span className="font-semibold text-ink-700 font-mono">{ctrData.score}%</span>
-                    <span className="text-ink-500 font-mono">→ 89.5% target</span>
-                    <Badge variant="sage" size="xs">
-                      +{Math.max(0, (89.5 - ctrData.score)).toFixed(1)}% Boost Opportunity
-                    </Badge>
-                  </p>
-                </div>
-              </div>
+          <Toolbar
+            left={
+              <>
+                <PillTab active={activeTab === 'links'} onClick={() => setActiveTab('links')}>Links</PillTab>
+                <PillTab active={activeTab === 'style'} onClick={() => setActiveTab('style')}>Design</PillTab>
+                <PillTab active={activeTab === 'widgets'} onClick={() => setActiveTab('widgets')}>Widgets</PillTab>
+              </>
+            }
+            right={
+              <>
+                <button
+                  type="button"
+                  onClick={handleCopyBioUrl}
+                  title="Copy bio link"
+                  className="flex h-[34px] max-w-[260px] items-center gap-[6px] rounded-[50px] border-[0.5px] border-[#DCDCDC] bg-white px-[10px] text-[12px] text-[#333333] hover:bg-[#F8F8F9BF]"
+                >
+                  <span className="truncate"><span className="text-[#808080]">treeinbio.me/</span>{currentProfile.username}</span>
+                  {copiedBioUrl ? <Check size={14} color="#16A34A" /> : <Copy size={14} className="text-[#808080]" />}
+                </button>
+                <ToolbarPill onClick={handleAutoOptimize} title={`Engagement score ${ctrData.score}%. Apply a layout and theme tuned for clicks.`}>
+                  Optimize
+                </ToolbarPill>
+              </>
+            }
+          />
 
-              <div className="flex items-center gap-3 relative z-10 shrink-0">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setRankerDismissed(true)}
-                  className="font-mono text-xs"
-                >
-                  Dismiss
-                </Button>
-                <Button
-                  variant="primary"
-                  size="sm"
-                  leftIcon={Zap}
-                  onClick={handleAutoOptimize}
-                >
-                  Optimize Layout &amp; Theme
-                </Button>
-              </div>
+          {activeTab === 'links' && (
+            <div className="flex flex-wrap items-center gap-[10px]">
+              <button
+                type="button"
+                onClick={() => setShowMarketplace(true)}
+                className="flex h-[34px] items-center rounded-[5px] bg-black px-[7px] pr-[12px] text-[14px] text-white"
+              >
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <path d="M10 4.16699V15.8337M4.16669 10.0003H15.8334" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+                <span className="ml-[10px]">Add to Bio</span>
+              </button>
+              <button
+                type="button"
+                className={secondaryButton}
+                onClick={() => {
+                  setActiveTab('links');
+                  setIsAddingLink(true);
+                  setEditingLinkId(null);
+                  setLinkForm({
+                    title: '',
+                    url: '',
+                    badge: '',
+                    icon: 'link',
+                    size: 'large',
+                    subtitle: '',
+                    collectionId: '',
+                  });
+                }}
+              >
+                Add Link
+              </button>
+              <button
+                type="button"
+                className={secondaryButton}
+                onClick={() => {
+                  setActiveTab('links');
+                  setIsAddingCollection(true);
+                  setEditingCollectionId(null);
+                  setCollectionForm({
+                    title: '',
+                    viewMode: 'list',
+                  });
+                }}
+              >
+                Add Collection
+              </button>
+              <button
+                type="button"
+                className={secondaryButton}
+                onClick={() => {
+                  setActiveTab('links');
+                  setIsAddingLink(true);
+                  setEditingLinkId(null);
+                  setLinkForm({
+                    title: 'Featured Bento Showcase',
+                    url: 'https://',
+                    badge: 'EXCLUSIVE',
+                    icon: 'star',
+                    size: 'large',
+                    subtitle: 'Multi-column media showcase card',
+                    collectionId: '',
+                  });
+                }}
+              >
+                Bento Card
+              </button>
             </div>
           )}
 
-          {/* Action Toolbar */}
-          <div className="flex flex-col gap-3 pb-1">
-            {/* Row 1: Tab Switchers Segmented Group & URL Shortcut */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div className="inline-flex items-center p-1 bg-surface-2 border-[0.5px] border-line rounded-xl gap-1 shadow-2xs self-start overflow-x-auto max-w-full">
-                <TabButton
-                  active={activeTab === 'links'}
-                  icon={Share2}
-                  onClick={() => setActiveTab('links')}
-                >
-                  Links &amp; Content
-                </TabButton>
-
-                <TabButton
-                  active={activeTab === 'style'}
-                  icon={Sliders}
-                  onClick={() => setActiveTab('style')}
-                >
-                  Theme &amp; Appearance
-                </TabButton>
-
-                <TabButton
-                  active={activeTab === 'widgets'}
-                  icon={GripVertical}
-                  onClick={() => setActiveTab('widgets')}
-                >
-                  Features &amp; Add-ons
-                </TabButton>
-              </div>
-
-              {/* URL Shortcut Badge */}
-              <div className="flex items-center gap-2 bg-surface-2 border-[0.5px] border-line px-3.5 py-1.5 rounded-xl self-start sm:self-auto shrink-0 min-h-[38px]">
-                <span className="font-mono text-xs text-ink-500">treeinbio.me/</span>
-                <span className="font-mono text-xs sm:text-sm text-ink-700 font-semibold">
-                  {currentProfile.username}
-                </span>
-                <IconButton
-                  icon={copiedBioUrl ? Check : Copy}
-                  size="sm"
-                  onClick={handleCopyBioUrl}
-                  title="Copy Bio URL"
-                  className={copiedBioUrl ? 'text-brand-600' : 'text-brand-500'}
-                />
-              </div>
-            </div>
-
-            {/* Row 2: Action Buttons for Links & Content (Never overflows screen) */}
-            {activeTab === 'links' && (
-              <div className="flex items-center gap-2 flex-wrap pt-0.5">
-                <Button
-                  variant="primary"
-                  size="sm"
-                  leftIcon={Plus}
-                  onClick={() => setShowMarketplace(true)}
-                  className="bg-ink-900 hover:bg-ink-900 text-white ring-1 ring-brand-500/30"
-                >
-                  Add to Bio
-                </Button>
-
-                <Button
-                  variant="outline"
-                  size="sm"
-                  leftIcon={Plus}
-                  onClick={() => {
-                    setActiveTab('links');
-                    setIsAddingLink(true);
-                    setEditingLinkId(null);
-                    setLinkForm({
-                      title: '',
-                      url: '',
-                      badge: '',
-                      icon: 'link',
-                      size: 'large',
-                      subtitle: '',
-                      collectionId: '',
-                    });
-                  }}
-                >
-                  Add Link
-                </Button>
-
-                <Button
-                  variant="outline"
-                  size="sm"
-                  leftIcon={Folder}
-                  onClick={() => {
-                    setActiveTab('links');
-                    setIsAddingCollection(true);
-                    setEditingCollectionId(null);
-                    setCollectionForm({
-                      title: '',
-                      viewMode: 'list',
-                    });
-                  }}
-                >
-                  Add Collection
-                </Button>
-
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  leftIcon={GripVertical}
-                  onClick={() => {
-                    setActiveTab('links');
-                    setIsAddingLink(true);
-                    setEditingLinkId(null);
-                    setLinkForm({
-                      title: 'Featured Bento Showcase',
-                      url: 'https://',
-                      badge: 'EXCLUSIVE',
-                      icon: 'star',
-                      size: 'large',
-                      subtitle: 'Multi-column media showcase card',
-                      collectionId: '',
-                    });
-                  }}
-                >
-                  Bento Card
-                </Button>
-              </div>
-            )}
-          </div>
 
           {/* 12-Column Responsive Split */}
           <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
@@ -1293,10 +1227,10 @@ export default function AtelierStudioPage() {
                   {(isAddingLink || editingLinkId) && (
                     <form
                       onSubmit={handleSaveLinkForm}
-                      className="bg-surface-2 border-2 border-brand-500 rounded-xl p-4 sm:p-5 flex flex-col gap-3.5 animate-fadeIn"
+                      className="bg-surface-2 border-2 border-brand-500 rounded-[10px] p-[15px] flex flex-col gap-3.5 animate-fadeIn"
                     >
                       <div className="flex items-center justify-between pb-2 border-b-[0.5px] border-line">
-                        <span className="font-sans font-semibold text-sm text-ink-700">
+                        <span className="font-sans font-semibold text-[12px] text-ink-700">
                           {editingLinkId ? 'Edit Link' : 'Add New Link'}
                         </span>
                         <Button
@@ -1306,13 +1240,13 @@ export default function AtelierStudioPage() {
                             setIsAddingLink(false);
                             setEditingLinkId(null);
                           }}
-                          className="font-mono text-xs"
+                          className="text-[12px]"
                         >
                           Cancel
                         </Button>
                       </div>
 
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 text-xs sm:text-sm">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 text-[12px]">
                         <div>
                           <Label htmlFor="link-form-title" required>Link Title</Label>
                           <Input
@@ -1333,7 +1267,7 @@ export default function AtelierStudioPage() {
                             placeholder="https://..."
                             value={linkForm.url}
                             onChange={(e) => setLinkForm({ ...linkForm, url: e.target.value })}
-                            className="font-mono"
+                            className=""
                           />
                         </div>
 
@@ -1382,7 +1316,7 @@ export default function AtelierStudioPage() {
                               placeholder="e.g. $29.99"
                               value={linkForm.price || ''}
                               onChange={(e) => setLinkForm({ ...linkForm, price: e.target.value })}
-                              className="font-mono font-semibold"
+                              className="font-semibold"
                             />
                           </div>
                         )}
@@ -1395,7 +1329,7 @@ export default function AtelierStudioPage() {
                             placeholder="https://... cover image or video thumb"
                             value={linkForm.thumbnail || ''}
                             onChange={(e) => setLinkForm({ ...linkForm, thumbnail: e.target.value })}
-                            className="font-mono"
+                            className=""
                           />
                         </div>
 
@@ -1417,13 +1351,13 @@ export default function AtelierStudioPage() {
                       </div>
 
                       {/* Power Feature Collapsible Accordions (Anti-Bloat Progressive Disclosure) */}
-                      <div className="flex flex-col gap-1.5 pt-1 border-t-[0.5px] border-line/70">
+                      <div className="flex flex-col gap-1.5 pt-1 border-t-[0.5px] border-line">
                         {/* 1. Lead Magnet Lock to Unlock Accordion */}
-                        <div className="rounded-lg border-[0.5px] border-line bg-white overflow-hidden ">
+                        <div className="rounded-[5px] border-[0.5px] border-line bg-white overflow-hidden">
                           <button
                             type="button"
                             onClick={() => setOpenLinkAccordion(openLinkAccordion === 'magnet' ? null : 'magnet')}
-                            className="w-full px-2.5 py-1.5 flex items-center justify-between text-xs text-ink-700 hover:bg-surface-2 transition-colors"
+                            className="w-full px-2.5 py-1.5 flex items-center justify-between text-[12px] text-ink-700 hover:bg-surface-2 transition-colors"
                           >
                             <div className="flex items-center gap-1.5 font-semibold">
                               <Lock size={13} className={linkForm.leadMagnet?.enabled ? 'text-amber-600' : 'text-ink-500'} />
@@ -1434,13 +1368,13 @@ export default function AtelierStudioPage() {
                                 </span>
                               )}
                             </div>
-                            <span className="text-[10px] text-ink-500 font-mono">
+                            <span className="text-[10px] text-ink-500">
                               {openLinkAccordion === 'magnet' ? '▲ Hide' : '▼ Configure'}
                             </span>
                           </button>
 
                           {openLinkAccordion === 'magnet' && (
-                            <div className="p-2.5 bg-surface-2/70 border-t-[0.5px] border-line flex flex-col gap-2 text-xs">
+                            <div className="p-2.5 bg-surface-2/70 border-t-[0.5px] border-line flex flex-col gap-2 text-[12px]">
                               <label className="flex items-center gap-2 cursor-pointer">
                                 <input
                                   type="checkbox"
@@ -1457,7 +1391,7 @@ export default function AtelierStudioPage() {
                               </label>
 
                               {linkForm.leadMagnet?.enabled && (
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 pt-3 border-t-[0.5px] border-line/50">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 pt-3 border-t-[0.5px] border-line">
                                   <div>
                                     <Label htmlFor="magnet-asset-url" required>Asset Download URL</Label>
                                     <Input
@@ -1470,7 +1404,7 @@ export default function AtelierStudioPage() {
                                         ...linkForm,
                                         leadMagnet: { ...(linkForm.leadMagnet || {}), assetUrl: e.target.value }
                                       })}
-                                      className="font-mono"
+                                      className=""
                                     />
                                   </div>
 
@@ -1559,28 +1493,28 @@ export default function AtelierStudioPage() {
                         </div>
 
                         {/* 2. In-Page Media Player Preview Accordion */}
-                        <div className="rounded-lg border-[0.5px] border-line bg-white overflow-hidden ">
+                        <div className="rounded-[5px] border-[0.5px] border-line bg-white overflow-hidden">
                           <button
                             type="button"
                             onClick={() => setOpenLinkAccordion(openLinkAccordion === 'embed' ? null : 'embed')}
-                            className="w-full px-2.5 py-1.5 flex items-center justify-between text-xs text-ink-700 hover:bg-surface-2 transition-colors"
+                            className="w-full px-2.5 py-1.5 flex items-center justify-between text-[12px] text-ink-700 hover:bg-surface-2 transition-colors"
                           >
                             <div className="flex items-center gap-1.5 font-semibold">
                               <Music size={13} className={linkForm.embed?.enabled ? 'text-brand-600' : 'text-ink-500'} />
                               <span>In-Page Media Preview (Zero Tab-Switching)</span>
                               {linkForm.embed?.enabled && (
-                                <span className="text-[9px] px-1.5 py-0.2 rounded-full bg-brand-100 text-brand-800 font-semibold uppercase">
+                                <span className="text-[9px] px-1.5 py-0.2 rounded-full bg-brand-100 text-brand-800 font-semibold">
                                   {linkForm.embed.platform}
                                 </span>
                               )}
                             </div>
-                            <span className="text-[10px] text-ink-500 font-mono">
+                            <span className="text-[10px] text-ink-500">
                               {openLinkAccordion === 'embed' ? '▲ Hide' : '▼ Configure'}
                             </span>
                           </button>
 
                           {openLinkAccordion === 'embed' && (
-                            <div className="p-2.5 bg-surface-2/70 border-t-[0.5px] border-line flex flex-col gap-2 text-xs">
+                            <div className="p-2.5 bg-surface-2/70 border-t-[0.5px] border-line flex flex-col gap-2 text-[12px]">
                               <div className="flex items-center justify-between">
                                 <label className="flex items-center gap-2 cursor-pointer">
                                   <input
@@ -1619,7 +1553,7 @@ export default function AtelierStudioPage() {
                               </div>
 
                               {linkForm.embed?.enabled && (
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 pt-3 border-t-[0.5px] border-line/50">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 pt-3 border-t-[0.5px] border-line">
                                   <div>
                                     <Label htmlFor="embed-platform">Platform</Label>
                                     <Select
@@ -1650,7 +1584,7 @@ export default function AtelierStudioPage() {
                                         ...linkForm,
                                         embed: { ...(linkForm.embed || {}), embedId: e.target.value.trim() }
                                       })}
-                                      className="font-mono"
+                                      className=""
                                     />
                                   </div>
                                 </div>
@@ -1660,11 +1594,11 @@ export default function AtelierStudioPage() {
                         </div>
 
                         {/* 3. Time-Sensitive Flash Links Accordion */}
-                        <div className="rounded-lg border-[0.5px] border-line bg-white overflow-hidden ">
+                        <div className="rounded-[5px] border-[0.5px] border-line bg-white overflow-hidden">
                           <button
                             type="button"
                             onClick={() => setOpenLinkAccordion(openLinkAccordion === 'schedule' ? null : 'schedule')}
-                            className="w-full px-2.5 py-1.5 flex items-center justify-between text-xs text-ink-700 hover:bg-surface-2 transition-colors"
+                            className="w-full px-2.5 py-1.5 flex items-center justify-between text-[12px] text-ink-700 hover:bg-surface-2 transition-colors"
                           >
                             <div className="flex items-center gap-1.5 font-semibold">
                               <Clock size={13} className={linkForm.schedule?.enabled ? 'text-blue-600' : 'text-ink-500'} />
@@ -1675,13 +1609,13 @@ export default function AtelierStudioPage() {
                                 </span>
                               )}
                             </div>
-                            <span className="text-[10px] text-ink-500 font-mono">
+                            <span className="text-[10px] text-ink-500">
                               {openLinkAccordion === 'schedule' ? '▲ Hide' : '▼ Configure'}
                             </span>
                           </button>
 
                           {openLinkAccordion === 'schedule' && (
-                            <div className="p-3 bg-surface-2/70 border-t-[0.5px] border-line flex flex-col gap-2.5 text-xs">
+                            <div className="p-3 bg-surface-2/70 border-t-[0.5px] border-line flex flex-col gap-2.5 text-[12px]">
                               <label className="flex items-center gap-2 cursor-pointer">
                                 <input
                                   type="checkbox"
@@ -1698,7 +1632,7 @@ export default function AtelierStudioPage() {
                               </label>
 
                               {linkForm.schedule?.enabled && (
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 pt-2 border-t-[0.5px] border-line/50">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 pt-2 border-t-[0.5px] border-line">
                                   <div>
                                     <Label htmlFor="schedule-starts">Starts At (Optional)</Label>
                                     <Input
@@ -1733,28 +1667,28 @@ export default function AtelierStudioPage() {
                         </div>
 
                         {/* 4. Country & Geo-Targeting Rules Accordion */}
-                        <div className="rounded-lg border-[0.5px] border-line bg-white overflow-hidden ">
+                        <div className="rounded-[5px] border-[0.5px] border-line bg-white overflow-hidden">
                           <button
                             type="button"
                             onClick={() => setOpenLinkAccordion(openLinkAccordion === 'geo' ? null : 'geo')}
-                            className="w-full px-2.5 py-1.5 flex items-center justify-between text-xs text-ink-700 hover:bg-surface-2 transition-colors cursor-pointer"
+                            className="w-full px-2.5 py-1.5 flex items-center justify-between text-[12px] text-ink-700 hover:bg-surface-2 transition-colors cursor-pointer"
                           >
                             <div className="flex items-center gap-1.5 font-semibold">
                               <Globe size={13} className={linkForm.geoTargeting?.enabled ? 'text-teal-600' : 'text-ink-500'} />
                               <span>Country &amp; Geo-Targeting Rules</span>
                               {linkForm.geoTargeting?.enabled && (
-                                <span className="text-[9px] px-1.5 py-0.2 rounded-full bg-teal-100 text-teal-800 font-semibold uppercase">
+                                <span className="text-[9px] px-1.5 py-0.2 rounded-full bg-teal-100 text-teal-800 font-semibold">
                                   {linkForm.geoTargeting.countries?.length || 0} Countries
                                 </span>
                               )}
                             </div>
-                            <span className="text-[10px] text-ink-500 font-mono">
+                            <span className="text-[10px] text-ink-500">
                               {openLinkAccordion === 'geo' ? '▲ Hide' : '▼ Configure'}
                             </span>
                           </button>
 
                           {openLinkAccordion === 'geo' && (
-                            <div className="p-3 bg-surface-2/70 border-t-[0.5px] border-line flex flex-col gap-2.5 text-xs">
+                            <div className="p-3 bg-surface-2/70 border-t-[0.5px] border-line flex flex-col gap-2.5 text-[12px]">
                               <label className="flex items-center gap-2 cursor-pointer">
                                 <input
                                   type="checkbox"
@@ -1771,7 +1705,7 @@ export default function AtelierStudioPage() {
                               </label>
 
                               {linkForm.geoTargeting?.enabled && (
-                                <div className="space-y-3 pt-2 border-t-[0.5px] border-line/50">
+                                <div className="space-y-3 pt-2 border-t-[0.5px] border-line">
                                   <div>
                                     <Label htmlFor="geo-mode">Targeting Rule</Label>
                                     <Select
@@ -1818,7 +1752,7 @@ export default function AtelierStudioPage() {
                                                 geoTargeting: { ...(linkForm.geoTargeting || {}), countries: next }
                                               });
                                             }}
-                                            className={`px-2 py-1.5 rounded-lg border text-left text-xs flex items-center justify-between transition-all cursor-pointer ${
+                                            className={`px-2 py-1.5 rounded-[5px] border text-left text-[12px] flex items-center justify-between transition-all cursor-pointer ${
                                               isSelected
                                                 ? 'bg-brand-500 text-white border-brand-600 font-semibold '
                                                 : 'bg-white text-ink-700 border-line hover:bg-surface-2'
@@ -1846,7 +1780,7 @@ export default function AtelierStudioPage() {
 
                       <div className="flex items-center justify-between pt-1">
                         <div className="flex items-center gap-2">
-                          <Label htmlFor="link-icon-select" className="mb-0 text-xs font-semibold uppercase text-ink-500">Icon:</Label>
+                          <Label htmlFor="link-icon-select" className="mb-0 text-[12px] font-semibold text-ink-500">Icon:</Label>
                           <div className="w-36">
                             <Select
                               id="link-icon-select"
@@ -1878,12 +1812,12 @@ export default function AtelierStudioPage() {
                   {(isAddingCollection || editingCollectionId) && (
                     <form
                       onSubmit={handleSaveCollection}
-                      className="bg-surface-2 border-2 border-brand-500 rounded-xl p-4 sm:p-5 flex flex-col gap-3.5 animate-fadeIn"
+                      className="bg-surface-2 border-2 border-brand-500 rounded-[10px] p-[15px] flex flex-col gap-3.5 animate-fadeIn"
                     >
                       <div className="flex items-center justify-between pb-2 border-b-[0.5px] border-line">
                         <div className="flex items-center gap-2">
                           <Folder className="w-4 h-4 text-brand-500" />
-                          <span className="font-sans font-semibold text-sm text-ink-700">
+                          <span className="font-sans font-semibold text-[12px] text-ink-700">
                             {editingCollectionId ? 'Edit Collection' : 'Create New Collection (Folder)'}
                           </span>
                         </div>
@@ -1894,13 +1828,13 @@ export default function AtelierStudioPage() {
                             setIsAddingCollection(false);
                             setEditingCollectionId(null);
                           }}
-                          className="font-mono text-xs"
+                          className="text-[12px]"
                         >
                           Cancel
                         </Button>
                       </div>
 
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 text-xs sm:text-sm">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 text-[12px]">
                         <div>
                           <Label htmlFor="col-title-input" required>Collection Name</Label>
                           <Input
@@ -1936,7 +1870,7 @@ export default function AtelierStudioPage() {
                               viewMode: 'carousel',
                               type: 'instagram'
                             })}
-                            className="px-2.5 py-1 rounded-md text-[11px] font-semibold bg-pink-50 hover:bg-pink-100 text-pink-700 border border-pink-200 cursor-pointer transition-colors flex items-center gap-1 "
+                            className="px-2.5 py-1 rounded-[5px] text-[11px] font-semibold bg-pink-50 hover:bg-pink-100 text-pink-700 border border-pink-200 cursor-pointer transition-colors flex items-center gap-1"
                           >
                             📸 Instagram Reels Carousel
                           </button>
@@ -1947,7 +1881,7 @@ export default function AtelierStudioPage() {
                               viewMode: 'carousel',
                               type: 'youtube'
                             })}
-                            className="px-2.5 py-1 rounded-md text-[11px] font-semibold bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 cursor-pointer transition-colors flex items-center gap-1 "
+                            className="px-2.5 py-1 rounded-[5px] text-[11px] font-semibold bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 cursor-pointer transition-colors flex items-center gap-1"
                           >
                             ▶️ YouTube Videos Carousel
                           </button>
@@ -1958,7 +1892,7 @@ export default function AtelierStudioPage() {
                               viewMode: 'carousel',
                               type: 'products'
                             })}
-                            className="px-2.5 py-1 rounded-md text-[11px] font-semibold bg-brand-50 hover:bg-brand-100 text-brand-800 border border-brand-200 cursor-pointer transition-colors flex items-center gap-1 "
+                            className="px-2.5 py-1 rounded-[5px] text-[11px] font-semibold bg-brand-50 hover:bg-brand-100 text-brand-800 border border-brand-200 cursor-pointer transition-colors flex items-center gap-1"
                           >
                             🛍️ Amaze Store Carousel
                           </button>
@@ -1982,8 +1916,8 @@ export default function AtelierStudioPage() {
 
                   {/* Collections Management Banner if any exist */}
                   {(currentProfile.collections || []).length > 0 && (
-                    <div className="bg-white border-[0.5px] border-line/80 rounded-2xl p-4 sm:p-5 flex flex-col gap-3">
-                      <div className="flex items-center justify-between pb-2.5 border-b-[0.5px] border-line/80">
+                    <div className="bg-white border-[0.5px] border-line rounded-[10px] p-[15px] flex flex-col gap-3">
+                      <div className="flex items-center justify-between pb-2.5 border-b-[0.5px] border-line">
                         <div className="flex items-center gap-2">
                           <Folder className="w-4 h-4 text-brand-500" />
                           <h3 className="text-[14px] font-sans font-semibold text-ink-700">Active Collections</h3>
@@ -2012,18 +1946,18 @@ export default function AtelierStudioPage() {
                           return (
                             <div
                               key={col.id}
-                              className="p-3 rounded-xl bg-surface-2/80 border-[0.5px] border-line flex flex-col justify-between gap-2.5"
+                              className="p-3 rounded-[10px] bg-surface-2/80 border-[0.5px] border-line flex flex-col justify-between gap-2.5"
                             >
                               <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2 min-w-0">
-                                  <div className="w-7 h-7 rounded-lg bg-white border-[0.5px] border-line flex items-center justify-center text-brand-500 shrink-0 font-semibold">
+                                  <div className="w-7 h-7 rounded-[5px] bg-white border-[0.5px] border-line flex items-center justify-center text-brand-500 shrink-0 font-semibold">
                                     <Folder className="w-3.5 h-3.5" />
                                   </div>
                                   <div className="min-w-0">
-                                    <span className="font-semibold text-xs sm:text-sm text-ink-700 block truncate">
+                                    <span className="font-semibold text-[12px] text-ink-700 block truncate">
                                       {col.title}
                                     </span>
-                                    <span className="text-[10px] text-ink-500 font-mono">
+                                    <span className="text-[10px] text-ink-500">
                                       {linksInCol.length} link{linksInCol.length === 1 ? '' : 's'} assigned
                                     </span>
                                   </div>
@@ -2057,7 +1991,7 @@ export default function AtelierStudioPage() {
                               </div>
 
                               {/* View Mode Switcher Pills */}
-                              <div className="flex items-center gap-1.5 pt-1.5 border-t-[0.5px] border-line/50">
+                              <div className="flex items-center gap-1.5 pt-1.5 border-t-[0.5px] border-line">
                                 <span className="text-[10px] text-ink-500 font-medium mr-1">View:</span>
                                 {[
                                   { id: 'list', label: 'List' },
@@ -2086,14 +2020,14 @@ export default function AtelierStudioPage() {
                   )}
 
                   {/* Links & Content Section */}
-                  <div className="bg-white border-[0.5px] border-line/80 rounded-2xl p-5 sm:p-6 flex flex-col gap-5">
+                  <div className="bg-white border-[0.5px] border-line rounded-[10px] p-[15px] flex flex-col gap-5">
                     {/* Content Sub-Tabs: Links | Shop */}
-                    <div className="flex items-center justify-between pb-3.5 border-b-[0.5px] border-line/80 flex-wrap gap-3">
-                      <div className="inline-flex items-center p-1 bg-surface-2 border-[0.5px] border-line rounded-xl gap-1 shadow-2xs">
+                    <div className="flex items-center justify-between pb-3.5 border-b-[0.5px] border-line flex-wrap gap-3">
+                      <div className="inline-flex items-center p-1 bg-surface-2 border-[0.5px] border-line rounded-[10px] gap-1 shadow-2xs">
                         <button
                           type="button"
                           onClick={() => handleContentSubTabSwitch('links')}
-                          className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-2 transition-all cursor-pointer ${
+                          className={`px-3.5 py-1.5 rounded-[5px] text-[12px] font-semibold flex items-center gap-2 transition-all cursor-pointer ${
                             contentSubTab === 'links'
                               ? 'bg-brand-500 text-white '
                               : 'text-ink-500 hover:text-ink-700'
@@ -2105,7 +2039,7 @@ export default function AtelierStudioPage() {
                         <button
                           type="button"
                           onClick={() => handleContentSubTabSwitch('shop')}
-                          className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-2 transition-all cursor-pointer ${
+                          className={`px-3.5 py-1.5 rounded-[5px] text-[12px] font-semibold flex items-center gap-2 transition-all cursor-pointer ${
                             contentSubTab === 'shop'
                               ? 'bg-brand-500 text-white '
                               : 'text-ink-500 hover:text-ink-700'
@@ -2114,7 +2048,7 @@ export default function AtelierStudioPage() {
                           <ShoppingBag className="w-3.5 h-3.5" />
                           <span>Shop</span>
                           {(currentProfile.shop?.products || []).length > 0 && (
-                            <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono ${
+                            <span className={`px-1.5 py-0.2 rounded-full text-[10px]  ${
                               contentSubTab === 'shop' ? 'bg-white/20 text-white' : 'bg-brand-100 text-ink-700'
                             }`}>
                               {(currentProfile.shop?.products || []).length}
@@ -2124,18 +2058,18 @@ export default function AtelierStudioPage() {
                       </div>
 
                       {contentSubTab === 'links' ? (
-                        <div className="inline-flex items-center p-0.5 bg-surface-2 border-[0.5px] border-line rounded-lg text-xs font-semibold">
+                        <div className="inline-flex items-center p-0.5 bg-surface-2 border-[0.5px] border-line rounded-[5px] text-[12px] font-semibold">
                           <button
                             type="button"
                             onClick={() => setLinkFilterTab('active')}
-                            className={`px-3 py-1 rounded-md transition-all cursor-pointer flex items-center gap-1.5 ${
+                            className={`px-3 py-1 rounded-[5px] transition-all cursor-pointer flex items-center gap-1.5 ${
                               linkFilterTab === 'active'
                                 ? 'bg-brand-500 text-white '
                                 : 'text-ink-500 hover:text-ink-700'
                             }`}
                           >
                             <span>Active Links</span>
-                            <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono ${
+                            <span className={`px-1.5 py-0.2 rounded-full text-[10px]  ${
                               linkFilterTab === 'active' ? 'bg-white/20 text-white' : 'bg-brand-100/50 text-ink-700'
                             }`}>
                               {(currentProfile.links || []).filter(l => !l.isArchived).length}
@@ -2145,7 +2079,7 @@ export default function AtelierStudioPage() {
                           <button
                             type="button"
                             onClick={() => setLinkFilterTab('archived')}
-                            className={`px-3 py-1 rounded-md transition-all cursor-pointer flex items-center gap-1.5 ${
+                            className={`px-3 py-1 rounded-[5px] transition-all cursor-pointer flex items-center gap-1.5 ${
                               linkFilterTab === 'archived'
                                 ? 'bg-brand-500 text-white '
                                 : 'text-ink-500 hover:text-ink-700'
@@ -2153,7 +2087,7 @@ export default function AtelierStudioPage() {
                           >
                             <Archive className="w-3.5 h-3.5" />
                             <span>Archived</span>
-                            <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono ${
+                            <span className={`px-1.5 py-0.2 rounded-full text-[10px]  ${
                               linkFilterTab === 'archived' ? 'bg-white/20 text-white' : 'bg-brand-100/50 text-ink-700'
                             }`}>
                               {(currentProfile.links || []).filter(l => l.isArchived).length}
@@ -2175,114 +2109,75 @@ export default function AtelierStudioPage() {
 
                     {/* Active Links List */}
                     {linkFilterTab === 'active' && (
-                      <div className="flex flex-col gap-2.5">
-                        {/* Interactive Lead Capture & Contact Form Builder Card */}
+                      <div className="flex flex-col gap-[10px]">
                         {currentProfile.leadCapture?.enabled !== false && (
-                          <div className="p-3.5 sm:p-4 rounded-xl bg-brand-50/60 border border-brand-500/40 hover:border-brand-500 flex items-center justify-between gap-3 transition-all">
-                            <div className="flex items-center gap-3 min-w-0 flex-1">
-                              <div className="w-10 h-10 rounded-lg bg-brand-500 text-white flex items-center justify-center shrink-0 ">
-                                <Contact className="w-5 h-5" />
-                              </div>
-                              <div className="min-w-0 flex-1">
-                                <div className="flex items-center gap-2 flex-wrap">
-                                  <h4 className="text-[12px] font-semibold text-ink-700 truncate">
-                                    {currentProfile.leadCapture?.title || "Let's Connect"}
-                                  </h4>
-                                  <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-brand-100 text-ink-700">
-                                    Lead Capture Form
-                                  </span>
-                                  {currentProfile.leadCapture?.syncToGoogleContacts !== false && (
-                                    <span className="text-[10px] font-mono text-brand-700 flex items-center gap-0.5">
-                                      <Sparkles className="w-2.5 h-2.5" /> CRM Synced
-                                    </span>
-                                  )}
-                                </div>
-                                <p className="text-[11px] text-ink-500 truncate mt-0.5">
-                                  {currentProfile.leadCapture?.subtitle || "Captures visitor contact info and automatically syncs to leads"}
-                                </p>
-                              </div>
-                            </div>
-
-                            <div className="flex items-center gap-2 shrink-0">
-                              <button
-                                type="button"
-                                onClick={() => setShowLeadModal(true)}
-                                className="px-2.5 py-1.5 rounded-lg bg-white hover:bg-surface-2 border-[0.5px] border-line text-xs font-semibold text-ink-700 flex items-center gap-1.5 transition-colors cursor-pointer"
-                                title="Preview and test contact form"
-                              >
-                                <ExternalLink className="w-3.5 h-3.5 text-brand-500" />
-                                <span className="hidden sm:inline">Preview Form</span>
+                          <div className="rounded-[10px] border-[0.5px] border-[#dcdcdc] p-[15px]">
+                            <SettingRow
+                              title={currentProfile.leadCapture?.title || "Let's Connect"}
+                              description={currentProfile.leadCapture?.subtitle || 'Contact form on your bio. Submissions appear in Leads.'}
+                            >
+                              <button type="button" onClick={() => setShowLeadModal(true)} className="text-[12px] text-[#16A34A] hover:underline">
+                                Preview
                               </button>
-                              <Link
-                                href="/leads"
-                                className="px-2.5 py-1.5 rounded-lg bg-brand-500 hover:bg-brand-600 text-white text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
-                                title="View captured leads in CRM"
-                              >
-                                <span>Leads</span>
-                              </Link>
-                              <Switch
+                              <Link href="/leads" className="text-[12px] text-[#16A34A] hover:underline">Leads</Link>
+                              <Toggle
                                 checked={currentProfile.leadCapture?.enabled !== false}
-                                onChange={(e) => setCurrentProfile(prev => ({
+                                label="Show contact form"
+                                onChange={(checked) => setCurrentProfile(prev => ({
                                   ...prev,
                                   leadCapture: {
                                     ...(prev.leadCapture || {}),
-                                    enabled: e.target.checked
+                                    enabled: checked
                                   }
                                 }))}
                               />
-                            </div>
+                            </SettingRow>
                           </div>
                         )}
 
                         {(currentProfile.links || []).filter(l => !l.isArchived).length === 0 ? (
-                          <div className="p-8 text-center border-2 border-dashed border-line rounded-xl flex flex-col items-center justify-center gap-2 text-ink-500">
-                            <Plus className="w-8 h-8 text-brand-500/60" />
-                            <p className="text-sm font-semibold text-ink-700">No active links yet</p>
-                            <p className="text-xs">Click &ldquo;+ Add to Bio&rdquo; or &ldquo;Add Link&rdquo; above to get started.</p>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              leftIcon={Plus}
+                          <div className="flex flex-col items-center justify-center px-[20px] py-[40px] text-center">
+                            <p className="text-[14px] font-semibold">No links yet</p>
+                            <p className="mt-[4px] max-w-[280px] text-[12px] leading-[1.6] text-[#808080]">Add your first link, video, product or form.</p>
+                            <button
+                              type="button"
                               onClick={() => setShowMarketplace(true)}
-                              className="mt-2"
+                              className="mt-[10px] rounded-[50px] bg-[#16A34A] px-[29px] py-[8px] text-[12px] font-medium text-white hover:bg-[#15803D]"
                             >
-                              Open App Marketplace
-                            </Button>
+                              Add to Bio
+                            </button>
                           </div>
                         ) : (
-                          (currentProfile.links || []).filter(l => !l.isArchived).map((link, idx) => {
+                          (currentProfile.links || []).filter(l => !l.isArchived).map((link, idx, activeLinks) => {
                             const iconSymbol = link.icon || 'link';
                             const isEditingTitle = inlineEditingLinkId === link.id;
 
                             return (
                               <div
                                 key={link.id || idx}
-                                className={`p-3.5 sm:p-4 rounded-xl flex items-center justify-between gap-3 transition-all group ${
-                                  link.disabled
-                                    ? 'bg-stone-50 border border-stone-200 opacity-60'
-                                    : idx === 0
-                                    ? 'bg-surface-2 border border-brand-500/40 hover:border-brand-500'
-                                    : 'bg-white border-[0.5px] border-line/80 hover:border-brand-500'
-                                }`}
+                                className={`group flex items-center justify-between gap-[10px] rounded-[10px] border-[0.5px] border-[#dcdcdc] bg-white px-[12px] py-[10px] transition-colors hover:bg-[#F8F8F9] ${link.disabled ? 'opacity-60' : ''}`}
                               >
-                                {/* Left: Move Arrows + Icon + Inline Title & Details */}
-                                <div className="flex items-center gap-3 min-w-0 flex-1">
-                                  <div className="flex flex-col text-ink-500 group-hover:text-ink-700 shrink-0">
+                                <div className="flex min-w-0 flex-1 items-center gap-[10px]">
+                                  <div className="flex shrink-0 flex-col text-[#808080]">
                                     <button
+                                      type="button"
                                       onClick={() => handleMoveLink(idx, 'up')}
                                       disabled={idx === 0}
-                                      className="hover:text-brand-500 disabled:opacity-20 cursor-pointer p-0.5"
-                                      title="Move Up"
+                                      className="hover:text-black disabled:opacity-20"
+                                      title="Move up"
+                                      aria-label="Move up"
                                     >
-                                      ▲
+                                      <ChevronUp size={14} />
                                     </button>
                                     <button
+                                      type="button"
                                       onClick={() => handleMoveLink(idx, 'down')}
-                                      disabled={idx === (currentProfile.links || []).filter(l => !l.isArchived).length - 1}
-                                      className="hover:text-brand-500 disabled:opacity-20 cursor-pointer p-0.5"
-                                      title="Move Down"
+                                      disabled={idx === activeLinks.length - 1}
+                                      className="hover:text-black disabled:opacity-20"
+                                      title="Move down"
+                                      aria-label="Move down"
                                     >
-                                      ▼
+                                      <ChevronDown size={14} />
                                     </button>
                                   </div>
 
@@ -2292,29 +2187,24 @@ export default function AtelierStudioPage() {
                                       setActiveThumbnailLink(link);
                                       setShowThumbnailModal(true);
                                     }}
-                                    className={`w-10 h-10 rounded-lg border flex items-center justify-center shrink-0 font-semibold relative group/thumb cursor-pointer transition-all overflow-hidden ${
-                                      idx === 0 ? 'bg-white border-line text-brand-500' : 'bg-surface-2 border-line text-brand-500'
-                                    }`}
-                                    title="Click to add or customize thumbnail"
+                                    className="group/thumb relative flex h-[40px] w-[40px] shrink-0 items-center justify-center overflow-hidden rounded-[6px] bg-[#f5f5f5] text-[#333333]"
+                                    title="Change thumbnail"
                                   >
                                     {link.thumbnailType === 'image' && link.thumbnail ? (
-                                      <img src={link.thumbnail} alt="" className="w-full h-full object-cover rounded-lg" />
+                                      <img src={link.thumbnail} alt="" className="h-full w-full object-cover" />
                                     ) : link.thumbnailType === 'icon' && link.thumbnail && !link.thumbnail.startsWith('http') && !link.thumbnail.startsWith('data:') ? (
-                                      <span className="text-xl">{link.thumbnail}</span>
+                                      <span className="text-[18px]">{link.thumbnail}</span>
                                     ) : (
-                                      <span className="material-symbols-outlined text-lg group-hover/thumb:hidden">
-                                        {iconSymbol}
-                                      </span>
+                                      <span className="material-symbols-outlined text-[18px] group-hover/thumb:hidden">{iconSymbol}</span>
                                     )}
-                                    <div className="absolute inset-0 bg-brand-500 text-white opacity-0 group-hover/thumb:opacity-100 flex items-center justify-center transition-opacity rounded-lg">
-                                      <ImagePlus className="w-4 h-4" />
-                                    </div>
+                                    <span className="absolute inset-0 flex items-center justify-center bg-black/50 text-white opacity-0 transition-opacity group-hover/thumb:opacity-100">
+                                      <ImagePlus size={16} />
+                                    </span>
                                   </button>
 
-                                  <div className="flex flex-col min-w-0 flex-1">
+                                  <div className="flex min-w-0 flex-1 flex-col">
                                     {isEditingTitle ? (
-                                      /* Phase 1: Inline Title Editing Form with Character Limit Countdown */
-                                      <div className="flex items-center gap-2 w-full max-w-md animate-fadeIn">
+                                      <div className="flex w-full max-w-md items-center gap-[6px]">
                                         <div className="relative flex-1">
                                           <input
                                             type="text"
@@ -2326,122 +2216,58 @@ export default function AtelierStudioPage() {
                                               if (e.key === 'Enter') handleSaveInlineTitle(link.id);
                                               if (e.key === 'Escape') handleCancelInlineTitle();
                                             }}
-                                            className="w-full px-2.5 py-1 text-sm font-semibold text-ink-700 bg-white border-2 border-brand-500 rounded-lg focus:outline-none pr-14 shadow-inner"
-                                            placeholder="Link title (max 35 chars)"
+                                            className="w-full rounded-[5px] border-[0.5px] border-[#404040] bg-[#FAFAFA] px-[10px] py-[5px] pr-[44px] text-[12px] outline-none"
+                                            placeholder="Link title"
                                           />
-                                          <span className={`absolute right-2 top-1/2 -translate-y-1/2 text-[10px] font-mono font-semibold ${
-                                            inlineTitleDraft.length >= 35
-                                              ? 'text-red-500 font-semibold'
-                                              : inlineTitleDraft.length > 25
-                                              ? 'text-amber-600'
-                                              : 'text-ink-500'
-                                          }`}>
+                                          <span className={`absolute right-[8px] top-1/2 -translate-y-1/2 text-[10px] ${inlineTitleDraft.length >= 35 ? 'text-[#FF4359]' : 'text-[#808080]'}`}>
                                             {inlineTitleDraft.length}/35
                                           </span>
                                         </div>
-                                        <button
-                                          type="button"
-                                          onClick={() => handleSaveInlineTitle(link.id)}
-                                          className="p-1 rounded-md bg-brand-500 text-white hover:bg-brand-600 transition-colors"
-                                          title="Save title"
-                                        >
+                                        <button type="button" onClick={() => handleSaveInlineTitle(link.id)} title="Save" aria-label="Save title" className="flex h-[24px] w-[24px] items-center justify-center rounded-full bg-[#16A34A] text-white">
                                           <Check size={14} />
                                         </button>
-                                        <button
-                                          type="button"
-                                          onClick={handleCancelInlineTitle}
-                                          className="p-1 rounded-md bg-brand-100 text-ink-700 hover:bg-stone-300 transition-colors"
-                                          title="Cancel"
-                                        >
+                                        <button type="button" onClick={handleCancelInlineTitle} title="Cancel" aria-label="Cancel" className="flex h-[24px] w-[24px] items-center justify-center rounded-full bg-[#F8F8F9] text-[#333333]">
                                           <X size={14} />
                                         </button>
                                       </div>
                                     ) : (
-                                      <div className="flex items-center gap-2 flex-wrap">
-                                        <span 
+                                      <div className="flex min-w-0 items-center gap-[6px]">
+                                        <span
                                           onDoubleClick={() => handleStartInlineEdit(link)}
-                                          className="text-sm font-semibold text-ink-700 truncate max-w-[200px] sm:max-w-[280px] hover:text-brand-500 cursor-pointer"
-                                          title="Double click or click pencil to edit title inline"
+                                          className="max-w-[280px] cursor-text truncate text-[12px] font-medium text-[#333333]"
+                                          title={link.title}
                                         >
                                           {link.title}
                                         </span>
-                                        <button
-                                          type="button"
-                                          onClick={() => handleStartInlineEdit(link)}
-                                          className="opacity-0 group-hover:opacity-100 text-ink-500 hover:text-brand-500 transition-opacity p-0.5"
-                                          title="Edit Title Inline"
-                                        >
-                                          <Edit3 size={12} />
-                                        </button>
                                         {link.badge && (
-                                          <span className={`px-2 py-0.5 text-xs font-semibold uppercase rounded-md ${
-                                            idx === 0
-                                              ? 'bg-brand-100 text-ink-700'
-                                              : 'bg-surface-2 border-[0.5px] border-line text-ink-500'
-                                          }`}>
-                                            {link.badge}
-                                          </span>
+                                          <span className="shrink-0 rounded-[3px] bg-[#EEEEEE] px-[4px] py-[1px] text-[9px] font-medium text-[#888888]">{link.badge}</span>
                                         )}
                                         {link.geoTargeting?.enabled && (
-                                          <span 
-                                            className="px-1.5 py-0.5 text-[10px] font-mono font-semibold rounded-md bg-teal-50 border border-teal-300 text-teal-800 flex items-center gap-1"
-                                            title={`Geo-Targeted: ${(link.geoTargeting.countries || []).join(', ') || 'Configured'}`}
-                                          >
-                                            <span>🌍</span>
-                                            <span>{(link.geoTargeting.countries || []).join(', ') || 'Geo'}</span>
+                                          <span className="shrink-0 rounded-[3px] bg-[#EEEEEE] px-[4px] py-[1px] text-[9px] font-medium text-[#888888]" title={`Shown in: ${(link.geoTargeting.countries || []).join(', ') || 'selected countries'}`}>
+                                            Geo
                                           </span>
-                                        )}
-                                        {(currentProfile.collections || []).length > 0 && (
-                                          <select
-                                            value={link.collectionId || ''}
-                                            onChange={(e) => handleAssignLinkToCollection(link.id, e.target.value)}
-                                            className="text-[10px] font-semibold bg-surface-2 hover:bg-surface-3 border-[0.5px] border-line rounded px-1.5 py-0.5 text-brand-500 cursor-pointer transition-colors focus:outline-none focus:border-brand-500"
-                                            title="Assign or reassign link to a collection"
-                                          >
-                                            <option value="">📁 No Collection</option>
-                                            {(currentProfile.collections || []).map((c) => (
-                                              <option key={c.id} value={c.id}>
-                                                📁 {c.title} ({c.viewMode || 'list'})
-                                              </option>
-                                            ))}
-                                          </select>
                                         )}
                                       </div>
                                     )}
-                                    <span className="text-xs font-mono text-ink-500 truncate">
-                                      {link.subtitle || link.url || 'No URL destination'} • {link.clicks || 0} clicks
+                                    <span className="truncate text-[10px] text-[#b0b0b0]" title={link.url}>
+                                      {link.subtitle || link.url || 'No destination'}
                                     </span>
                                   </div>
                                 </div>
 
-                                {/* Right: Real Clicks + Switch + Action Buttons (Edit, Archive, Delete) */}
-                                <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-                                  <div className="flex flex-col items-end leading-tight hidden xs:flex">
-                                    <span className="text-sm font-semibold font-mono text-brand-500">
-                                      {link.clicks || 0} clicks
-                                    </span>
-                                    <span className="text-[0.65rem] font-mono text-ink-500">
-                                      {link.clicks > 0 ? 'Active Traffic' : 'Ready for clicks'}
-                                    </span>
-                                  </div>
-
-                                  {/* Active Toggle Switch */}
-                                  <Switch
-                                    checked={!link.disabled}
-                                    onChange={() => handleToggleLink(link.id)}
-                                  />
-
-                                  {/* Quick Tune Settings */}
+                                <div className="flex shrink-0 items-center gap-[10px]">
+                                  <span className="hidden text-[12px] tabular-nums text-[#333333] sm:inline" title="Clicks">{link.clicks || 0}</span>
+                                  <Toggle checked={!link.disabled} onChange={() => handleToggleLink(link.id)} label="Show link" />
                                   <button
                                     type="button"
                                     onClick={() => handleStartEditLink(link)}
-                                    className="p-1.5 hover:text-ink-700 hover:bg-surface-2 rounded-lg cursor-pointer transition-colors text-ink-500"
-                                    title="Edit Link Settings"
+                                    title="Edit link"
+                                    aria-label="Edit link"
+                                    className="flex h-[30px] w-[30px] items-center justify-center rounded-full text-[#808080] hover:bg-[#16A34A1A] hover:text-[#16A34A]"
                                   >
-                                    <span className="material-symbols-outlined text-base">tune</span>
+                                    <Sliders size={16} />
                                   </button>
 
-                                  {/* Floating 3-Dot Context Menu (⋮) */}
                                   <div className="relative">
                                     <button
                                       type="button"
@@ -2449,100 +2275,63 @@ export default function AtelierStudioPage() {
                                         e.stopPropagation();
                                         setActiveLinkMenuId(activeLinkMenuId === link.id ? null : link.id);
                                       }}
-                                      className="p-1.5 hover:text-ink-700 hover:bg-surface-2 rounded-lg cursor-pointer transition-colors text-ink-500"
-                                      title="More block actions"
+                                      title="More"
+                                      aria-label="More actions"
+                                      className="flex h-[30px] w-[30px] items-center justify-center rounded-full text-[#808080] hover:bg-[#F8F8F9] hover:text-[#333333]"
                                     >
-                                      <MoreVertical className="w-4 h-4" />
+                                      <MoreVertical size={16} />
                                     </button>
 
                                     {activeLinkMenuId === link.id && (
-                                      <div 
-                                        className="absolute right-0 top-full mt-1 w-52 bg-white rounded-xl shadow-modal border-[0.5px] border-line py-1.5 z-40 animate-in fade-in zoom-in-95 duration-150"
+                                      <div
+                                        className="absolute right-0 top-[calc(100%+4px)] z-40 w-[200px] rounded-[10px] border-[0.5px] border-[#DCDCDC] bg-white p-[8px] shadow-[0_4px_16px_rgba(0,0,0,0.08)] animate-fade-in"
                                         onClick={(e) => e.stopPropagation()}
                                       >
-                                        {/* 1. Edit title inline */}
+                                        <p className="mb-[4px] border-b-[0.5px] border-[#DCDCDC] px-[8px] pb-[6px] text-[12px] font-medium">Options</p>
                                         <button
                                           type="button"
-                                          onClick={() => {
-                                            setActiveLinkMenuId(null);
-                                            handleStartInlineEdit(link);
-                                          }}
-                                          className="w-full text-left px-3.5 py-2 text-xs font-semibold text-ink-700 hover:bg-surface-2 flex items-center gap-2.5 transition-colors cursor-pointer"
+                                          onClick={() => { setActiveLinkMenuId(null); handleStartInlineEdit(link); }}
+                                          className="w-full rounded-[5px] px-[8px] py-[6px] text-left text-[12px] hover:bg-[#F8F8F9]"
                                         >
-                                          <Edit3 className="w-3.5 h-3.5 text-brand-500" />
-                                          <span>Edit Title (X/35)</span>
+                                          Rename
                                         </button>
-
-                                        {/* 2. Move to collection */}
-                                        <div className="px-3.5 py-1.5 border-t border-b-[0.5px] border-line/40 my-1 bg-surface-2/40">
-                                          <label className="block text-[10px] font-semibold text-ink-500 uppercase tracking-wider mb-1 flex items-center gap-1.5">
-                                            <Folder className="w-3 h-3 text-brand-500" /> Move to Collection
+                                        <button
+                                          type="button"
+                                          onClick={() => { handleToggleLink(link.id); setActiveLinkMenuId(null); }}
+                                          className="w-full rounded-[5px] px-[8px] py-[6px] text-left text-[12px] hover:bg-[#F8F8F9]"
+                                        >
+                                          {link.disabled ? 'Show' : 'Hide'}
+                                        </button>
+                                        {(currentProfile.collections || []).length > 0 && (
+                                          <label className="block px-[8px] py-[6px]">
+                                            <span className="mb-[4px] block text-[10px] text-[#808080]">Collection</span>
+                                            <select
+                                              value={link.collectionId || ''}
+                                              onChange={(e) => { handleAssignLinkToCollection(link.id, e.target.value); setActiveLinkMenuId(null); }}
+                                              className="h-[28px] w-full rounded-[5px] border-[0.5px] border-[#dcdcdc] bg-white px-[6px] text-[12px] outline-none"
+                                            >
+                                              <option value="">None</option>
+                                              {(currentProfile.collections || []).map((c) => (
+                                                <option key={c.id} value={c.id}>{c.title}</option>
+                                              ))}
+                                            </select>
                                           </label>
-                                          <select
-                                            value={link.collectionId || ''}
-                                            onChange={(e) => {
-                                              handleAssignLinkToCollection(link.id, e.target.value);
-                                              setActiveLinkMenuId(null);
-                                            }}
-                                            className="w-full text-[11px] font-semibold bg-white border-[0.5px] border-line rounded-lg px-2 py-1 text-ink-700 focus:outline-none focus:border-brand-500"
-                                          >
-                                            <option value="">📁 Root (No Collection)</option>
-                                            {(currentProfile.collections || []).map((c) => (
-                                              <option key={c.id} value={c.id}>
-                                                📁 {c.title}
-                                              </option>
-                                            ))}
-                                          </select>
-                                        </div>
-
-                                        {/* 3. Hide / Unhide */}
+                                        )}
+                                        <div className="my-[4px] h-[0.5px] bg-[#DCDCDC]" />
                                         <button
                                           type="button"
-                                          onClick={() => {
-                                            handleToggleLink(link.id);
-                                            setActiveLinkMenuId(null);
-                                          }}
-                                          className="w-full text-left px-3.5 py-2 text-xs font-semibold text-ink-700 hover:bg-surface-2 flex items-center gap-2.5 transition-colors cursor-pointer"
+                                          onClick={() => { handleArchiveLink(link.id); setActiveLinkMenuId(null); }}
+                                          className="w-full rounded-[5px] px-[8px] py-[6px] text-left text-[12px] hover:bg-[#F8F8F9]"
                                         >
-                                          {link.disabled ? (
-                                            <>
-                                              <Eye className="w-3.5 h-3.5 text-brand-600" />
-                                              <span>Unhide Block</span>
-                                            </>
-                                          ) : (
-                                            <>
-                                              <EyeOff className="w-3.5 h-3.5 text-amber-600" />
-                                              <span>Hide Block</span>
-                                            </>
-                                          )}
+                                          Archive
                                         </button>
-
-                                        {/* 4. Delete / Archive */}
-                                        <div className="border-t-[0.5px] border-line/60 my-1 pt-1">
-                                          <button
-                                            type="button"
-                                            onClick={() => {
-                                              handleArchiveLink(link.id);
-                                              setActiveLinkMenuId(null);
-                                            }}
-                                            className="w-full text-left px-3.5 py-2 text-xs font-semibold text-amber-800 hover:bg-amber-50 flex items-center gap-2.5 transition-colors cursor-pointer"
-                                          >
-                                            <Archive className="w-3.5 h-3.5 text-amber-600" />
-                                            <span>Archive (Keep Clicks)</span>
-                                          </button>
-
-                                          <button
-                                            type="button"
-                                            onClick={() => {
-                                              handleDeleteLink(link.id);
-                                              setActiveLinkMenuId(null);
-                                            }}
-                                            className="w-full text-left px-3.5 py-2 text-xs font-semibold text-rose-600 hover:bg-rose-50 flex items-center gap-2.5 transition-colors cursor-pointer"
-                                          >
-                                            <Trash2 className="w-3.5 h-3.5" />
-                                            <span>Delete Permanently</span>
-                                          </button>
-                                        </div>
+                                        <button
+                                          type="button"
+                                          onClick={() => { handleDeleteLink(link.id); setActiveLinkMenuId(null); }}
+                                          className="w-full rounded-[5px] px-[8px] py-[6px] text-left text-[12px] text-[#FF4359] hover:bg-[#FFEDEF]"
+                                        >
+                                          Delete
+                                        </button>
                                       </div>
                                     )}
                                   </div>
@@ -2558,10 +2347,10 @@ export default function AtelierStudioPage() {
                     {linkFilterTab === 'archived' && (
                       <div className="flex flex-col gap-2.5">
                         {(currentProfile.links || []).filter(l => l.isArchived).length === 0 ? (
-                          <div className="p-8 text-center border-2 border-dashed border-line rounded-xl flex flex-col items-center justify-center gap-2 text-ink-500">
+                          <div className="p-8 text-center border-2 border-dashed border-line rounded-[10px] flex flex-col items-center justify-center gap-2 text-ink-500">
                             <Archive className="w-8 h-8 text-ink-500/50" />
-                            <p className="text-sm font-semibold text-ink-700">No archived links</p>
-                            <p className="text-xs max-w-sm">
+                            <p className="text-[12px] font-semibold text-ink-700">No archived links</p>
+                            <p className="text-[12px] max-w-sm">
                               Archiving a link hides it from your public bio without losing its historical click metrics and traffic stats.
                             </p>
                           </div>
@@ -2569,22 +2358,22 @@ export default function AtelierStudioPage() {
                           (currentProfile.links || []).filter(l => l.isArchived).map((link) => (
                             <div
                               key={link.id}
-                              className="p-3.5 sm:p-4 rounded-xl flex items-center justify-between gap-3 bg-stone-50 border border-stone-200 "
+                              className="p-3.5 rounded-[10px] flex items-center justify-between gap-3 bg-stone-50 border border-stone-200"
                             >
                               <div className="flex items-center gap-3 min-w-0">
-                                <div className="w-10 h-10 rounded-lg bg-stone-200/80 border border-stone-300 flex items-center justify-center shrink-0 text-stone-500">
+                                <div className="w-10 h-10 rounded-[5px] bg-stone-200/80 border border-stone-300 flex items-center justify-center shrink-0 text-stone-500">
                                   <Archive className="w-5 h-5" />
                                 </div>
                                 <div className="flex flex-col min-w-0">
                                   <div className="flex items-center gap-2">
-                                    <span className="text-sm font-semibold text-stone-700 truncate line-through">
+                                    <span className="text-[12px] font-semibold text-stone-700 truncate line-through">
                                       {link.title}
                                     </span>
-                                    <span className="px-1.5 py-0.2 rounded text-[10px] font-mono font-semibold bg-amber-100 text-amber-800">
+                                    <span className="px-1.5 py-0.2 rounded text-[10px] font-semibold bg-amber-100 text-amber-800">
                                       ARCHIVED
                                     </span>
                                   </div>
-                                  <span className="text-xs font-mono text-stone-500 truncate">
+                                  <span className="text-[12px] text-stone-500 truncate">
                                     {link.url} • <strong className="text-stone-700">{link.clicks || 0} historical clicks preserved</strong>
                                   </span>
                                 </div>
@@ -2594,7 +2383,7 @@ export default function AtelierStudioPage() {
                                 <button
                                   type="button"
                                   onClick={() => handleRestoreLink(link.id)}
-                                  className="px-3 py-1.5 rounded-lg bg-brand-500 hover:bg-brand-600 text-white font-semibold text-xs flex items-center gap-1.5 transition-colors cursor-pointer"
+                                  className="px-3 py-1.5 rounded-[5px] bg-brand-500 hover:bg-brand-600 text-white font-semibold text-[12px] flex items-center gap-1.5 transition-colors cursor-pointer"
                                   title="Restore Link to Active Bio"
                                 >
                                   <RotateCcw className="w-3.5 h-3.5" />
@@ -2603,7 +2392,7 @@ export default function AtelierStudioPage() {
                                 <button
                                   type="button"
                                   onClick={() => handlePermanentDeleteLink(link.id)}
-                                  className="p-1.5 rounded-lg hover:bg-rose-100 text-stone-400 hover:text-rose-600 transition-colors cursor-pointer"
+                                  className="p-1.5 rounded-[5px] hover:bg-rose-100 text-stone-400 hover:text-rose-600 transition-colors cursor-pointer"
                                   title="Permanently Delete"
                                 >
                                   <Trash2 className="w-4 h-4" />
@@ -2619,13 +2408,13 @@ export default function AtelierStudioPage() {
                     {contentSubTab === 'shop' && (
                       <div className="flex flex-col gap-4">
                         {/* Publish your Shop Visibility Banner */}
-                        <div className={`p-4 rounded-xl border flex items-center justify-between gap-4 transition-all ${
+                        <div className={`p-[15px] rounded-[10px] border flex items-center justify-between gap-4 transition-all ${
                           currentProfile.shop?.published
                             ? 'bg-brand-50/80 border-brand-300'
                             : 'bg-surface-2 border-line'
                         }`}>
                           <div className="flex items-center gap-3 min-w-0">
-                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
+                            <div className={`w-10 h-10 rounded-[10px] flex items-center justify-center shrink-0 ${
                               currentProfile.shop?.published ? 'bg-brand-500 text-white ' : 'bg-brand-100 text-ink-500'
                             }`}>
                               <ShoppingBag className="w-5 h-5" />
@@ -2641,7 +2430,7 @@ export default function AtelierStudioPage() {
                                   {currentProfile.shop?.published ? 'Live on Bio' : 'Hidden'}
                                 </span>
                               </div>
-                              <p className="text-xs text-ink-500 mt-0.5">
+                              <p className="text-[12px] text-ink-500 mt-0.5">
                                 Display a dedicated storefront tab on your live TreeInBio page.
                               </p>
                             </div>
@@ -2654,7 +2443,7 @@ export default function AtelierStudioPage() {
 
                         {/* Top Store Action */}
                         <div className="flex items-center justify-between">
-                          <span className="font-semibold text-xs text-ink-700 uppercase tracking-wider">
+                          <span className="font-semibold text-[12px] text-ink-700">
                             Products ({(currentProfile.shop?.products || []).length})
                           </span>
                           <Button
@@ -2672,8 +2461,8 @@ export default function AtelierStudioPage() {
                         {isShopTransitioning ? (
                           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3.5 animate-pulse">
                             {[1, 2, 3, 4, 5, 6].map((sk) => (
-                              <div key={sk} className="h-44 rounded-xl bg-stone-100 border border-stone-200 p-3 flex flex-col justify-between">
-                                <div className="w-full h-24 bg-stone-200 rounded-lg" />
+                              <div key={sk} className="h-44 rounded-[10px] bg-stone-100 border border-stone-200 p-3 flex flex-col justify-between">
+                                <div className="w-full h-24 bg-stone-200 rounded-[5px]" />
                                 <div className="space-y-1.5 mt-2">
                                   <div className="w-3/4 h-3 bg-stone-200 rounded" />
                                   <div className="w-1/2 h-2.5 bg-stone-200 rounded" />
@@ -2682,13 +2471,13 @@ export default function AtelierStudioPage() {
                             ))}
                           </div>
                         ) : (currentProfile.shop?.products || []).length === 0 ? (
-                          <div className="p-10 text-center border-2 border-dashed border-line rounded-xl flex flex-col items-center justify-center gap-3 text-ink-500">
+                          <div className="p-10 text-center border-2 border-dashed border-line rounded-[10px] flex flex-col items-center justify-center gap-3 text-ink-500">
                             <div className="w-12 h-12 rounded-full bg-surface-2 flex items-center justify-center text-brand-500">
                               <ShoppingBag className="w-6 h-6" />
                             </div>
                             <div>
-                              <p className="text-sm font-semibold text-ink-700">Your Shop is Empty</p>
-                              <p className="text-xs max-w-sm mt-1">
+                              <p className="text-[12px] font-semibold text-ink-700">Your Shop is Empty</p>
+                              <p className="text-[12px] max-w-sm mt-1">
                                 Sell digital downloads, merchandise, courses, or paste external store links with 1-click automatic metadata fetching.
                               </p>
                             </div>
@@ -2707,15 +2496,15 @@ export default function AtelierStudioPage() {
                             {(currentProfile.shop?.products || []).map((product) => (
                               <div
                                 key={product.id}
-                                className="p-3 rounded-xl border-[0.5px] border-line bg-surface-2/40 hover:bg-surface-2 hover:border-brand-500/50 transition-all flex flex-col justify-between gap-3 group "
+                                className="p-3 rounded-[10px] border-[0.5px] border-line bg-surface-2/40 hover:bg-surface-2 hover:border-brand-500/50 transition-all flex flex-col justify-between gap-3 group"
                               >
                                 <div>
                                   {product.image ? (
-                                    <div className="w-full h-28 rounded-lg overflow-hidden bg-stone-100 mb-2.5">
+                                    <div className="w-full h-28 rounded-[5px] overflow-hidden bg-stone-100 mb-2.5">
                                       <img src={product.image} alt={product.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
                                     </div>
                                   ) : (
-                                    <div className="w-full h-28 rounded-lg bg-brand-100/40 flex items-center justify-center text-brand-500 mb-2.5">
+                                    <div className="w-full h-28 rounded-[5px] bg-brand-100/40 flex items-center justify-center text-brand-500 mb-2.5">
                                       <ShoppingBag className="w-8 h-8" />
                                     </div>
                                   )}
@@ -2723,13 +2512,13 @@ export default function AtelierStudioPage() {
                                     <h4 className="text-[12px] font-semibold text-ink-700 line-clamp-2">
                                       {product.title}
                                     </h4>
-                                    <span className="font-mono font-semibold text-xs px-2 py-0.5 rounded-md bg-brand-100 text-brand-800 shrink-0">
+                                    <span className="font-semibold text-[12px] px-2 py-0.5 rounded-[5px] bg-brand-100 text-brand-800 shrink-0">
                                       {product.currency === 'USD' ? '$' : product.currency === 'EUR' ? '€' : product.currency === 'GBP' ? '£' : product.currency === 'INR' ? '₹' : ''}
                                       {product.price}
                                     </span>
                                   </div>
                                   {product.description && (
-                                    <p className="text-xs text-ink-500 line-clamp-2 mt-1">
+                                    <p className="text-[12px] text-ink-500 line-clamp-2 mt-1">
                                       {product.description}
                                     </p>
                                   )}
@@ -2739,7 +2528,7 @@ export default function AtelierStudioPage() {
                                     </span>
                                   )}
                                 </div>
-                                <div className="flex items-center justify-between pt-2 border-t-[0.5px] border-line/50 text-xs">
+                                <div className="flex items-center justify-between pt-2 border-t-[0.5px] border-line text-[12px]">
                                   <a
                                     href={product.url}
                                     target="_blank"
@@ -2771,7 +2560,7 @@ export default function AtelierStudioPage() {
               {/* Tab 2: Style & Platinum Editor */}
               {activeTab === 'style' && (
                 <>
-                  <div className="bg-white border-[0.5px] border-line/80 rounded-2xl p-5 sm:p-6 flex flex-col gap-5">
+                  <div className="bg-white border-[0.5px] border-line rounded-[10px] p-[15px] flex flex-col gap-5">
                   <div className="flex items-center justify-between pb-3 border-b-[0.5px] border-line flex-wrap gap-2">
                     <div className="flex items-center gap-2">
                       <Sliders className="w-5 h-5 text-brand-500" />
@@ -2793,7 +2582,7 @@ export default function AtelierStudioPage() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-y-5 gap-x-4 text-xs sm:text-sm">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-y-5 gap-x-4 text-[12px]">
                     <div>
                       <Label htmlFor="creator-name-input">Creator Name</Label>
                       <Input
@@ -2813,16 +2602,16 @@ export default function AtelierStudioPage() {
                         value={currentProfile.username || ''}
                         onChange={(e) => setCurrentProfile({ ...currentProfile, username: e.target.value })}
                         placeholder="username"
-                        className="font-mono"
+                        className=""
                       />
                     </div>
 
                     <div>
-                      <div className="p-3.5 rounded-xl bg-surface-2 border-[0.5px] border-line flex flex-col gap-2.5">
+                      <div className="p-3.5 rounded-[10px] bg-surface-2 border-[0.5px] border-line flex flex-col gap-2.5">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <Type className="w-4 h-4 text-brand-500" />
-                            <span className="font-semibold text-xs sm:text-sm text-ink-700">
+                            <span className="font-semibold text-[12px] text-ink-700">
                               Alternative Title Font
                             </span>
                             <span className="text-[10px] text-brand-700 bg-brand-100 font-semibold px-1.5 py-0.2 rounded">
@@ -2833,13 +2622,13 @@ export default function AtelierStudioPage() {
                             variant="outline"
                             size="xs"
                             onClick={() => setShowTitleFontModal(true)}
-                            className="text-xs font-semibold bg-white border-line text-brand-500 hover:border-brand-500"
+                            className="text-[12px] font-semibold bg-white border-line text-brand-500 hover:border-brand-500"
                           >
                             {getTitleFontName(currentProfile.alternativeTitleFont) ? getTitleFontName(currentProfile.alternativeTitleFont) : 'Choose Font'}
                           </Button>
                         </div>
                         {getTitleFontName(currentProfile.alternativeTitleFont) && (
-                          <div className="flex items-center justify-between pt-2 border-t-[0.5px] border-line/60 text-xs">
+                          <div className="flex items-center justify-between pt-2 border-t-[0.5px] border-line text-[12px]">
                             <span className="text-stone-600 font-medium truncate" style={{ fontFamily: getTitleFontName(currentProfile.alternativeTitleFont) }}>
                               Active: {getTitleFontName(currentProfile.alternativeTitleFont)} (Preview Style)
                             </span>
@@ -2856,11 +2645,11 @@ export default function AtelierStudioPage() {
                     </div>
 
                     {/* Phase 2: Brand Logo Title Option */}
-                    <div className="md:col-span-2 p-3.5 rounded-xl bg-surface-2 border-[0.5px] border-line flex flex-col gap-2.5">
+                    <div className="md:col-span-2 p-3.5 rounded-[10px] bg-surface-2 border-[0.5px] border-line flex flex-col gap-2.5">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                           <Store className="w-4 h-4 text-brand-500" />
-                          <span className="font-semibold text-xs sm:text-sm text-ink-700">
+                          <span className="font-semibold text-[12px] text-ink-700">
                             Brand Logo Title
                           </span>
                           <span className="text-[10px] text-ink-500">
@@ -2880,7 +2669,7 @@ export default function AtelierStudioPage() {
                       </div>
 
                       {currentProfile.titleLogo?.enabled && (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2 border-t-[0.5px] border-line/60">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2 border-t-[0.5px] border-line">
                           <div>
                             <Label htmlFor="title-logo-url" required>Logo Image URL (PNG / SVG with transparent background)</Label>
                             <Input
@@ -2895,7 +2684,7 @@ export default function AtelierStudioPage() {
                                   url: e.target.value,
                                 }
                               })}
-                              className="font-mono text-xs"
+                              className="text-[12px]"
                             />
                           </div>
                           <div>
@@ -2912,7 +2701,7 @@ export default function AtelierStudioPage() {
                                   altText: e.target.value,
                                 }
                               })}
-                              className="text-xs"
+                              className="text-[12px]"
                             />
                           </div>
                         </div>
@@ -2931,7 +2720,7 @@ export default function AtelierStudioPage() {
                             const randomBio = recs[Math.floor(Math.random() * recs.length)];
                             setCurrentProfile({ ...currentProfile, bio: randomBio });
                           }}
-                          className="text-xs font-mono text-brand-500 hover:underline flex items-center gap-1.5 cursor-pointer font-medium"
+                          className="text-[12px] text-brand-500 hover:underline flex items-center gap-1.5 cursor-pointer font-medium"
                         >
                           <Sparkles className="w-3.5 h-3.5" />
                           <span>AI Suggest Bio</span>
@@ -2943,7 +2732,7 @@ export default function AtelierStudioPage() {
                         value={currentProfile.bio || ''}
                         onChange={(e) => setCurrentProfile({ ...currentProfile, bio: e.target.value })}
                         placeholder="Tell visitors about yourself..."
-                        className="w-full px-3.5 py-2.5 bg-white border-[0.5px] border-line rounded-lg text-sm text-ink-700 placeholder-ink-500/60 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/15 transition-all leading-relaxed"
+                        className="w-full px-3.5 py-2.5 bg-white border-[0.5px] border-line rounded-[5px] text-[12px] text-ink-700 placeholder-ink-500/60 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/15 transition-all leading-relaxed"
                       />
                     </div>
 
@@ -2955,17 +2744,17 @@ export default function AtelierStudioPage() {
                         value={currentProfile.avatar || ''}
                         onChange={(e) => setCurrentProfile({ ...currentProfile, avatar: e.target.value })}
                         placeholder="https://... or upload photo"
-                        className="font-mono"
+                        className=""
                       />
                     </div>
 
                     {/* Phase 2: Avatar Masks (Cutout & Shapes) */}
                     <div className="md:col-span-2 flex flex-col gap-2">
                       <div className="flex items-center justify-between">
-                        <Label className="mb-0 font-semibold text-xs uppercase text-ink-500">
+                        <Label className="mb-0 font-semibold text-[12px] text-ink-500">
                           Avatar Mask Shape (Geometry &amp; Cutout)
                         </Label>
-                        <span className="text-[11px] font-mono text-brand-500 font-semibold">
+                        <span className="text-[11px] text-brand-500 font-semibold">
                           Active: {currentProfile.avatarShape || 'circle'}
                         </span>
                       </div>
@@ -2977,7 +2766,7 @@ export default function AtelierStudioPage() {
                               key={shape.id}
                               type="button"
                               onClick={() => setCurrentProfile({ ...currentProfile, avatarShape: shape.id })}
-                              className={`p-2.5 rounded-xl border flex flex-col items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                              className={`p-2.5 rounded-[10px] border flex flex-col items-center justify-center gap-1.5 transition-all cursor-pointer ${
                                 isSelected
                                   ? 'bg-brand-500 text-white border-brand-600 '
                                   : 'bg-surface-2 text-ink-700 border-line hover:bg-white hover:border-brand-500'
@@ -2986,7 +2775,7 @@ export default function AtelierStudioPage() {
                               {/* Shape Icon Miniature Silhouette */}
                               <div className={`w-7 h-7 border-2 ${isSelected ? 'border-white bg-white/20' : 'border-brand-500 bg-white'} ${
                                 shape.id === 'circle' ? 'rounded-full' :
-                                shape.id === 'rounded' ? 'rounded-lg' :
+                                shape.id === 'rounded' ? 'rounded-[5px]' :
                                 shape.id === 'squircle' ? 'rounded-[30%]' :
                                 shape.id === 'arch' ? 'rounded-t-full rounded-b-xs' :
                                 shape.id === 'hexagon' ? '[clip-path:polygon(50%_0%,100%_25%,100%_75%,50%_100%,0%_75%,0%_25%)]' :
@@ -3037,7 +2826,7 @@ export default function AtelierStudioPage() {
                           value={currentProfile.coverImage || ''}
                           onChange={(e) => setCurrentProfile({ ...currentProfile, coverImage: e.target.value })}
                           placeholder="https://... (1200x400 landscape banner recommended)"
-                          className="font-mono"
+                          className=""
                         />
                         <p className="text-[11px] text-ink-500 mt-1">
                           Displays a panoramic cover banner behind your avatar at the very top of your profile.
@@ -3086,7 +2875,7 @@ export default function AtelierStudioPage() {
                     <div className="md:col-span-2 pt-4 border-t-[0.5px] border-line flex flex-col gap-3">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                          <span className="material-symbols-outlined text-brand-500 text-lg">palette</span>
+                          <span className="material-symbols-outlined text-brand-500 text-[14px]">palette</span>
                           <h4 className="text-[12px] font-semibold text-ink-700">
                             Curated Theme Presets Library
                           </h4>
@@ -3097,7 +2886,7 @@ export default function AtelierStudioPage() {
                           size="xs"
                           leftIcon={Dices}
                           onClick={handleThemeShuffle}
-                          className="text-xs font-semibold text-brand-500"
+                          className="text-[12px] font-semibold text-brand-500"
                         >
                           🎲 Shuffle Random
                         </Button>
@@ -3111,7 +2900,7 @@ export default function AtelierStudioPage() {
                               key={preset.id}
                               type="button"
                               onClick={() => handleApplyThemePreset(preset)}
-                              className={`p-2.5 rounded-xl border text-left flex flex-col justify-between gap-2 transition-all cursor-pointer ${
+                              className={`p-2.5 rounded-[10px] border text-left flex flex-col justify-between gap-2 transition-all cursor-pointer ${
                                 isSelected
                                   ? 'border-2 border-brand-500 bg-white ring-2 ring-brand-500/20 '
                                   : 'border-line bg-surface-2 hover:bg-white hover:border-brand-500/50'
@@ -3125,7 +2914,7 @@ export default function AtelierStudioPage() {
                               </div>
                               <div>
                                 <div className="flex items-center justify-between">
-                                  <span className="text-xs font-semibold text-ink-700 block truncate">{preset.name}</span>
+                                  <span className="text-[12px] font-semibold text-ink-700 block truncate">{preset.name}</span>
                                   {isSelected && <span className="text-[10px] text-brand-600 font-semibold">✓</span>}
                                 </div>
                                 <span className="text-[9px] text-ink-500 font-medium block truncate">{preset.tag}</span>
@@ -3137,17 +2926,17 @@ export default function AtelierStudioPage() {
                     </div>
 
                     {/* Story Bubble Greeting Video Section */}
-                    <div className="md:col-span-2 p-4 rounded-xl bg-surface-2 border-[0.5px] border-line flex flex-col gap-3 mt-1">
+                    <div className="md:col-span-2 p-[15px] rounded-[10px] bg-surface-2 border-[0.5px] border-line flex flex-col gap-3 mt-1">
                       <div className="flex items-center justify-between gap-3">
                         <div className="flex items-center gap-3">
-                          <div className="w-9 h-9 rounded-lg bg-gradient-to-tr from-amber-500 to-rose-500 text-white flex items-center justify-center shrink-0">
+                          <div className="w-9 h-9 rounded-[5px] bg-gradient-to-tr from-amber-500 to-rose-500 text-white flex items-center justify-center shrink-0">
                             <Video className="w-4.5 h-4.5" />
                           </div>
                           <div>
                             <h4 className="text-[12px] font-semibold text-ink-700">
                               Instagram/TikTok Story Bubble Avatar
                             </h4>
-                            <p className="text-xs text-ink-500">
+                            <p className="text-[12px] text-ink-500">
                               Pulsing gradient ring opening vertical video greeting when clicked
                             </p>
                           </div>
@@ -3166,7 +2955,7 @@ export default function AtelierStudioPage() {
                       </div>
 
                       {currentProfile.storyBubble?.enabled && (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 pt-3 border-t-[0.5px] border-line/70 text-xs sm:text-sm">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 pt-3 border-t-[0.5px] border-line text-[12px]">
                           <div>
                             <Label htmlFor="story-video-url" required>Greeting Video URL (MP4 / WebM)</Label>
                             <Input
@@ -3181,7 +2970,7 @@ export default function AtelierStudioPage() {
                                   videoUrl: e.target.value
                                 }
                               })}
-                              className="font-mono"
+                              className=""
                             />
                           </div>
                           <div>
@@ -3207,15 +2996,15 @@ export default function AtelierStudioPage() {
                 </div>
 
                 {/* Design Tab: Drill-Down Slide Navigation Engine */}
-                <div className="bg-white border-[0.5px] border-line/80 rounded-2xl p-5 sm:p-6 flex flex-col gap-5">
+                <div className="bg-white border-[0.5px] border-line rounded-[10px] p-[15px] flex flex-col gap-5">
                   {/* Header: Back navigation when in sub-menu or Root title */}
-                  <div className="flex items-center justify-between pb-3.5 border-b-[0.5px] border-line/80">
+                  <div className="flex items-center justify-between pb-3.5 border-b-[0.5px] border-line">
                     <div className="flex items-center gap-2">
                       {designSubMenu !== 'root' ? (
                         <button
                           type="button"
                           onClick={() => setDesignSubMenu('root')}
-                          className="flex items-center gap-1.5 text-xs font-semibold text-brand-500 hover:text-brand-600 px-2 py-1 rounded-lg hover:bg-surface-2 transition-colors"
+                          className="flex items-center gap-1.5 text-[12px] font-semibold text-brand-500 hover:text-brand-600 px-2 py-1 rounded-[5px] hover:bg-surface-2 transition-colors"
                         >
                           <ChevronLeft className="w-4 h-4" />
                           <span>Design</span>
@@ -3229,7 +3018,7 @@ export default function AtelierStudioPage() {
                         </div>
                       )}
                       {designSubMenu !== 'root' && (
-                        <span className="text-sm font-semibold text-ink-700 capitalize">
+                        <span className="text-[12px] font-semibold text-ink-700 capitalize">
                           / {designSubMenu}
                         </span>
                       )}
@@ -3241,7 +3030,7 @@ export default function AtelierStudioPage() {
                         size="xs"
                         leftIcon={Dices}
                         onClick={handleThemeShuffle}
-                        className="text-xs font-semibold text-brand-500"
+                        className="text-[12px] font-semibold text-brand-500"
                       >
                         🎲 Shuffle Random
                       </Button>
@@ -3308,23 +3097,23 @@ export default function AtelierStudioPage() {
                             key={cat.id}
                             type="button"
                             onClick={() => setDesignSubMenu(cat.id)}
-                            className="p-4 rounded-xl border-[0.5px] border-line bg-surface-2/60 hover:bg-surface-2 hover:border-brand-500 text-left flex items-center justify-between gap-3 group transition-all cursor-pointer shadow-2xs"
+                            className="p-[15px] rounded-[10px] border-[0.5px] border-line bg-surface-2/60 hover:bg-surface-2 hover:border-brand-500 text-left flex items-center justify-between gap-3 group transition-all cursor-pointer shadow-2xs"
                           >
                             <div className="flex items-center gap-3 min-w-0">
-                              <div className="w-10 h-10 rounded-xl bg-white border-[0.5px] border-line flex items-center justify-center text-brand-500 group-hover:scale-105 transition-transform shrink-0">
+                              <div className="w-10 h-10 rounded-[10px] bg-white border-[0.5px] border-line flex items-center justify-center text-brand-500 group-hover:scale-105 transition-transform shrink-0">
                                 <IconComp className="w-5 h-5" />
                               </div>
                               <div className="min-w-0">
                                 <h4 className="text-[12px] font-semibold text-ink-700 group-hover:text-brand-500 transition-colors truncate">
                                   {cat.title}
                                 </h4>
-                                <p className="text-xs text-ink-500 line-clamp-1 mt-0.5">
+                                <p className="text-[12px] text-ink-500 line-clamp-1 mt-0.5">
                                   {cat.desc}
                                 </p>
                               </div>
                             </div>
                             <div className="flex items-center gap-2 shrink-0">
-                              <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-md bg-white border-[0.5px] border-line text-brand-500 capitalize">
+                              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-[5px] bg-white border-[0.5px] border-line text-brand-500 capitalize">
                                 {cat.badge}
                               </span>
                               <ChevronRight className="w-4 h-4 text-ink-500 group-hover:text-brand-500 transition-colors" />
@@ -3341,7 +3130,7 @@ export default function AtelierStudioPage() {
                       {/* Section A: Customizable Presets */}
                       <div>
                         <div className="flex items-center justify-between mb-2.5">
-                          <h4 className="text-[12px] font-semibold uppercase tracking-wider text-ink-500">
+                          <h4 className="text-[12px] font-semibold text-ink-500">
                             Customizable Theme Presets (18)
                           </h4>
                         </div>
@@ -3353,7 +3142,7 @@ export default function AtelierStudioPage() {
                                 key={preset.id}
                                 type="button"
                                 onClick={() => handleApplyThemePreset(preset)}
-                                className={`p-2.5 rounded-xl border text-left flex flex-col justify-between gap-2 transition-all cursor-pointer ${
+                                className={`p-2.5 rounded-[10px] border text-left flex flex-col justify-between gap-2 transition-all cursor-pointer ${
                                   isSelected
                                     ? 'border-2 border-brand-500 bg-white ring-2 ring-brand-500/20 '
                                     : 'border-line bg-surface-2 hover:bg-white hover:border-brand-500/50'
@@ -3366,7 +3155,7 @@ export default function AtelierStudioPage() {
                                 </div>
                                 <div>
                                   <div className="flex items-center justify-between">
-                                    <span className="text-xs font-semibold text-ink-700 block truncate">{preset.name}</span>
+                                    <span className="text-[12px] font-semibold text-ink-700 block truncate">{preset.name}</span>
                                     {isSelected && <span className="text-[10px] text-brand-600 font-semibold">✓</span>}
                                   </div>
                                   <span className="text-[9px] text-ink-500 font-medium block truncate">{preset.tag}</span>
@@ -3380,7 +3169,7 @@ export default function AtelierStudioPage() {
                       {/* Section B: Curated Creator Themes */}
                       <div className="pt-4 border-t-[0.5px] border-line">
                         <div className="flex items-center justify-between mb-2.5">
-                          <h4 className="text-[12px] font-semibold uppercase tracking-wider text-ink-500 flex items-center gap-1.5">
+                          <h4 className="text-[12px] font-semibold text-ink-500 flex items-center gap-1.5">
                             <Sparkles className="w-3.5 h-3.5 text-amber-500" />
                             <span>Curated Creator Themes (100% Free)</span>
                           </h4>
@@ -3393,7 +3182,7 @@ export default function AtelierStudioPage() {
                                 key={theme.id}
                                 type="button"
                                 onClick={() => handleApplyThemePreset(theme)}
-                                className={`p-3 rounded-xl border text-left flex flex-col justify-between gap-2.5 transition-all cursor-pointer ${
+                                className={`p-3 rounded-[10px] border text-left flex flex-col justify-between gap-2.5 transition-all cursor-pointer ${
                                   isSelected
                                     ? 'border-2 border-brand-500 bg-white ring-2 ring-brand-500/20 '
                                     : 'border-line bg-surface-2 hover:bg-white hover:border-brand-500/50'
@@ -3403,15 +3192,15 @@ export default function AtelierStudioPage() {
                                   <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-brand-100/50 text-ink-700">
                                     {theme.creator}
                                   </span>
-                                  {isSelected && <span className="text-xs text-brand-600 font-semibold">✓ Active</span>}
+                                  {isSelected && <span className="text-[12px] text-brand-600 font-semibold">✓ Active</span>}
                                 </div>
                                 <div>
-                                  <h5 className="font-semibold text-xs text-ink-700">{theme.name}</h5>
+                                  <h5 className="font-semibold text-[12px] text-ink-700">{theme.name}</h5>
                                   <span className="text-[10px] text-ink-500">{theme.tag}</span>
                                 </div>
                                 <div className="flex items-center gap-1.5">
-                                  <span className="w-5 h-5 rounded-md border border-black/10" style={{ backgroundColor: theme.primary }} />
-                                  <span className="w-5 h-5 rounded-md border border-black/10" style={{ backgroundColor: theme.accent }} />
+                                  <span className="w-5 h-5 rounded-[5px] border border-black/10" style={{ backgroundColor: theme.primary }} />
+                                  <span className="w-5 h-5 rounded-[5px] border border-black/10" style={{ backgroundColor: theme.accent }} />
                                 </div>
                               </button>
                             );
@@ -3445,7 +3234,7 @@ export default function AtelierStudioPage() {
                                     },
                                   }));
                                 }}
-                                className={`p-3 rounded-xl border text-center capitalize text-xs font-semibold transition-all ${
+                                className={`p-3 rounded-[10px] border text-center capitalize text-[12px] font-semibold transition-all ${
                                   isSelected
                                     ? 'bg-brand-500 text-white border-brand-600 '
                                     : 'bg-surface-2 text-ink-700 border-line hover:bg-white'
@@ -3460,7 +3249,7 @@ export default function AtelierStudioPage() {
 
                       {/* Dynamic Input based on active wallpaper type */}
                       {(currentProfile.designSettings?.wallpaper?.type || 'fill') === 'fill' && (
-                        <div className="p-4 rounded-xl bg-surface-2 border-[0.5px] border-line space-y-2">
+                        <div className="p-[15px] rounded-[10px] bg-surface-2 border-[0.5px] border-line space-y-2">
                           <Label htmlFor="wallpaper-fill">Fill Background Color</Label>
                           <div className="flex items-center gap-3">
                             <input
@@ -3481,7 +3270,7 @@ export default function AtelierStudioPage() {
                                   },
                                 }));
                               }}
-                              className="w-10 h-10 rounded-lg cursor-pointer border-[0.5px] border-line"
+                              className="w-10 h-10 rounded-[5px] cursor-pointer border-[0.5px] border-line"
                             />
                             <input
                               type="text"
@@ -3500,14 +3289,14 @@ export default function AtelierStudioPage() {
                                   },
                                 }));
                               }}
-                              className="font-mono text-xs px-3 py-2 bg-white border-[0.5px] border-line rounded-lg"
+                              className="text-[12px] px-3 py-2 bg-white border-[0.5px] border-line rounded-[5px]"
                             />
                           </div>
                         </div>
                       )}
 
                       {(currentProfile.designSettings?.wallpaper?.type === 'gradient') && (
-                        <div className="p-4 rounded-xl bg-surface-2 border-[0.5px] border-line space-y-2">
+                        <div className="p-[15px] rounded-[10px] bg-surface-2 border-[0.5px] border-line space-y-2">
                           <Label htmlFor="wallpaper-gradient">CSS Gradient String</Label>
                           <Input
                             id="wallpaper-gradient"
@@ -3527,13 +3316,13 @@ export default function AtelierStudioPage() {
                                 },
                               }));
                             }}
-                            className="font-mono text-xs"
+                            className="text-[12px]"
                           />
                         </div>
                       )}
 
                       {(currentProfile.designSettings?.wallpaper?.type === 'blur' || currentProfile.designSettings?.wallpaper?.type === 'image') && (
-                        <div className="p-4 rounded-xl bg-surface-2 border-[0.5px] border-line space-y-2">
+                        <div className="p-[15px] rounded-[10px] bg-surface-2 border-[0.5px] border-line space-y-2">
                           <Label htmlFor="wallpaper-image">Background Image URL</Label>
                           <Input
                             id="wallpaper-image"
@@ -3554,13 +3343,13 @@ export default function AtelierStudioPage() {
                                 },
                               }));
                             }}
-                            className="font-mono text-xs"
+                            className="text-[12px]"
                           />
                         </div>
                       )}
 
                       {(currentProfile.designSettings?.wallpaper?.type === 'video') && (
-                        <div className="p-4 rounded-xl bg-surface-2 border-[0.5px] border-line space-y-2">
+                        <div className="p-[15px] rounded-[10px] bg-surface-2 border-[0.5px] border-line space-y-2">
                           <Label htmlFor="wallpaper-video">Background Video URL (MP4 / WebM)</Label>
                           <Input
                             id="wallpaper-video"
@@ -3580,7 +3369,7 @@ export default function AtelierStudioPage() {
                                 },
                               }));
                             }}
-                            className="font-mono text-xs"
+                            className="text-[12px]"
                           />
                         </div>
                       )}
@@ -3609,7 +3398,7 @@ export default function AtelierStudioPage() {
                                     },
                                   }));
                                 }}
-                                className={`p-3 rounded-xl border capitalize text-xs font-semibold transition-all ${
+                                className={`p-3 rounded-[10px] border capitalize text-[12px] font-semibold transition-all ${
                                   isSelected
                                     ? 'bg-brand-500 text-white border-brand-600 '
                                     : 'bg-surface-2 text-ink-700 border-line hover:bg-white'
@@ -3646,7 +3435,7 @@ export default function AtelierStudioPage() {
                                     },
                                   }));
                                 }}
-                                className={`p-2.5 rounded-xl border text-center text-xs font-semibold transition-all ${
+                                className={`p-2.5 rounded-[10px] border text-center text-[12px] font-semibold transition-all ${
                                   isSelected
                                     ? 'bg-brand-500 text-white border-brand-600 '
                                     : 'bg-surface-2 text-ink-700 border-line hover:bg-white'
@@ -3684,7 +3473,7 @@ export default function AtelierStudioPage() {
                                       },
                                     }));
                                   }}
-                                  className={`p-2.5 rounded-xl border text-center text-xs font-semibold transition-all ${
+                                  className={`p-2.5 rounded-[10px] border text-center text-[12px] font-semibold transition-all ${
                                     isSelected
                                       ? 'bg-brand-500 text-white border-brand-600 '
                                       : 'bg-surface-2 text-ink-700 border-line hover:bg-white'
@@ -3717,7 +3506,7 @@ export default function AtelierStudioPage() {
                                   },
                                 }));
                               }}
-                              className="w-8 h-8 rounded-lg cursor-pointer border-[0.5px] border-line"
+                              className="w-8 h-8 rounded-[5px] cursor-pointer border-[0.5px] border-line"
                             />
                             <input
                               type="text"
@@ -3732,7 +3521,7 @@ export default function AtelierStudioPage() {
                                   },
                                 }));
                               }}
-                              className="font-mono text-xs px-2.5 py-1.5 bg-white border-[0.5px] border-line rounded-lg w-full"
+                              className="text-[12px] px-2.5 py-1.5 bg-white border-[0.5px] border-line rounded-[5px] w-full"
                             />
                           </div>
                         </div>
@@ -3754,7 +3543,7 @@ export default function AtelierStudioPage() {
                                   },
                                 }));
                               }}
-                              className="w-8 h-8 rounded-lg cursor-pointer border-[0.5px] border-line"
+                              className="w-8 h-8 rounded-[5px] cursor-pointer border-[0.5px] border-line"
                             />
                             <input
                               type="text"
@@ -3769,7 +3558,7 @@ export default function AtelierStudioPage() {
                                   },
                                 }));
                               }}
-                              className="font-mono text-xs px-2.5 py-1.5 bg-white border-[0.5px] border-line rounded-lg w-full"
+                              className="text-[12px] px-2.5 py-1.5 bg-white border-[0.5px] border-line rounded-[5px] w-full"
                             />
                           </div>
                         </div>
@@ -3781,11 +3570,11 @@ export default function AtelierStudioPage() {
                   {designSubMenu === 'text' && (
                     <div className="space-y-4 animate-fadeIn">
                       {/* Active Pairing Summary */}
-                      <div className="p-3.5 rounded-xl bg-surface-2 border-[0.5px] border-line">
-                        <span className="text-[10px] font-semibold uppercase tracking-wider text-ink-500">Active Font Pairing</span>
+                      <div className="p-3.5 rounded-[10px] bg-surface-2 border-[0.5px] border-line">
+                        <span className="text-[10px] font-semibold text-ink-500">Active Font Pairing</span>
                         <div className="flex items-center justify-between mt-1">
-                          <span className="text-sm font-semibold text-ink-700">{currentProfile.font || 'Playfair Display'} (Headline)</span>
-                          <span className="text-xs text-stone-500 font-mono">+ {getTitleFontName(currentProfile.alternativeTitleFont) || 'Default Serif'}</span>
+                          <span className="text-[12px] font-semibold text-ink-700">{currentProfile.font || 'Playfair Display'} (Headline)</span>
+                          <span className="text-[12px] text-stone-500">+ {getTitleFontName(currentProfile.alternativeTitleFont) || 'Default Serif'}</span>
                         </div>
                       </div>
 
@@ -3809,7 +3598,7 @@ export default function AtelierStudioPage() {
                           variant="outline"
                           size="sm"
                           onClick={() => setShowTitleFontModal(true)}
-                          className="w-full text-xs font-semibold bg-white border-line text-brand-500 hover:border-brand-500"
+                          className="w-full text-[12px] font-semibold bg-white border-line text-brand-500 hover:border-brand-500"
                         >
                           {getTitleFontName(currentProfile.alternativeTitleFont) ? `Font: ${getTitleFontName(currentProfile.alternativeTitleFont)}` : 'Browse 48 Expressive Fonts'}
                         </Button>
@@ -3830,10 +3619,10 @@ export default function AtelierStudioPage() {
                           { label: 'Border', hex: '#DCDCDC' },
                           { label: 'Accent', hex: '#38BDF8' },
                         ].map((cItem, cIdx) => (
-                          <div key={cIdx} className="p-3 bg-surface-2 border-[0.5px] border-line rounded-xl flex flex-col gap-1.5">
-                            <span className="text-[10px] font-semibold uppercase tracking-wider text-ink-500">{cItem.label}</span>
+                          <div key={cIdx} className="p-3 bg-surface-2 border-[0.5px] border-line rounded-[10px] flex flex-col gap-1.5">
+                            <span className="text-[10px] font-semibold text-ink-500">{cItem.label}</span>
                             <div className="flex items-center justify-between">
-                              <span className="font-mono text-xs font-semibold text-ink-700">{cItem.hex}</span>
+                              <span className="text-[12px] font-semibold text-ink-700">{cItem.hex}</span>
                               <span className="w-5 h-5 rounded-full border border-black/15 shadow-2xs" style={{ backgroundColor: cItem.hex }} />
                             </div>
                           </div>
@@ -3847,10 +3636,10 @@ export default function AtelierStudioPage() {
                     <div className="space-y-5 animate-fadeIn">
                       <div className="flex items-center justify-between">
                         <div>
-                          <h4 className="text-[12px] font-semibold uppercase tracking-wider text-ink-500">
+                          <h4 className="text-[12px] font-semibold text-ink-500">
                             Interactive Sticker Packs (Drag & Drop onto Preview)
                           </h4>
-                          <p className="text-xs text-stone-500 mt-0.5">
+                          <p className="text-[12px] text-stone-500 mt-0.5">
                             Drag any sticker and drop directly on the preview to position it, or click to add.
                           </p>
                         </div>
@@ -3866,7 +3655,7 @@ export default function AtelierStudioPage() {
                                 },
                               }));
                             }}
-                            className="text-xs text-rose-500 hover:underline font-semibold"
+                            className="text-[12px] text-rose-500 hover:underline font-semibold"
                           >
                             Clear All
                           </button>
@@ -3874,10 +3663,10 @@ export default function AtelierStudioPage() {
                       </div>
 
                       {STICKER_PACKS.map((pack) => (
-                        <div key={pack.id} className="p-3.5 rounded-xl bg-surface-2 border-[0.5px] border-line space-y-2">
+                        <div key={pack.id} className="p-3.5 rounded-[10px] bg-surface-2 border-[0.5px] border-line space-y-2">
                           <div className="flex items-center justify-between">
-                            <span className="text-xs font-semibold text-ink-700">{pack.name}</span>
-                            <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-white border-[0.5px] border-line text-brand-500">
+                            <span className="text-[12px] font-semibold text-ink-700">{pack.name}</span>
+                            <span className="text-[10px] px-2 py-0.5 rounded-[5px] bg-white border-[0.5px] border-line text-brand-500">
                               {pack.tag}
                             </span>
                           </div>
@@ -3923,7 +3712,7 @@ export default function AtelierStudioPage() {
                                     },
                                   }));
                                 }}
-                                className="text-2xl p-2.5 rounded-xl bg-white border-[0.5px] border-line hover:border-brand-500 hover:scale-110 transition-all flex items-center justify-center cursor-grab active:cursor-grabbing shadow-2xs select-none"
+                                className="text-[16px] p-2.5 rounded-[10px] bg-white border-[0.5px] border-line hover:border-brand-500 hover:scale-110 transition-all flex items-center justify-center cursor-grab active:cursor-grabbing shadow-2xs select-none"
                                 title={`Drag or click to place ${stk.name}`}
                               >
                                 {stk.emoji}
@@ -3937,7 +3726,7 @@ export default function AtelierStudioPage() {
 
                   {/* SUB-MENU 7: FOOTER */}
                   {designSubMenu === 'footer' && (
-                    <div className="p-4 rounded-xl bg-surface-2 border-[0.5px] border-line flex items-center justify-between gap-4 animate-fadeIn">
+                    <div className="p-[15px] rounded-[10px] bg-surface-2 border-[0.5px] border-line flex items-center justify-between gap-4 animate-fadeIn">
                       <div>
                         <div className="flex items-center gap-2">
                           <h4 className="text-[12px] font-semibold text-ink-700">Hide Linktree Footer Branding</h4>
@@ -3945,7 +3734,7 @@ export default function AtelierStudioPage() {
                             Free For All
                           </span>
                         </div>
-                        <p className="text-xs text-ink-500 mt-0.5">
+                        <p className="text-[12px] text-ink-500 mt-0.5">
                           Remove &ldquo;Powered by TreeInBio&rdquo; from the bottom of your live profile.
                         </p>
                       </div>
@@ -3968,433 +3757,241 @@ export default function AtelierStudioPage() {
               </>
             )}
 
-              {/* Tab 3: Widgets & Bounties */}
+              {/* Tab 3: Widgets */}
               {activeTab === 'widgets' && (
-                <div className="bg-white border-[0.5px] border-line/80 rounded-2xl p-5 sm:p-6 flex flex-col gap-5">
-                  <div className="flex items-center justify-between pb-3.5 border-b-[0.5px] border-line/80">
-                    <h3 className="text-[14px] font-sans font-semibold text-ink-700">
-                      Interactive Bio Widgets &amp; Monetization Bounties
-                    </h3>
-                    <span className="font-mono text-xs text-brand-500">Zero Platform Fee</span>
-                  </div>
-
-                  <div className="flex flex-col gap-3">
-                    {/* Lead Capture Dialog Widget */}
-                    <div className="p-3.5 sm:p-4 bg-surface-2 border-[0.5px] border-line rounded-xl flex flex-col gap-3">
-                      <div className="flex items-center justify-between gap-3">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-lg bg-white text-brand-500 border-[0.5px] border-line flex items-center justify-center shrink-0">
-                            <Contact className="w-5 h-5" />
-                          </div>
-                          <div>
-                            <h4 className="text-[12px] font-semibold text-ink-700">
-                              Interactive Lead Capture &amp; Contact Sync
-                            </h4>
-                            <p className="text-xs font-mono text-ink-500">
-                              Shows &apos;Connect&apos; button with validated form &amp; Google Contacts sync
-                            </p>
-                          </div>
-                        </div>
-                        <button
-                          onClick={() => setShowLeadModal(true)}
-                          className="px-3.5 py-2 bg-white hover:bg-surface-2 border-[0.5px] border-line text-xs sm:text-sm font-semibold rounded-lg cursor-pointer min-h-[36px] transition-colors shrink-0"
-                        >
-                          Preview Form
-                        </button>
-                      </div>
-
-                      {/* User Auto-Sync Option */}
-                      <div className="pt-2.5 border-t-[0.5px] border-line/70 flex items-center justify-between gap-3 text-xs">
-                        <div className="flex items-center gap-2">
-                          <Sparkles className="w-3.5 h-3.5 text-brand-700 shrink-0" />
-                          <span className="font-semibold text-ink-700">Auto-Sync contacts to Google &amp; Gmail</span>
-                          <span className={`px-1.5 py-0.2 rounded text-[10px] font-mono font-semibold ${
-                            currentProfile.leadCapture?.syncToGoogleContacts !== false
-                              ? 'bg-brand-100 text-brand-800'
-                              : 'bg-stone-200 text-stone-600'
-                          }`}>
-                            {currentProfile.leadCapture?.syncToGoogleContacts !== false ? 'ON' : 'OFF'}
-                          </span>
-                        </div>
-                        <Switch
+                <div className="flex flex-col rounded-[10px] border-[0.5px] border-[#dcdcdc]">
+                  {[
+                    {
+                      key: 'lead',
+                      title: 'Contact Form',
+                      description: 'Visitors can leave their details. Submissions appear in Leads.',
+                      control: (
+                        <button type="button" onClick={() => setShowLeadModal(true)} className="text-[12px] text-[#16A34A] hover:underline">Preview</button>
+                      ),
+                    },
+                    {
+                      key: 'lead-sync',
+                      title: 'Sync Leads to Google Contacts',
+                      description: 'Adds each new lead to your connected Google Contacts.',
+                      control: (
+                        <Toggle
+                          label="Sync leads to Google Contacts"
                           checked={currentProfile.leadCapture?.syncToGoogleContacts !== false}
-                          onChange={(e) => setCurrentProfile({
+                          onChange={(checked) => setCurrentProfile({
                             ...currentProfile,
-                            leadCapture: {
-                              ...(currentProfile.leadCapture || {}),
-                              syncToGoogleContacts: e.target.checked,
-                            },
+                            leadCapture: { ...(currentProfile.leadCapture || {}), syncToGoogleContacts: checked },
                           })}
                         />
-                      </div>
-                    </div>
-
-                    {/* Bookings & 1:1 Meetings Widget */}
-                    <div className="p-3.5 sm:p-4 bg-surface-2 border-[0.5px] border-line rounded-xl flex items-center justify-between gap-3">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-lg bg-white text-brand-500 border-[0.5px] border-line flex items-center justify-center shrink-0">
-                          <Calendar className="w-5 h-5" />
-                        </div>
-                        <div>
-                          <h4 className="text-[12px] font-semibold text-ink-700">
-                            1:1 Consultation &amp; Google Meet Scheduling
-                          </h4>
-                          <p className="text-xs font-mono text-ink-500">
-                            Direct slot booking with Google Calendar availability
-                          </p>
-                        </div>
-                      </div>
-                      <button
-                        onClick={() => setShowMeetingModal(true)}
-                        className="px-3.5 py-2 bg-white hover:bg-surface-2 border-[0.5px] border-line text-xs sm:text-sm font-semibold rounded-lg cursor-pointer min-h-[36px] transition-colors shrink-0"
-                      >
-                        Preview Calendar
-                      </button>
-                    </div>
-
-                    {/* Creator Tip Jar Widget */}
-                    <div className="p-3.5 sm:p-4 bg-surface-2 border-[0.5px] border-line rounded-xl flex items-center justify-between gap-3">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-lg bg-white text-brand-500 border-[0.5px] border-line flex items-center justify-center shrink-0">
-                          <Coffee className="w-5 h-5" />
-                        </div>
-                        <div>
-                          <h4 className="text-[12px] font-semibold text-ink-700">
-                            Stripe Direct Tip Jar with Champagne Confetti
-                          </h4>
-                          <p className="text-xs font-mono text-ink-500">
-                            $5, $15, $50 fan support with custom notes &amp; confetti
-                          </p>
-                        </div>
-                      </div>
-                      <button
-                        onClick={() => setShowTipModal(true)}
-                        className="px-3.5 py-2 bg-brand-500 hover:bg-brand-600 text-white text-xs sm:text-sm font-semibold rounded-lg cursor-pointer min-h-[36px] transition-colors shrink-0"
-                      >
-                        Test Tip Jar
-                      </button>
-                    </div>
-
-                    {/* Live Social Proof Ticker Widget */}
-                    <div className="p-3.5 sm:p-4 bg-surface-2 border-[0.5px] border-line rounded-xl flex flex-col gap-2.5">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-lg bg-white text-amber-600 border-[0.5px] border-line flex items-center justify-center shrink-0">
-                            <Sparkles className="w-5 h-5" />
-                          </div>
-                          <div>
-                            <h4 className="text-[12px] font-semibold text-ink-700">
-                              Live Social Proof Activity Ticker
-                            </h4>
-                            <p className="text-xs font-mono text-ink-500">
-                              Subtle floating notifications (&ldquo;Sarah from London just downloaded...&rdquo;)
-                            </p>
-                          </div>
-                        </div>
-
-                        <Switch
+                      ),
+                    },
+                    {
+                      key: 'meeting',
+                      title: 'Meeting Booking',
+                      description: 'Visitors can request a 1:1 meeting in your available slots.',
+                      control: (
+                        <button type="button" onClick={() => setShowMeetingModal(true)} className="text-[12px] text-[#16A34A] hover:underline">Preview</button>
+                      ),
+                    },
+                    {
+                      key: 'tip',
+                      title: 'Tip Jar',
+                      description: 'Fans can pledge a tip with a short message.',
+                      control: (
+                        <button type="button" onClick={() => setShowTipModal(true)} className="text-[12px] text-[#16A34A] hover:underline">Preview</button>
+                      ),
+                    },
+                    {
+                      key: 'social-proof',
+                      title: 'Activity Notifications',
+                      description: 'Shows recent downloads, bookings and clicks as small pop-ups.',
+                      control: (
+                        <Toggle
+                          label="Activity notifications"
                           checked={Boolean(currentProfile.socialProof?.enabled)}
-                          onChange={(e) => setCurrentProfile({
+                          onChange={(checked) => setCurrentProfile({
                             ...currentProfile,
-                            socialProof: {
-                              ...(currentProfile.socialProof || {}),
-                              enabled: e.target.checked
-                            }
+                            socialProof: { ...(currentProfile.socialProof || {}), enabled: checked },
                           })}
                         />
-                      </div>
-
-                      {currentProfile.socialProof?.enabled && (
-                        <div className="pt-2.5 border-t-[0.5px] border-line/60 flex items-center justify-between text-xs sm:text-sm">
-                          <span className="text-xs text-ink-500">Notification Cycle Interval:</span>
-                          <div className="flex items-center gap-2 font-mono text-xs sm:text-sm">
-                            <div className="w-20">
-                              <Input
-                                size="sm"
-                                type="number"
-                                min={3}
-                                max={30}
-                                value={Math.round((currentProfile.socialProof?.intervalMs || 8000) / 1000)}
+                      ),
+                      extra: currentProfile.socialProof?.enabled && (
+                        <label className="flex items-center gap-[10px] text-[12px]">
+                          <span className="text-[#808080]">Show every</span>
+                          <input
+                            type="number"
+                            min={3}
+                            max={30}
+                            value={Math.round((currentProfile.socialProof?.intervalMs || 8000) / 1000)}
+                            onChange={(e) => setCurrentProfile({
+                              ...currentProfile,
+                              socialProof: {
+                                ...(currentProfile.socialProof || {}),
+                                intervalMs: Math.max(3000, Number(e.target.value) * 1000)
+                              }
+                            })}
+                            className="w-[60px] rounded-[5px] border-[0.5px] border-[#dcdcdc] bg-[#FAFAFA] px-[10px] py-[5px] text-center text-[12px] outline-none"
+                          />
+                          <span className="text-[#808080]">seconds</span>
+                        </label>
+                      ),
+                    },
+                    {
+                      key: 'pixels',
+                      title: 'Tracking Pixels',
+                      description: 'Add your pixel IDs to retarget visitors on ad platforms.',
+                      extra: (
+                        <div className="grid grid-cols-1 gap-[15px] md:grid-cols-2">
+                          {[
+                            ['pixel-meta', 'Meta Pixel ID', 'e.g. 123456789012345', 'metaPixelId'],
+                            ['pixel-ga4', 'Google Analytics ID', 'e.g. G-XXXXXXXXXX', 'ga4MeasurementId'],
+                            ['pixel-tiktok', 'TikTok Pixel ID', 'e.g. CXXXXXXXXXXXXXXXXX', 'tiktokPixelId'],
+                            ['pixel-pinterest', 'Pinterest Tag ID', 'e.g. 26XXXXXXXXXXXXX', 'pinterestTagId'],
+                          ].map(([id, label, placeholder, field]) => (
+                            <label key={id} htmlFor={id} className="flex flex-col gap-[5px]">
+                              <span className="text-[12px] font-medium">{label}</span>
+                              <input
+                                id={id}
+                                type="text"
+                                placeholder={placeholder}
+                                value={currentProfile.trackingPixels?.[field] || ''}
                                 onChange={(e) => setCurrentProfile({
                                   ...currentProfile,
-                                  socialProof: {
-                                    ...(currentProfile.socialProof || {}),
-                                    intervalMs: Math.max(3000, Number(e.target.value) * 1000)
-                                  }
+                                  trackingPixels: { ...(currentProfile.trackingPixels || {}), [field]: e.target.value.trim() }
                                 })}
-                                className="text-center font-semibold"
+                                className="rounded-[5px] border-[0.5px] border-[#dcdcdc] bg-[#FAFAFA] px-[10px] py-[8px] text-[12px] outline-none placeholder:text-[#808080] focus:border-[#404040]"
                               />
-                            </div>
-                            <span className="text-ink-500 font-sans">seconds</span>
-                          </div>
+                            </label>
+                          ))}
                         </div>
-                      )}
-                    </div>
-
-                    {/* 1-Click Tracking Pixels Hub Widget */}
-                    <div className="p-3.5 sm:p-4 bg-surface-2 border-[0.5px] border-line rounded-xl flex flex-col gap-2.5">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-lg bg-white text-indigo-600 border-[0.5px] border-line flex items-center justify-center shrink-0">
-                          <TrendingUp className="w-5 h-5" />
-                        </div>
-                        <div>
-                          <h4 className="text-[12px] font-semibold text-ink-700">
-                            1-Click Tracking Pixel Hub (Retargeting)
-                          </h4>
-                          <p className="text-xs font-mono text-ink-500">
-                            Zero coding: Paste pixel IDs to retarget visitors on Meta, TikTok, Google &amp; Pinterest
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 pt-3 border-t-[0.5px] border-line/70 text-xs sm:text-sm">
-                        <div>
-                          <Label htmlFor="pixel-meta">Meta (Facebook) Pixel ID</Label>
-                          <Input
-                            id="pixel-meta"
-                            size="sm"
-                            type="text"
-                            placeholder="e.g. 123456789012345"
-                            value={currentProfile.trackingPixels?.metaPixelId || ''}
-                            onChange={(e) => setCurrentProfile({
-                              ...currentProfile,
-                              trackingPixels: {
-                                ...(currentProfile.trackingPixels || {}),
-                                metaPixelId: e.target.value.trim()
-                              }
-                            })}
-                            className="font-mono"
-                          />
-                        </div>
-
-                        <div>
-                          <Label htmlFor="pixel-ga4">Google Analytics (GA4) ID</Label>
-                          <Input
-                            id="pixel-ga4"
-                            size="sm"
-                            type="text"
-                            placeholder="e.g. G-XXXXXXXXXX"
-                            value={currentProfile.trackingPixels?.ga4MeasurementId || ''}
-                            onChange={(e) => setCurrentProfile({
-                              ...currentProfile,
-                              trackingPixels: {
-                                ...(currentProfile.trackingPixels || {}),
-                                ga4MeasurementId: e.target.value.trim()
-                              }
-                            })}
-                            className="font-mono"
-                          />
-                        </div>
-
-                        <div>
-                          <Label htmlFor="pixel-tiktok">TikTok Pixel ID</Label>
-                          <Input
-                            id="pixel-tiktok"
-                            size="sm"
-                            type="text"
-                            placeholder="e.g. CXXXXXXXXXXXXXXXXX"
-                            value={currentProfile.trackingPixels?.tiktokPixelId || ''}
-                            onChange={(e) => setCurrentProfile({
-                              ...currentProfile,
-                              trackingPixels: {
-                                ...(currentProfile.trackingPixels || {}),
-                                tiktokPixelId: e.target.value.trim()
-                              }
-                            })}
-                            className="font-mono"
-                          />
-                        </div>
-
-                        <div>
-                          <Label htmlFor="pixel-pinterest">Pinterest Tag ID</Label>
-                          <Input
-                            id="pixel-pinterest"
-                            size="sm"
-                            type="text"
-                            placeholder="e.g. 26XXXXXXXXXXXXX"
-                            value={currentProfile.trackingPixels?.pinterestTagId || ''}
-                            onChange={(e) => setCurrentProfile({
-                              ...currentProfile,
-                              trackingPixels: {
-                                ...(currentProfile.trackingPixels || {}),
-                                pinterestTagId: e.target.value.trim()
-                              }
-                            })}
-                            className="font-mono"
-                          />
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* FTC Affiliate Auto-Disclosure Widget */}
-                    <div className="p-3.5 sm:p-4 bg-surface-2 border-[0.5px] border-line rounded-xl flex flex-col gap-2.5">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-lg bg-white text-brand-700 border-[0.5px] border-line flex items-center justify-center shrink-0">
-                            <Tag className="w-5 h-5" />
-                          </div>
-                          <div>
-                            <h4 className="text-[12px] font-semibold text-ink-700">
-                              FTC Affiliate Auto-Disclosure
-                            </h4>
-                            <p className="text-xs font-mono text-ink-500">
-                              1-toggle compliance badge keeping your bio compliant with international advertising laws
-                            </p>
-                          </div>
-                        </div>
-
-                        <Switch
+                      ),
+                    },
+                    {
+                      key: 'disclosure',
+                      title: 'Affiliate Disclosure',
+                      description: 'Shows a notice that your page contains affiliate links.',
+                      control: (
+                        <Toggle
+                          label="Affiliate disclosure"
                           checked={Boolean(currentProfile.compliance?.affiliateDisclosure)}
-                          onChange={(e) => setCurrentProfile({
+                          onChange={(checked) => setCurrentProfile({
                             ...currentProfile,
-                            compliance: {
-                              ...(currentProfile.compliance || {}),
-                              affiliateDisclosure: e.target.checked
-                            }
+                            compliance: { ...(currentProfile.compliance || {}), affiliateDisclosure: checked }
                           })}
                         />
-                      </div>
-
-                      {currentProfile.compliance?.affiliateDisclosure && (
-                        <div className="pt-3 border-t-[0.5px] border-line/70 text-xs sm:text-sm">
-                          <Label htmlFor="affiliate-disclosure-note">Custom Legal Disclosure Note</Label>
-                          <Input
+                      ),
+                      extra: currentProfile.compliance?.affiliateDisclosure && (
+                        <label htmlFor="affiliate-disclosure-note" className="flex flex-col gap-[5px]">
+                          <span className="text-[12px] font-medium">Disclosure Text</span>
+                          <input
                             id="affiliate-disclosure-note"
-                            size="sm"
                             type="text"
                             value={currentProfile.compliance?.disclosureText || ''}
                             onChange={(e) => setCurrentProfile({
                               ...currentProfile,
-                              compliance: {
-                                ...(currentProfile.compliance || {}),
-                                disclosureText: e.target.value
-                              }
+                              compliance: { ...(currentProfile.compliance || {}), disclosureText: e.target.value }
                             })}
                             placeholder="This page contains affiliate links. I may earn a commission at no extra cost to you."
+                            className="rounded-[5px] border-[0.5px] border-[#dcdcdc] bg-[#FAFAFA] px-[10px] py-[8px] text-[12px] outline-none placeholder:text-[#808080] focus:border-[#404040]"
                           />
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Profile Access Gate & Sensitive Content Notice Widget */}
-                    <div className="p-3.5 sm:p-4 bg-surface-2 border-[0.5px] border-line rounded-xl flex flex-col gap-3">
-                      <div className="flex items-center justify-between gap-3">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-lg bg-white text-brand-500 border-[0.5px] border-line flex items-center justify-center shrink-0">
-                            <Lock className="w-5 h-5 text-brand-500" />
-                          </div>
-                          <div>
-                            <h4 className="text-[12px] font-semibold text-ink-700">
-                              Profile Access Gate (Passcode / 18+ Notice)
-                            </h4>
-                            <p className="text-xs font-mono text-ink-500">
-                              Restrict profile viewing behind a passcode or require age / content confirmation
-                            </p>
-                          </div>
-                        </div>
-
-                        <Switch
+                        </label>
+                      ),
+                    },
+                    {
+                      key: 'gate',
+                      title: 'Access Gate',
+                      description: 'Ask for a passcode, an 18+ confirmation or a content warning before your page opens.',
+                      control: (
+                        <Toggle
+                          label="Access gate"
                           checked={Boolean(currentProfile.accessGate?.enabled)}
-                          onChange={(e) => setCurrentProfile({
+                          onChange={(checked) => setCurrentProfile({
                             ...currentProfile,
                             accessGate: {
                               ...(currentProfile.accessGate || {}),
-                              enabled: e.target.checked,
+                              enabled: checked,
                               type: currentProfile.accessGate?.type === 'none' ? 'passcode' : (currentProfile.accessGate?.type || 'passcode'),
                             }
                           })}
                         />
-                      </div>
-
-                      {currentProfile.accessGate?.enabled && (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 pt-3 border-t-[0.5px] border-line/70 text-xs sm:text-sm">
-                          <div>
-                            <Label htmlFor="gate-type-select">Gate Enforcement Type</Label>
-                            <Select
+                      ),
+                      extra: currentProfile.accessGate?.enabled && (
+                        <div className="grid grid-cols-1 gap-[15px] md:grid-cols-2">
+                          <label htmlFor="gate-type-select" className="flex flex-col gap-[5px]">
+                            <span className="text-[12px] font-medium">Type</span>
+                            <select
                               id="gate-type-select"
-                              size="sm"
                               value={currentProfile.accessGate?.type || 'passcode'}
                               onChange={(e) => setCurrentProfile({
                                 ...currentProfile,
-                                accessGate: {
-                                  ...(currentProfile.accessGate || {}),
-                                  type: e.target.value,
-                                }
+                                accessGate: { ...(currentProfile.accessGate || {}), type: e.target.value }
                               })}
+                              className="h-[34px] rounded-[5px] border-[0.5px] border-[#dcdcdc] bg-[#FAFAFA] px-[10px] text-[12px] outline-none focus:border-[#404040]"
                             >
-                              <option value="passcode">Passcode Lock (PIN / Password Required)</option>
-                              <option value="age_18">18+ Age Gate (Adult Content Confirmation)</option>
-                              <option value="sensitive">Sensitive Content Warning (Click to Continue)</option>
-                            </Select>
-                          </div>
-
+                              <option value="passcode">Passcode</option>
+                              <option value="age_18">18+ confirmation</option>
+                              <option value="sensitive">Content warning</option>
+                            </select>
+                          </label>
                           {currentProfile.accessGate?.type === 'passcode' && (
-                            <div>
-                              <Label htmlFor="gate-passcode" required>Profile Passcode</Label>
-                              <Input
+                            <label htmlFor="gate-passcode" className="flex flex-col gap-[5px]">
+                              <span className="text-[12px] font-medium">Passcode <span className="text-[#FF4359]">*</span></span>
+                              <input
                                 id="gate-passcode"
-                                size="sm"
                                 type="text"
-                                placeholder="e.g. VIP2026 or 1234"
+                                placeholder="e.g. VIP2026"
                                 value={currentProfile.accessGate?.passcode || ''}
                                 onChange={(e) => setCurrentProfile({
                                   ...currentProfile,
-                                  accessGate: {
-                                    ...(currentProfile.accessGate || {}),
-                                    passcode: e.target.value,
-                                  }
+                                  accessGate: { ...(currentProfile.accessGate || {}), passcode: e.target.value }
                                 })}
-                                className="font-mono font-semibold"
+                                className="rounded-[5px] border-[0.5px] border-[#dcdcdc] bg-[#FAFAFA] px-[10px] py-[8px] text-[12px] outline-none placeholder:text-[#808080] focus:border-[#404040]"
                               />
-                            </div>
+                            </label>
                           )}
-
-                          <div>
-                            <Label htmlFor="gate-title">Gate Headline</Label>
-                            <Input
+                          <label htmlFor="gate-title" className="flex flex-col gap-[5px]">
+                            <span className="text-[12px] font-medium">Headline</span>
+                            <input
                               id="gate-title"
-                              size="sm"
                               type="text"
-                              placeholder="e.g. Restricted VIP Profile"
+                              placeholder="e.g. Members Only"
                               value={currentProfile.accessGate?.title || ''}
                               onChange={(e) => setCurrentProfile({
                                 ...currentProfile,
-                                accessGate: {
-                                  ...(currentProfile.accessGate || {}),
-                                  title: e.target.value,
-                                }
+                                accessGate: { ...(currentProfile.accessGate || {}), title: e.target.value }
                               })}
+                              className="rounded-[5px] border-[0.5px] border-[#dcdcdc] bg-[#FAFAFA] px-[10px] py-[8px] text-[12px] outline-none placeholder:text-[#808080] focus:border-[#404040]"
                             />
-                          </div>
-
-                          <div>
-                            <Label htmlFor="gate-desc">Gate Instructions / Warning</Label>
-                            <Input
+                          </label>
+                          <label htmlFor="gate-desc" className="flex flex-col gap-[5px]">
+                            <span className="text-[12px] font-medium">Message</span>
+                            <input
                               id="gate-desc"
-                              size="sm"
                               type="text"
-                              placeholder="e.g. Enter your passcode to view exclusive content."
+                              placeholder="e.g. Enter your passcode to continue."
                               value={currentProfile.accessGate?.description || ''}
                               onChange={(e) => setCurrentProfile({
                                 ...currentProfile,
-                                accessGate: {
-                                  ...(currentProfile.accessGate || {}),
-                                  description: e.target.value,
-                                }
+                                accessGate: { ...(currentProfile.accessGate || {}), description: e.target.value }
                               })}
+                              className="rounded-[5px] border-[0.5px] border-[#dcdcdc] bg-[#FAFAFA] px-[10px] py-[8px] text-[12px] outline-none placeholder:text-[#808080] focus:border-[#404040]"
                             />
-                          </div>
+                          </label>
                         </div>
-                      )}
+                      ),
+                    },
+                  ].map((row, index, rows) => (
+                    <div key={row.key} className={`flex flex-col gap-[15px] px-[15px] py-[15px] ${index === rows.length - 1 ? '' : 'border-b-[0.5px] border-[#DCDCDC]'}`}>
+                      <SettingRow title={row.title} description={row.description}>{row.control}</SettingRow>
+                      {row.extra}
                     </div>
-                  </div>
+                  ))}
                 </div>
               )}
             </div>
 
             {/* Right 5 Columns: Live Bio Preview */}
             <div className="xl:col-span-5 flex flex-col gap-2">
-              <div className="bg-white border-[0.5px] border-line/80 rounded-2xl p-4 sm:p-5 flex flex-col items-center">
+              <div className="bg-white border-[0.5px] border-line rounded-[10px] p-[15px] flex flex-col items-center">
                 <PhoneMockup
                   profile={currentProfile}
                   onIncrementClick={handleMockupLinkClick}

@@ -1,18 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { 
-  X, 
-  User, 
-  Mail, 
-  Lock, 
-  ArrowRight, 
-  Loader2, 
-  CheckCircle2, 
-  AlertCircle,
-  Sparkles,
-  ShieldCheck
-} from '@/components/icons';
+import { Modal, ModalButton, Field, inputClass } from '@/components/ui';
 import { PLATFORM_NAME } from '@/constants/app';
 
 export default function AuthModal({ isOpen = true, onClose, onSuccess, initialMode = 'login', mode: propMode }) {
@@ -68,167 +57,109 @@ export default function AuthModal({ isOpen = true, onClose, onSuccess, initialMo
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-[#00000A73] backdrop-blur-[5px] flex items-center justify-center p-3 sm:p-4 animate-fadeIn">
-      <div className="w-full max-w-md bg-white border-[0.5px] border-line rounded-lg shadow-modal overflow-hidden flex flex-col">
-        {/* Modal Header */}
-        <div className="px-5 py-4 border-b-[0.5px] border-line flex items-center justify-between bg-surface-2">
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-full bg-brand-500 flex items-center justify-center text-white ">
-              <Sparkles className="w-3.5 h-3.5 fill-white" />
-            </div>
-            <span className="font-sans font-semibold text-sm text-ink-700">
-              {mode === 'login' ? `Sign In to ${PLATFORM_NAME}` : `Claim Your ${PLATFORM_NAME}`}
-            </span>
+    <Modal
+      open
+      onClose={onClose}
+      title={mode === 'login' ? `Sign In to ${PLATFORM_NAME}` : `Claim Your ${PLATFORM_NAME}`}
+      width="sm"
+      footer={
+        <ModalButton id="tb-auth-submit-btn" type="submit" form="tb-auth-form" variant="primary" disabled={loading}>
+          {loading ? 'Processing...' : mode === 'login' ? 'Sign In' : 'Create Account'}
+        </ModalButton>
+      }
+    >
+      <div className="flex flex-col gap-[15px]">
+        {error && (
+          <div role="alert" className="rounded-[5px] border-[0.5px] border-[#FF4359] bg-[#FF43591A] px-[10px] py-[8px] text-[12px] text-[#FF4359]">
+            {error}
           </div>
+        )}
 
-          <button
-            onClick={onClose}
-            className="p-1 rounded text-ink-500 hover:text-ink-700 cursor-pointer transition-colors"
-          >
-            <X className="w-4 h-4" />
-          </button>
-        </div>
+        <form id="tb-auth-form" onSubmit={handleSubmit} className="flex flex-col gap-[15px]">
+          {mode === 'register' && (
+            <>
+              <Field label="Full Name">
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. Sarah Jenkins"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className={inputClass}
+                />
+              </Field>
 
-        {/* Modal Form Body */}
-        <div className="p-6 flex flex-col gap-4">
-          {error && (
-            <div className="p-2.5 rounded bg-rose-50 border border-rose-300 text-rose-800 text-xs flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
-              <span>{error}</span>
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-            {mode === 'register' && (
-              <>
-                <div>
-                  <label className="text-[0.6875rem] font-semibold uppercase text-ink-500">Full Name</label>
-                  <div className="relative mt-1">
-                    <User className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-500" />
-                    <input
-                      type="text"
-                      required
-                      placeholder="e.g. Sarah Jenkins"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      className="w-full pl-8 pr-3 py-1.5 bg-surface-2 border-[0.5px] border-line rounded text-xs text-ink-700 focus:outline-none focus:border-brand-500"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="text-[0.6875rem] font-semibold uppercase text-ink-500">Choose Your Bio Username</label>
-                  <div className="relative mt-1">
-                    <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs font-mono text-ink-500">/</span>
-                    <input
-                      type="text"
-                      required
-                      placeholder="sarahjenkins"
-                      value={username}
-                      onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, ''))}
-                      className="w-full pl-6 pr-3 py-1.5 bg-surface-2 border-[0.5px] border-line rounded text-xs font-mono text-ink-700 focus:outline-none focus:border-brand-500"
-                    />
-                  </div>
-                  <span className="text-[0.62rem] font-mono text-ink-500">Your public URL: treeinbio.com/{username || 'yourname'}</span>
-                </div>
-
-                <div>
-                  <label className="text-[0.6875rem] font-semibold uppercase text-ink-500">Email Address</label>
-                  <div className="relative mt-1">
-                    <Mail className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-500" />
-                    <input
-                      type="email"
-                      required
-                      placeholder="sarah@example.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="w-full pl-8 pr-3 py-1.5 bg-surface-2 border-[0.5px] border-line rounded text-xs text-ink-700 focus:outline-none focus:border-brand-500"
-                    />
-                  </div>
-                </div>
-              </>
-            )}
-
-            {mode === 'login' && (
-              <div>
-                <label className="text-[0.6875rem] font-semibold uppercase text-ink-500">Email or Username</label>
-                <div className="relative mt-1">
-                  <User className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-500" />
+              <Field label="Username" hint={`Your public URL: treeinbio.com/${username || 'yourname'}`}>
+                <div className="relative">
+                  <span className="absolute left-[10px] top-1/2 -translate-y-1/2 text-[12px] text-[#808080]">/</span>
                   <input
-                    id="tb-auth-email-or-username"
                     type="text"
                     required
-                    placeholder="Enter your email or username"
-                    value={emailOrUsername}
-                    onChange={(e) => setEmailOrUsername(e.target.value)}
-                    className="w-full pl-8 pr-3 py-1.5 bg-surface-2 border-[0.5px] border-line rounded text-xs text-ink-700 focus:outline-none focus:border-brand-500"
+                    placeholder="sarahjenkins"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, ''))}
+                    className={`${inputClass} pl-[20px]`}
                   />
                 </div>
-              </div>
-            )}
+              </Field>
 
-            <div>
-              <label className="text-[0.6875rem] font-semibold uppercase text-ink-500">Password</label>
-              <div className="relative mt-1">
-                <Lock className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-500" />
+              <Field label="Email">
                 <input
-                  id="tb-auth-password"
-                  type="password"
+                  type="email"
                   required
-                  placeholder={mode === 'register' ? 'At least 12 characters' : 'Enter your password'}
-                  minLength={mode === 'register' ? 12 : undefined}
-                  maxLength={128}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-8 pr-3 py-1.5 bg-surface-2 border-[0.5px] border-line rounded text-xs text-ink-700 focus:outline-none focus:border-brand-500"
+                  placeholder="sarah@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className={inputClass}
                 />
-              </div>
-            </div>
+              </Field>
+            </>
+          )}
 
-            <button
-              id="tb-auth-submit-btn"
-              type="submit"
-              disabled={loading}
-              className="mt-2 w-full py-2 bg-brand-500 hover:bg-brand-600 text-white text-xs font-semibold rounded transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-60"
-            >
-              {loading ? (
-                <>
-                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                  <span>Processing...</span>
-                </>
-              ) : mode === 'login' ? (
-                <>
-                  <span>Sign In</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </>
-              ) : (
-                <>
-                  <span>Create Account</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </>
-              )}
-            </button>
-          </form>
+          {mode === 'login' && (
+            <Field label="Email or Username">
+              <input
+                id="tb-auth-email-or-username"
+                type="text"
+                required
+                placeholder="Enter your email or username"
+                value={emailOrUsername}
+                onChange={(e) => setEmailOrUsername(e.target.value)}
+                className={inputClass}
+              />
+            </Field>
+          )}
 
-          {/* Toggle Login / Register */}
-          <div className="pt-3 border-t-[0.5px] border-line flex items-center justify-between text-xs text-ink-500">
-            <span>
-              {mode === 'login' ? "Don't have an account?" : 'Already have an account?'}
-            </span>
-            <button
-              id="tb-auth-toggle-mode-btn"
-              type="button"
-              onClick={() => {
-                setError(null);
-                setMode(mode === 'login' ? 'register' : 'login');
-              }}
-              className="text-brand-500 font-semibold hover:underline cursor-pointer"
-            >
-              {mode === 'login' ? 'Create one now' : 'Sign In'}
-            </button>
-          </div>
+          <Field label="Password">
+            <input
+              id="tb-auth-password"
+              type="password"
+              required
+              placeholder={mode === 'register' ? 'At least 12 characters' : 'Enter your password'}
+              minLength={mode === 'register' ? 12 : undefined}
+              maxLength={128}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className={inputClass}
+            />
+          </Field>
+        </form>
+
+        <div className="flex items-center justify-between border-t-[0.5px] border-[#EBEBEB] pt-[10px] text-[12px] text-[#808080]">
+          <span>{mode === 'login' ? "Don't have an account?" : 'Already have an account?'}</span>
+          <button
+            id="tb-auth-toggle-mode-btn"
+            type="button"
+            onClick={() => {
+              setError(null);
+              setMode(mode === 'login' ? 'register' : 'login');
+            }}
+            className="font-medium text-[#16A34A] hover:text-[#15803D]"
+          >
+            {mode === 'login' ? 'Create Account' : 'Sign In'}
+          </button>
         </div>
       </div>
-    </div>
+    </Modal>
   );
 }

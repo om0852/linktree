@@ -38,10 +38,10 @@ export default function PaletteSuggester({ avatarUrl, currentTheme, onSelectThem
   }
 
   return (
-    <div className="p-4 rounded-xl bg-surface-2 border-[0.5px] border-line ">
+    <div className="p-[15px] rounded-[10px] bg-surface-2 border-[0.5px] border-line">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-white border-[0.5px] border-line text-brand-500 flex items-center justify-center shrink-0">
+          <div className="w-8 h-8 rounded-[5px] bg-white border-[0.5px] border-line text-brand-500 flex items-center justify-center shrink-0">
             <Sparkles size={16} />
           </div>
           <div>
@@ -62,7 +62,7 @@ export default function PaletteSuggester({ avatarUrl, currentTheme, onSelectThem
           {extractedColors.map((hex, i) => (
             <div
               key={i}
-              className="w-5 h-5 rounded-full border border-white "
+              className="w-5 h-5 rounded-full border border-white"
               style={{ backgroundColor: hex }}
               title={hex}
             />
@@ -81,18 +81,18 @@ export default function PaletteSuggester({ avatarUrl, currentTheme, onSelectThem
                 setAppliedThemeId(theme.id);
                 if (onSelectTheme) onSelectTheme(theme.id, theme);
               }}
-              className={`p-3 rounded-xl border text-left transition-all relative overflow-hidden group cursor-pointer ${
+              className={`p-3 rounded-[10px] border text-left transition-all relative overflow-hidden group cursor-pointer ${
                 isSelected
                   ? 'border-brand-500 bg-white ring-2 ring-brand-500/20'
                   : 'border-line bg-white/70 hover:bg-white'
               }`}
             >
               <div
-                className="w-full h-8 rounded-lg mb-2 shadow-inner border border-black/5"
+                className="w-full h-8 rounded-[5px] mb-2 shadow-inner border border-black/5"
                 style={{ background: theme.previewGradients }}
               />
               <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold text-ink-700">{theme.name}</span>
+                <span className="text-[12px] font-semibold text-ink-700">{theme.name}</span>
                 {isSelected && <Check size={14} className="text-brand-500" />}
               </div>
               <p className="text-[10px] text-ink-500 mt-0.5 line-clamp-1">

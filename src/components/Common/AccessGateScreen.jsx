@@ -46,14 +46,14 @@ export default function AccessGateScreen({ accessGate, profileTitle, onUnlock, u
   };
 
   return (
-    <div className="min-h-[550px] w-full flex items-center justify-center p-4">
-      <div className="w-full max-w-sm rounded-3xl bg-white border-[0.5px] border-line p-6 sm:p-7 shadow-modal text-center flex flex-col items-center gap-4 animate-fadeIn">
+    <div className="min-h-[550px] w-full flex items-center justify-center p-[15px]">
+      <div className="w-full max-w-sm rounded-[10px] bg-white border-[0.5px] border-line p-[15px] shadow-modal text-center flex flex-col items-center gap-4 animate-fadeIn">
         {/* Security Icon Badge */}
-        <div className="w-16 h-16 rounded-2xl bg-brand-500/10 border border-brand-500/20 flex items-center justify-center text-brand-500 ">
+        <div className="w-16 h-16 rounded-[10px] bg-brand-500/10 border border-brand-500/20 flex items-center justify-center text-brand-500">
           {gateType === 'passcode' ? (
             <KeyRound className="w-8 h-8 text-brand-500" />
           ) : gateType === 'age_18' ? (
-            <span className="font-sans font-semibold text-2xl text-brand-500">18+</span>
+            <span className="font-sans font-semibold text-[16px] text-brand-500">18+</span>
           ) : (
             <ShieldAlert className="w-8 h-8 text-brand-500" />
           )}
@@ -70,7 +70,7 @@ export default function AccessGateScreen({ accessGate, profileTitle, onUnlock, u
                 : 'Sensitive Content Notice'
             )}
           </h2>
-          <p className="text-xs sm:text-sm text-ink-500 mt-1.5 leading-relaxed">
+          <p className="text-[12px] text-ink-500 mt-1.5 leading-relaxed">
             {accessGate?.description || (
               gateType === 'passcode'
                 ? `Enter the creator passcode to unlock @${profileTitle}'s bio.`
@@ -85,7 +85,7 @@ export default function AccessGateScreen({ accessGate, profileTitle, onUnlock, u
         {gateType === 'passcode' ? (
           <form onSubmit={handleVerifyPasscode} className="w-full space-y-3 pt-1">
             {errorMsg && (
-              <div className="p-2.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-1.5 text-left">
+              <div className="p-2.5 rounded-[10px] bg-rose-50 border border-rose-200 text-rose-700 text-[12px] flex items-center gap-1.5 text-left">
                 <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
                 <span>{errorMsg}</span>
               </div>
@@ -101,13 +101,13 @@ export default function AccessGateScreen({ accessGate, profileTitle, onUnlock, u
                   setEnteredPasscode(e.target.value);
                   if (errorMsg) setErrorMsg('');
                 }}
-                className="w-full px-4 py-2.5 rounded-xl bg-white border-[0.5px] border-line text-sm text-ink-700 text-center font-mono placeholder-ink-500/50 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/15 transition-all "
+                className="w-full px-4 py-2.5 rounded-[10px] bg-white border-[0.5px] border-line text-[12px] text-ink-700 text-center placeholder-ink-500/50 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/15 transition-all"
               />
             </div>
 
             <button
               type="submit"
-              className="w-full py-2.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-white text-xs font-semibold transition-all cursor-pointer flex items-center justify-center gap-2 active:scale-98"
+              className="w-full py-2.5 rounded-[10px] bg-brand-500 hover:bg-brand-600 text-white text-[12px] font-semibold transition-all cursor-pointer flex items-center justify-center gap-2 active:scale-98"
             >
               <span>Unlock Profile</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -119,7 +119,7 @@ export default function AccessGateScreen({ accessGate, profileTitle, onUnlock, u
             <button
               type="button"
               onClick={handleConfirmAgeOrSensitive}
-              className="w-full py-2.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-white text-xs font-semibold transition-all cursor-pointer flex items-center justify-center gap-2 active:scale-98"
+              className="w-full py-2.5 rounded-[10px] bg-brand-500 hover:bg-brand-600 text-white text-[12px] font-semibold transition-all cursor-pointer flex items-center justify-center gap-2 active:scale-98"
             >
               <CheckCircle2 className="w-4 h-4" />
               <span>

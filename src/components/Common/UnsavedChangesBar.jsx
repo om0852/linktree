@@ -24,7 +24,7 @@ export default function UnsavedChangesBar({
 
   return (
     <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 w-[95%] max-w-xl animate-in fade-in slide-in-from-bottom-5 duration-300">
-      <div className="bg-ink-900 text-white border border-brand-500/50 px-4 py-3 rounded-2xl shadow-modal flex items-center justify-between gap-3 backdrop-blur-md">
+      <div className="bg-ink-900 text-white border border-brand-500/50 px-4 py-3 rounded-[10px] shadow-modal flex items-center justify-between gap-3 backdrop-blur-md">
         
         {/* Left: Status & Undo/Redo */}
         <div className="flex items-center gap-2.5">
@@ -32,7 +32,7 @@ export default function UnsavedChangesBar({
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
             <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-400"></span>
           </span>
-          <span className="text-xs font-semibold tracking-wide">
+          <span className="text-[12px] font-semibold tracking-wide">
             Unsaved changes
           </span>
 
@@ -44,7 +44,7 @@ export default function UnsavedChangesBar({
               type="button"
               onClick={onUndo}
               disabled={!canUndo || saving}
-              className="p-1.5 rounded-lg text-white/80 hover:text-white hover:bg-white/10 disabled:opacity-30 disabled:hover:bg-transparent transition-colors cursor-pointer"
+              className="p-1.5 rounded-[5px] text-white/80 hover:text-white hover:bg-white/10 disabled:opacity-30 disabled:hover:bg-transparent transition-colors cursor-pointer"
               title="Undo (Ctrl+Z)"
             >
               <Undo2 className="w-4 h-4" />
@@ -53,7 +53,7 @@ export default function UnsavedChangesBar({
               type="button"
               onClick={onRedo}
               disabled={!canRedo || saving}
-              className="p-1.5 rounded-lg text-white/80 hover:text-white hover:bg-white/10 disabled:opacity-30 disabled:hover:bg-transparent transition-colors cursor-pointer"
+              className="p-1.5 rounded-[5px] text-white/80 hover:text-white hover:bg-white/10 disabled:opacity-30 disabled:hover:bg-transparent transition-colors cursor-pointer"
               title="Redo (Ctrl+Y)"
             >
               <Redo2 className="w-4 h-4" />
@@ -67,7 +67,7 @@ export default function UnsavedChangesBar({
             type="button"
             onClick={onDiscard}
             disabled={saving}
-            className="px-3 py-1.5 text-xs font-medium text-white/80 hover:text-white hover:bg-white/10 rounded-xl transition-colors cursor-pointer"
+            className="px-3 py-1.5 text-[12px] font-medium text-white/80 hover:text-white hover:bg-white/10 rounded-[10px] transition-colors cursor-pointer"
           >
             Discard
           </button>
@@ -75,7 +75,7 @@ export default function UnsavedChangesBar({
             type="button"
             onClick={onSave}
             disabled={saving}
-            className="px-4 py-1.5 text-xs font-semibold bg-brand-500 hover:bg-brand-600 text-white rounded-xl transition-colors flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+            className="px-4 py-1.5 text-[12px] font-semibold bg-brand-500 hover:bg-brand-600 text-white rounded-[10px] transition-colors flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
           >
             {saving ? (
               <>

@@ -36,3 +36,4 @@ export {
   SERIES_COLORS,
   table,
 } from './patterns';
+export { default as Modal, ModalButton, Field, inputClass } from './Modal';

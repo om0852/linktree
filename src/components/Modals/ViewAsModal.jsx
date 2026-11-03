@@ -1,17 +1,8 @@
 'use client';
 
 import React from 'react';
-import { 
-  X, 
-  Eye, 
-  MapPin, 
-  Smartphone, 
-  Languages, 
-  Check, 
-  RotateCcw,
-  Sparkles,
-  Info
-} from '@/components/icons';
+import Modal, { ModalButton } from '@/components/ui/Modal';
+import { InfoTip } from '@/components/ui/patterns';
 
 export const SIMULATION_LOCATIONS = [
   { id: 'global', name: 'Global (Auto Detect)', flag: '🌍', currency: 'USD ($)', region: 'Worldwide' },
@@ -40,6 +31,20 @@ export const SIMULATION_LANGUAGES = [
   { id: 'ja', name: 'Japanese (日本語)', native: '日本語' },
 ];
 
+const tileClass = (isSelected, layout = 'items-center gap-[8px] text-left') =>
+  `flex min-w-0 ${layout} rounded-[5px] border-[0.5px] px-[10px] py-[8px] text-[12px] hover:bg-[#F8F8F9BF] ${
+    isSelected ? 'border-[#000] bg-[#F8F8F9BF] text-black' : 'border-[#DCDCDC] bg-white text-[#333333]'
+  }`;
+
+function Section({ label, children }) {
+  return (
+    <div className="flex flex-col gap-[5px]">
+      <span className="text-[14px] font-medium text-black">{label}</span>
+      {children}
+    </div>
+  );
+}
+
 export default function ViewAsModal({ 
   isOpen, 
   onClose, 
@@ -50,172 +55,82 @@ export default function ViewAsModal({
   if (!isOpen) return null;
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div 
-        className="modal-content max-w-md w-full rounded-2xl bg-white border-[0.5px] border-line shadow-modal overflow-hidden flex flex-col text-ink-700 animate-fadeIn"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Modal Header */}
-        <div className="px-5 py-4 border-b-[0.5px] border-line flex items-center justify-between bg-surface-2/70">
-          <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-brand-500/10 border border-brand-500/20 flex items-center justify-center text-brand-500">
-              <Eye className="w-4.5 h-4.5" />
-            </div>
-            <div>
-              <h3 className="text-[14px] font-sans font-semibold text-ink-700 flex items-center gap-2">
-                <span>View as...</span>
-                <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-semibold bg-brand-50 text-brand-500 border-[0.5px] border-line">
-                  Simulator
+    <Modal
+      onClose={onClose}
+      title="View As"
+      width="md"
+      headerExtra={<InfoTip content="Preview geo rules, localized dates and safe areas by visitor location, platform and language." />}
+      bodyClassName="flex flex-col gap-[15px]"
+      footer={
+        <>
+          <ModalButton variant="secondary" className="w-[50%]" onClick={onResetSimulation}>
+            Reset
+          </ModalButton>
+          <ModalButton variant="primary" className="w-[50%]" onClick={onClose}>
+            Apply
+          </ModalButton>
+        </>
+      }
+    >
+      <Section label="Location">
+        <div className="grid grid-cols-2 gap-[8px]">
+          {SIMULATION_LOCATIONS.map((loc) => {
+            const isSelected = simulation.location === loc.id;
+            return (
+              <button
+                key={loc.id}
+                type="button"
+                onClick={() => onUpdateSimulation('location', loc.id)}
+                className={tileClass(isSelected)}
+              >
+                <span className="shrink-0 text-[14px] leading-none">{loc.flag}</span>
+                <span className="flex min-w-0 flex-col">
+                  <span className="truncate">{loc.name}</span>
+                  <span className="text-[10px] text-[#808080]">{loc.currency}</span>
                 </span>
-              </h3>
-              <p className="text-xs text-ink-500 mt-0.5 font-medium">
-                Test how your profile renders for different visitors worldwide
-              </p>
-            </div>
-          </div>
-          <button
-            onClick={onClose}
-            className="w-8 h-8 rounded-full text-ink-500 hover:text-ink-700 hover:bg-surface-3 flex items-center justify-center transition-all cursor-pointer"
-            aria-label="Close"
-          >
-            <X className="w-4 h-4 text-ink-500" />
-          </button>
+              </button>
+            );
+          })}
         </div>
+      </Section>
 
-        {/* Info Banner */}
-        <div className="p-4 mx-5 mt-4 rounded-xl bg-surface-2/90 border-[0.5px] border-line flex items-start gap-3 text-xs text-ink-500">
-          <Info className="w-4 h-4 text-brand-500 shrink-0 mt-0.5" />
-          <p className="leading-relaxed">
-            <strong className="text-ink-700">Audience Simulation:</strong> Preview rules, geo-targeted links, localized dates, and safe-area margins based on visitor location, operating system, and language.
-          </p>
+      <Section label="Platform">
+        <div className="grid grid-cols-2 gap-[8px]">
+          {SIMULATION_PLATFORMS.map((plat) => {
+            const isSelected = simulation.platform === plat.id;
+            return (
+              <button
+                key={plat.id}
+                type="button"
+                onClick={() => onUpdateSimulation('platform', plat.id)}
+                className={tileClass(isSelected)}
+                title={plat.name}
+              >
+                <span className="truncate">{plat.name}</span>
+              </button>
+            );
+          })}
         </div>
+      </Section>
 
-        {/* Modal Body */}
-        <div className="p-5 space-y-4 overflow-y-auto max-h-[65vh]">
-          {/* 1. Location Selector */}
-          <div>
-            <label className="text-xs font-semibold text-ink-700 flex items-center gap-1.5 mb-2">
-              <MapPin className="w-3.5 h-3.5 text-brand-500" /> Visitor Country / Location
-            </label>
-            <div className="grid grid-cols-2 gap-2">
-              {SIMULATION_LOCATIONS.map((loc) => {
-                const isSelected = simulation.location === loc.id;
-                return (
-                  <button
-                    key={loc.id}
-                    type="button"
-                    onClick={() => onUpdateSimulation('location', loc.id)}
-                    className={`p-2.5 rounded-xl text-left transition-all border flex items-center justify-between cursor-pointer ${
-                      isSelected
-                        ? 'bg-brand-500 text-white border-brand-600 '
-                        : 'bg-surface-2 text-ink-700 border-line hover:bg-surface-3'
-                    }`}
-                  >
-                    <div className="flex items-center gap-2 min-w-0">
-                      <span className="text-base shrink-0">{loc.flag}</span>
-                      <div className="min-w-0">
-                        <span className="font-semibold text-xs block truncate leading-tight">
-                          {loc.name}
-                        </span>
-                        <span className={`text-[10px] font-mono ${isSelected ? 'text-white/80' : 'text-ink-500'}`}>
-                          {loc.currency}
-                        </span>
-                      </div>
-                    </div>
-                    {isSelected && <Check className="w-3.5 h-3.5 text-white shrink-0 ml-1" />}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* 2. Platform / Device Simulation */}
-          <div>
-            <label className="text-xs font-semibold text-ink-700 flex items-center gap-1.5 mb-2">
-              <Smartphone className="w-3.5 h-3.5 text-brand-500" /> Platform / In-App WebView
-            </label>
-            <div className="grid grid-cols-2 gap-2">
-              {SIMULATION_PLATFORMS.map((plat) => {
-                const isSelected = simulation.platform === plat.id;
-                return (
-                  <button
-                    key={plat.id}
-                    type="button"
-                    onClick={() => onUpdateSimulation('platform', plat.id)}
-                    className={`p-2.5 rounded-xl text-left transition-all border flex items-center justify-between cursor-pointer ${
-                      isSelected
-                        ? 'bg-brand-500 text-white border-brand-600 '
-                        : 'bg-surface-2 text-ink-700 border-line hover:bg-surface-3'
-                    }`}
-                  >
-                    <div className="flex items-center gap-2 min-w-0">
-                      <span className="text-base shrink-0">{plat.icon}</span>
-                      <div className="min-w-0">
-                        <span className="font-semibold text-xs block truncate leading-tight">
-                          {plat.name}
-                        </span>
-                      </div>
-                    </div>
-                    {isSelected && <Check className="w-3.5 h-3.5 text-white shrink-0 ml-1" />}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* 3. Language Selector */}
-          <div>
-            <label className="text-xs font-semibold text-ink-700 flex items-center gap-1.5 mb-2">
-              <Languages className="w-3.5 h-3.5 text-brand-500" /> Browser Language
-            </label>
-            <div className="grid grid-cols-3 gap-2">
-              {SIMULATION_LANGUAGES.map((lang) => {
-                const isSelected = simulation.language === lang.id;
-                return (
-                  <button
-                    key={lang.id}
-                    type="button"
-                    onClick={() => onUpdateSimulation('language', lang.id)}
-                    className={`p-2 rounded-xl text-center transition-all border cursor-pointer ${
-                      isSelected
-                        ? 'bg-brand-500 text-white border-brand-600 font-semibold'
-                        : 'bg-surface-2 text-ink-700 border-line hover:bg-surface-3'
-                    }`}
-                  >
-                    <span className="font-semibold text-xs block truncate leading-tight">
-                      {lang.name.split(' ')[0]}
-                    </span>
-                    <span className={`text-[10px] ${isSelected ? 'text-white/80' : 'text-ink-500'}`}>
-                      {lang.native}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
+      <Section label="Language">
+        <div className="grid grid-cols-3 gap-[8px]">
+          {SIMULATION_LANGUAGES.map((lang) => {
+            const isSelected = simulation.language === lang.id;
+            return (
+              <button
+                key={lang.id}
+                type="button"
+                onClick={() => onUpdateSimulation('language', lang.id)}
+                className={tileClass(isSelected, 'flex-col items-center text-center')}
+              >
+                <span className="w-full truncate">{lang.name.split(' ')[0]}</span>
+                <span className="text-[10px] text-[#808080]">{lang.native}</span>
+              </button>
+            );
+          })}
         </div>
-
-        {/* Modal Footer */}
-        <div className="px-5 py-3.5 border-t-[0.5px] border-line flex items-center justify-between bg-surface-2/70">
-          <button
-            type="button"
-            onClick={onResetSimulation}
-            className="flex items-center gap-1.5 text-xs text-ink-500 hover:text-ink-700 font-semibold cursor-pointer transition-colors"
-          >
-            <RotateCcw className="w-3.5 h-3.5" />
-            <span>Reset to Default</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={onClose}
-            className="px-4 py-2 rounded-xl bg-brand-500 hover:bg-brand-600 text-white text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5"
-          >
-            <Sparkles className="w-3.5 h-3.5 fill-white" />
-            <span>Apply Simulation</span>
-          </button>
-        </div>
-      </div>
-    </div>
+      </Section>
+    </Modal>
   );
 }

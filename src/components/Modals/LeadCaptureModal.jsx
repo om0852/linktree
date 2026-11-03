@@ -2,20 +2,9 @@
 
 import React, { useState } from 'react';
 import confetti from 'canvas-confetti';
-import { 
-  X, 
-  User, 
-  Phone, 
-  Mail, 
-  Building2, 
-  MessageSquare, 
-  Send, 
-  CheckCircle2, 
-  AlertCircle, 
-  Loader2, 
-  Sparkles,
-  Lock
-} from '@/components/icons';
+import { Check } from '@/components/icons';
+import Modal, { ModalButton, Field, inputClass } from '@/components/ui/Modal';
+import { EmptyState } from '@/components/ui/patterns';
 
 const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$/;
 const PHONE_REGEX = /^(\+?[0-9\s\-().]{7,20})$/;
@@ -178,114 +167,90 @@ export default function LeadCaptureModal({ profile, onClose, onLeadSubmitted }) 
     }
   };
 
+  const fieldClass = (hasError) => (hasError ? inputClass.replace('border-[#dcdcdc]', 'border-[#FF4359]') : inputClass);
+  const fieldLabel = (text, required) => (
+    <>
+      {text}
+      {required && <span className="text-[#FF4359]"> *</span>}
+    </>
+  );
+  const fieldError = (msg) => msg && <span className="text-[10px] text-[#FF4359]">{msg}</span>;
+  const fallbackAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(profile?.name || profile?.title || 'Creator')}&background=16A34A&color=FFFFFF&bold=true&size=256`;
+
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div 
-        className="modal-content p-6 sm:p-7 max-w-md w-full relative border-[0.5px] border-line bg-white shadow-modal rounded-2xl animate-in fade-in zoom-in-95 duration-150"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Close button */}
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 p-2 rounded-full text-ink-500 hover:text-ink-700 hover:bg-surface-2 transition-all cursor-pointer"
-        >
-          <X className="w-4 h-4" />
-        </button>
-
-        {isSuccess ? (
-          /* Success Screen */
-          <div className="text-center py-6 space-y-3 animate-fade-in">
-            <div className="w-14 h-14 rounded-full bg-brand-500/10 text-brand-500 border border-brand-500/30 flex items-center justify-center mx-auto ">
-              <CheckCircle2 className="w-8 h-8 text-brand-500" />
-            </div>
-            <h3 className="text-[14px] font-sans font-semibold text-ink-700">Contact Info Sent!</h3>
-            <p className="text-xs text-ink-500 max-w-xs mx-auto leading-relaxed">
-              {config.successMessage || 'Thank you! Your details have been delivered to @' + profile.username + '.'}
+    <Modal
+      onClose={onClose}
+      title={config.title || "Let's Connect"}
+      width="sm"
+      footer={
+        isSuccess ? null : (
+          <>
+            <ModalButton variant="secondary" className="w-[50%]" onClick={onClose}>Cancel</ModalButton>
+            <ModalButton type="submit" form="lead-capture-form" className="w-[50%]" disabled={isSubmitting}>
+              {isSubmitting ? 'Sending...' : config.buttonText || 'Exchange Contact'}
+            </ModalButton>
+          </>
+        )
+      }
+    >
+      {isSuccess ? (
+        <EmptyState icon={Check} title="Contact Info Sent">
+          {config.successMessage || 'Thank you! Your details have been delivered to @' + profile.username + '.'}
+          {config.syncToGoogleContacts && (
+            <span className="mt-[6px] block text-[10px] text-[#16A34A]">Synced to Gmail Contacts</span>
+          )}
+        </EmptyState>
+      ) : (
+        <div className="flex flex-col gap-[15px]">
+          <div className="flex items-center gap-[10px]">
+            <img
+              src={
+                profile?.avatar && typeof profile.avatar === 'string' && profile.avatar.trim() !== ''
+                  ? profile.avatar.trim()
+                  : fallbackAvatar
+              }
+              alt={profile?.title || profile?.name || 'Creator'}
+              className="size-[34px] shrink-0 rounded-full border-[0.5px] border-[#DCDCDC] object-cover"
+              onError={(e) => {
+                e.currentTarget.onerror = null;
+                e.currentTarget.src = fallbackAvatar;
+              }}
+            />
+            <p className="line-clamp-2 text-[12px] text-[#808080]">
+              {config.subtitle || `Share your details with ${profile.name || profile.title}`}
             </p>
-            {config.syncToGoogleContacts && (
-              <p className="text-[11px] font-mono text-brand-500 flex items-center justify-center gap-1">
-                <Sparkles className="w-3 h-3 text-brand-500" /> Synced to Gmail Contacts
-              </p>
-            )}
           </div>
-        ) : (
-          /* Form Screen */
-          <div>
-            {/* Header with Creator Avatar */}
-            <div className="flex items-center gap-3.5 mb-5 pb-4 border-b-[0.5px] border-line">
-              <div className="w-12 h-12 rounded-full p-0.5 border-[0.5px] border-line shrink-0 ">
-                <img
-                  src={
-                    profile?.avatar && typeof profile.avatar === 'string' && profile.avatar.trim() !== ''
-                      ? profile.avatar.trim()
-                      : `https://ui-avatars.com/api/?name=${encodeURIComponent(profile?.name || profile?.title || 'Creator')}&background=16A34A&color=FFFFFF&bold=true&size=256`
-                  }
-                  alt={profile?.title || profile?.name || 'Creator'}
-                  className="w-full h-full object-cover rounded-full"
-                  onError={(e) => {
-                    e.currentTarget.onerror = null;
-                    e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(profile?.name || profile?.title || 'Creator')}&background=16A34A&color=FFFFFF&bold=true&size=256`;
-                  }}
-                />
-              </div>
-              <div className="flex-1 pr-4">
-                <h3 className="text-[14px] font-sans font-semibold text-ink-700">
-                  {config.title || "Let's Connect"}
-                </h3>
-                <p className="text-xs text-ink-500 mt-0.5 line-clamp-2">
-                  {config.subtitle || `Drop your contact details to reach ${profile.name || profile.title}`}
-                </p>
-              </div>
-            </div>
 
-            {/* Server Error Alert */}
-            {serverError && (
-              <div className="p-3 rounded-lg mb-4 bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
-                <span>{serverError}</span>
-              </div>
+          {serverError && (
+            <div className="rounded-[5px] border-[0.5px] border-[#FFC2CA] bg-[#FFEDEF] px-[12px] py-[8px] text-[11px] text-[#FF4359]">
+              {serverError}
+            </div>
+          )}
+
+          <form id="lead-capture-form" onSubmit={handleSubmit} className="flex flex-col gap-[15px]">
+            {fields.name?.enabled && (
+              <Field label={fieldLabel(fields.name.label || 'Full Name', fields.name.required)}>
+                <input
+                  type="text"
+                  name="fullName"
+                  value={formData.fullName}
+                  onChange={handleChange}
+                  placeholder="e.g. John Doe"
+                  required={fields.name.required}
+                  className={fieldClass(errors.fullName)}
+                />
+                {fieldError(errors.fullName)}
+              </Field>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-3.5">
-              {/* Full Name */}
-              {fields.name?.enabled && (
-                <div>
-                  <div className="flex justify-between items-center mb-1">
-                    <label className="text-[11px] font-semibold text-ink-700 flex items-center gap-1.5">
-                      <User className="w-3 h-3 text-brand-500" />
-                      {fields.name.label || 'Full Name'}
-                    </label>
-                    {fields.name.required && (
-                      <span className="text-[10px] text-amber-700 font-mono">*required</span>
-                    )}
-                  </div>
-                  <input
-                    type="text"
-                    name="fullName"
-                    value={formData.fullName}
-                    onChange={handleChange}
-                    placeholder="e.g. John Doe"
-                    required={fields.name.required}
-                    className={`tb-input w-full text-xs ${errors.fullName ? 'border-rose-400 focus:border-rose-500' : ''}`}
-                  />
-                  {errors.fullName && (
-                    <p className="text-[10px] text-rose-600 mt-1">{errors.fullName}</p>
+            {fields.phone?.enabled && (
+              <div className="flex flex-col gap-[8px]">
+                <Field
+                  label={fieldLabel(
+                    (fields.phone.label && !fields.phone.label.toLowerCase().includes('contact') && !fields.phone.label.toLowerCase().includes('whatsapp')) ? fields.phone.label : 'Phone Number',
+                    fields.phone.required
                   )}
-                </div>
-              )}
-
-              {/* Phone Number */}
-              {fields.phone?.enabled && (
-                <div>
-                  <div className="flex justify-between items-center mb-1">
-                    <label className="text-[11px] font-semibold text-ink-700 flex items-center gap-1.5">
-                      <Phone className="w-3 h-3 text-brand-500" />
-                      {(fields.phone.label && !fields.phone.label.toLowerCase().includes('contact') && !fields.phone.label.toLowerCase().includes('whatsapp')) ? fields.phone.label : 'Phone Number'}
-                    </label>
-                    {fields.phone.required && (
-                      <span className="text-[10px] text-amber-700 font-mono">*required</span>
-                    )}
-                  </div>
+                >
                   <input
                     type="tel"
                     name="phone"
@@ -293,128 +258,70 @@ export default function LeadCaptureModal({ profile, onClose, onLeadSubmitted }) 
                     onChange={handleChange}
                     placeholder="e.g. +1 (555) 234-5678"
                     required={fields.phone.required}
-                    className={`tb-input w-full text-xs font-mono ${errors.phone ? 'border-rose-400 focus:border-rose-500' : ''}`}
+                    className={fieldClass(errors.phone)}
                   />
-                  {errors.phone && (
-                    <p className="text-[10px] text-rose-600 mt-1">{errors.phone}</p>
-                  )}
-                  <label className="flex items-center gap-2 mt-2 text-xs text-ink-500 cursor-pointer select-none">
-                    <input
-                      type="checkbox"
-                      name="isWhatsApp"
-                      checked={Boolean(formData.isWhatsApp)}
-                      onChange={(e) => setFormData((prev) => ({ ...prev, isWhatsApp: e.target.checked }))}
-                      className="w-3.5 h-3.5 rounded border-line text-brand-500 focus:ring-brand-500 accent-brand-500"
-                    />
-                    <span className="text-ink-700 text-[11px] font-medium">
-                      This provided number is also available on WhatsApp
-                    </span>
-                  </label>
-                </div>
-              )}
-
-              {/* Email Address */}
-              {fields.email?.enabled && (
-                <div>
-                  <div className="flex justify-between items-center mb-1">
-                    <label className="text-[11px] font-semibold text-ink-700 flex items-center gap-1.5">
-                      <Mail className="w-3 h-3 text-brand-500" />
-                      {fields.email.label || 'Email Address'}
-                    </label>
-                    {fields.email.required && (
-                      <span className="text-[10px] text-amber-700 font-mono">*required</span>
-                    )}
-                  </div>
+                  {fieldError(errors.phone)}
+                </Field>
+                <label className="flex cursor-pointer select-none items-center gap-[8px] text-[12px]">
                   <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    placeholder="e.g. john@company.com"
-                    required={fields.email.required}
-                    className={`tb-input w-full text-xs ${errors.email ? 'border-rose-400 focus:border-rose-500' : ''}`}
+                    type="checkbox"
+                    name="isWhatsApp"
+                    checked={Boolean(formData.isWhatsApp)}
+                    onChange={(e) => setFormData((prev) => ({ ...prev, isWhatsApp: e.target.checked }))}
+                    className="size-[14px] accent-[#16A34A]"
                   />
-                  {errors.email && (
-                    <p className="text-[10px] text-rose-600 mt-1">{errors.email}</p>
-                  )}
-                </div>
-              )}
-
-              {/* Company / Brand (Optional) */}
-              {fields.company?.enabled && (
-                <div>
-                  <div className="flex justify-between items-center mb-1">
-                    <label className="text-[11px] font-semibold text-ink-700 flex items-center gap-1.5">
-                      <Building2 className="w-3 h-3 text-brand-500" />
-                      {fields.company.label || 'Company / Brand'}
-                    </label>
-                    {fields.company.required && (
-                      <span className="text-[10px] text-amber-700 font-mono">*required</span>
-                    )}
-                  </div>
-                  <input
-                    type="text"
-                    name="company"
-                    value={formData.company}
-                    onChange={handleChange}
-                    placeholder="e.g. Acme Studio / Google"
-                    required={fields.company.required}
-                    className="tb-input w-full text-xs"
-                  />
-                </div>
-              )}
-
-              {/* Message / Note */}
-              {fields.note?.enabled && (
-                <div>
-                  <div className="flex justify-between items-center mb-1">
-                    <label className="text-[11px] font-semibold text-ink-700 flex items-center gap-1.5">
-                      <MessageSquare className="w-3 h-3 text-brand-500" />
-                      {fields.note.label || 'Message / Reason for Contact'}
-                    </label>
-                    {fields.note.required && (
-                      <span className="text-[10px] text-amber-700 font-mono">*required</span>
-                    )}
-                  </div>
-                  <textarea
-                    rows={2}
-                    name="note"
-                    value={formData.note}
-                    onChange={handleChange}
-                    placeholder="e.g. Interested in sponsorship, collaboration, or booking..."
-                    required={fields.note.required}
-                    className="tb-input tb-textarea w-full text-xs"
-                  />
-                </div>
-              )}
-
-              {/* Submit CTA */}
-              <div className="pt-2">
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="tb-btn tb-btn-primary w-full py-2.5 justify-center text-xs font-semibold rounded-sm cursor-pointer"
-                >
-                  {isSubmitting ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin" /> Sending...
-                    </>
-                  ) : (
-                    <>
-                      <Send className="w-4 h-4" /> {config.buttonText || 'Exchange Contact'}
-                    </>
-                  )}
-                </button>
+                  This number is on WhatsApp
+                </label>
               </div>
+            )}
 
-              {/* Privacy Notice */}
-              <p className="text-[10px] text-ink-500 text-center flex items-center justify-center gap-1">
-                <Lock className="w-2.5 h-2.5 text-brand-500" /> Your information is privately shared with @{profile.username}
-              </p>
-            </form>
-          </div>
-        )}
-      </div>
-    </div>
+            {fields.email?.enabled && (
+              <Field label={fieldLabel(fields.email.label || 'Email Address', fields.email.required)}>
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  placeholder="e.g. john@company.com"
+                  required={fields.email.required}
+                  className={fieldClass(errors.email)}
+                />
+                {fieldError(errors.email)}
+              </Field>
+            )}
+
+            {fields.company?.enabled && (
+              <Field label={fieldLabel(fields.company.label || 'Company / Brand', fields.company.required)}>
+                <input
+                  type="text"
+                  name="company"
+                  value={formData.company}
+                  onChange={handleChange}
+                  placeholder="e.g. Acme Studio"
+                  required={fields.company.required}
+                  className={inputClass}
+                />
+              </Field>
+            )}
+
+            {fields.note?.enabled && (
+              <Field label={fieldLabel(fields.note.label || 'Message / Reason for Contact', fields.note.required)}>
+                <textarea
+                  rows={2}
+                  name="note"
+                  value={formData.note}
+                  onChange={handleChange}
+                  placeholder="What would you like to discuss?"
+                  required={fields.note.required}
+                  className={`${inputClass} resize-none`}
+                />
+              </Field>
+            )}
+
+            <p className="text-center text-[10px] text-[#808080]">Shared privately with @{profile.username}</p>
+          </form>
+        </div>
+      )}
+    </Modal>
   );
 }

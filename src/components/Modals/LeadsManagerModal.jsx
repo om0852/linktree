@@ -1,25 +1,20 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { 
-  Users, 
-  X, 
-  Phone, 
-  Mail, 
-  Building2, 
-  MessageSquare, 
-  Download, 
-  Trash2, 
-  RefreshCw, 
-  CheckCircle2, 
-  AlertCircle, 
-  Loader2, 
-  Search, 
-  ExternalLink,
-  Sparkles,
-  Copy,
-  Check
-} from '@/components/icons';
+import { Users, Phone, Mail, CheckCircle2, Trash2, RefreshCw, Loader2, Copy, Check } from '@/components/icons';
+import Modal from '@/components/ui/Modal';
+import {
+  KpiCard,
+  KpiGrid,
+  SearchPill,
+  RoundIconButton,
+  ToolbarPill,
+  InfoChip,
+  InfoTip,
+  EmptyState,
+  SkeletonRows,
+  table,
+} from '@/components/ui/patterns';
 
 export default function LeadsManagerModal({ profile, onClose }) {
   const [leads, setLeads] = useState([]);
@@ -123,225 +118,148 @@ export default function LeadsManagerModal({ profile, onClose }) {
   };
 
   return (
-    <div className="modal-overlay">
-      <div className="modal-content p-6 max-w-3xl w-full relative max-h-[90vh] overflow-y-auto border-[0.5px] border-line bg-white shadow-modal rounded-2xl">
-        {/* Close button */}
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 p-2 rounded-full text-ink-500 hover:text-ink-700 hover:bg-surface-2 transition-all cursor-pointer"
-        >
-          <X className="w-5 h-5" />
-        </button>
+    <Modal
+      onClose={onClose}
+      title="Leads"
+      width="xl"
+      headerExtra={
+        <>
+          <InfoChip>@{profile.username}</InfoChip>
+          <InfoTip content="Contact form submissions from your bio page. Synced leads go to your connected Google Contacts." />
+        </>
+      }
+    >
+      <div className="flex flex-col gap-[15px]">
+        <KpiGrid columns={4}>
+          <KpiCard icon={Users} value={stats.total} label="Total Leads" />
+          <KpiCard icon={Phone} value={stats.withPhone} label="Phone Numbers" />
+          <KpiCard icon={Mail} value={stats.withEmail} label="Emails" />
+          <KpiCard icon={CheckCircle2} value={stats.syncedToGoogle} label="Google Synced" />
+        </KpiGrid>
 
-        {/* Header */}
-        <div className="flex items-center gap-3.5 mb-5 pb-4 border-b-[0.5px] border-line">
-          <div className="w-12 h-12 rounded-full bg-brand-500/10 text-brand-500 border border-brand-500/20 flex items-center justify-center ">
-            <Users className="w-6 h-6" />
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <h3 className="text-[14px] font-sans font-semibold text-ink-700">Captured Contact Leads</h3>
-              <span className="px-2 py-0.5 rounded-sm bg-brand-500/10 text-brand-500 text-[10px] font-mono border border-brand-500/30 font-semibold">
-                @{profile.username}
-              </span>
-            </div>
-            <p className="text-xs text-ink-500 mt-0.5">
-              Contact submissions captured from your Link-in-Bio form dialog and synced to Gmail Contacts
-            </p>
-          </div>
-        </div>
-
-        {/* Metrics Banner */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
-          <div className="p-3 rounded-xl bg-surface-2 border-[0.5px] border-line text-center">
-            <span className="text-[10px] font-semibold text-ink-500 uppercase">Total Leads</span>
-            <p className="text-xl font-semibold text-ink-700 font-mono mt-0.5">{stats.total}</p>
-          </div>
-          <div className="p-3 rounded-xl bg-surface-2 border-[0.5px] border-line text-center">
-            <span className="text-[10px] font-semibold text-brand-500 uppercase">Phone Numbers</span>
-            <p className="text-xl font-semibold text-brand-500 font-mono mt-0.5">{stats.withPhone}</p>
-          </div>
-          <div className="p-3 rounded-xl bg-surface-2 border-[0.5px] border-line text-center">
-            <span className="text-[10px] font-semibold text-brand-500 uppercase">Emails</span>
-            <p className="text-xl font-semibold text-brand-500 font-mono mt-0.5">{stats.withEmail}</p>
-          </div>
-          <div className="p-3 rounded-xl bg-surface-2 border-[0.5px] border-line text-center">
-            <span className="text-[10px] font-semibold text-brand-500 uppercase">Google Synced</span>
-            <p className="text-xl font-semibold text-brand-500 font-mono mt-0.5">{stats.syncedToGoogle}</p>
-          </div>
-        </div>
-
-        {/* Feedback Alert */}
         {feedback && (
           <div
-            className={`p-3 rounded-xl mb-4 text-xs flex items-center gap-2 ${
+            className={`rounded-[5px] border-[0.5px] px-[10px] py-[8px] text-[12px] ${
               feedback.type === 'success'
-                ? 'bg-brand-500/10 border border-brand-500/30 text-ink-700'
-                : 'bg-amber-50 border border-amber-200 text-amber-800'
+                ? 'border-[#16A34A33] bg-[#E8F7EE] text-[#333333]'
+                : 'border-[#FFE082] bg-[#FFF8E1] text-[#92400E]'
             }`}
           >
-            {feedback.type === 'success' ? (
-              <CheckCircle2 className="w-4 h-4 text-brand-500 shrink-0" />
-            ) : (
-              <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
-            )}
-            <span>{feedback.text}</span>
+            {feedback.text}
           </div>
         )}
 
-        {/* Search, Filter & Export Toolbar */}
-        <div className="flex flex-col sm:flex-row gap-2.5 mb-4 justify-between">
-          <div className="relative flex-1">
-            <input
-              type="text"
-              placeholder="Search leads by name, phone, or email..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="tb-input w-full pl-9 text-xs"
-            />
-            <Search className="w-4 h-4 text-ink-500 absolute left-3 top-1/2 -translate-y-1/2" />
-          </div>
-
-          <div className="flex items-center gap-2">
-            <button
-              onClick={fetchLeads}
-              className="tb-btn tb-btn-ghost text-xs p-2 text-ink-700 rounded-sm cursor-pointer"
-              title="Refresh leads"
-            >
-              <RefreshCw className="w-3.5 h-3.5" />
-            </button>
-
-            <a
-              href={`/api/leads/export?username=${profile.username}`}
-              download
-              className="tb-btn tb-btn-primary text-xs shrink-0 flex items-center gap-1.5 rounded-sm"
-              title="Export all leads as CSV file"
-            >
-              <Download className="w-3.5 h-3.5" /> Export CSV
-            </a>
+        <div className="flex flex-wrap items-center justify-between gap-[10px] border-b-[0.5px] border-[#DCDCDC] pb-[15px]">
+          <SearchPill value={searchQuery} onChange={setSearchQuery} placeholder="Search leads" className="w-[260px] max-w-full" />
+          <div className="flex items-center gap-[10px]">
+            <RoundIconButton icon={RefreshCw} title="Refresh" onClick={() => setRefreshIndex((n) => n + 1)} />
+            <ToolbarPill as="a" href={`/api/leads/export?username=${profile.username}`} download title="Export all leads as CSV">
+              Export CSV
+            </ToolbarPill>
           </div>
         </div>
 
-        {/* Leads List */}
         {loading ? (
-          <div className="p-8 text-center text-ink-500 flex flex-col items-center justify-center gap-2">
-            <Loader2 className="w-6 h-6 animate-spin text-brand-500" />
-            <span className="text-xs">Loading leads...</span>
-          </div>
+          <SkeletonRows rows={4} />
         ) : leads.length === 0 ? (
-          <div className="p-8 rounded-xl bg-surface-2 border border-dashed border-line text-center space-y-2">
-            <Users className="w-8 h-8 text-ink-500 mx-auto" />
-            <p className="text-xs font-semibold text-ink-700">No contact leads captured yet</p>
-            <p className="text-[11px] text-ink-500 max-w-sm mx-auto">
-              When visitors open your link-in-bio profile, they can submit their contact info which will appear here and automatically sync to your connected Google Contacts.
-            </p>
-          </div>
+          <EmptyState title="No leads yet">Contact form submissions appear here.</EmptyState>
         ) : (
-          <div className="space-y-3">
-            {leads.map((lead) => {
-              const isSyncing = syncingId === lead._id;
-              return (
-                <div
-                  key={lead._id}
-                  className="p-4 rounded-xl bg-surface-2 border-[0.5px] border-line hover:border-brand-500 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3"
-                >
-                  <div className="space-y-1.5">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-sm font-semibold text-ink-700">
-                        {lead.fullName || 'Anonymous Visitor'}
-                      </span>
-                      {lead.company && (
-                        <span className="px-2 py-0.5 rounded-sm bg-white text-ink-700 text-[10px] font-mono border-[0.5px] border-line flex items-center gap-1">
-                          <Building2 className="w-2.5 h-2.5 text-ink-500" /> {lead.company}
-                        </span>
-                      )}
-                      {lead.syncedToGoogleContacts ? (
-                        <span className="px-2 py-0.5 rounded-sm bg-brand-500/10 text-brand-500 text-[10px] font-semibold border border-brand-500/30 flex items-center gap-1">
-                          <Sparkles className="w-2.5 h-2.5 text-brand-500" /> Synced to Gmail
-                        </span>
-                      ) : (
-                        <span className="px-2 py-0.5 rounded-sm bg-amber-50 text-amber-800 text-[10px] font-semibold border border-amber-200">
-                          Pending Sync
-                        </span>
-                      )}
-                    </div>
-
-                    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-ink-700">
-                      {lead.phone && (
-                        <div className="flex items-center gap-1 font-mono text-brand-500 font-semibold">
-                          <Phone className="w-3 h-3 text-brand-500" />
-                          <a href={`tel:${lead.phone}`} className="hover:underline">
-                            {lead.phone}
-                          </a>
-                          <button
-                            onClick={() => handleCopy(lead.phone, `phone_${lead._id}`)}
-                            className="p-0.5 text-ink-500 hover:text-ink-700 cursor-pointer"
-                            title="Copy phone number"
-                          >
-                            {copiedKey === `phone_${lead._id}` ? (
-                              <Check className="w-2.5 h-2.5 text-brand-500" />
-                            ) : (
-                              <Copy className="w-2.5 h-2.5" />
-                            )}
-                          </button>
+          <div className={table.wrapper}>
+            <table className={table.table}>
+              <thead className={table.head}>
+                <tr>
+                  <th className={table.th}>Name</th>
+                  <th className={table.th}>Phone</th>
+                  <th className={table.th}>Email</th>
+                  <th className={table.th}>Note</th>
+                  <th className={table.th}>Date</th>
+                  <th className={table.th}>Status</th>
+                  <th className={table.th} />
+                </tr>
+              </thead>
+              <tbody>
+                {leads.map((lead) => {
+                  const isSyncing = syncingId === lead._id;
+                  return (
+                    <tr key={lead._id} className={table.row}>
+                      <td className={table.td}>
+                        <div className="flex min-w-0 flex-col">
+                          <span className="truncate font-medium">{lead.fullName || 'Anonymous'}</span>
+                          {lead.company && <span className="truncate text-[10px] text-[#808080]">{lead.company}</span>}
                         </div>
-                      )}
-
-                      {lead.email && (
-                        <div className="flex items-center gap-1 text-ink-700">
-                          <Mail className="w-3 h-3 text-brand-500" />
-                          <a href={`mailto:${lead.email}`} className="hover:underline text-ink-700">
+                      </td>
+                      <td className={`${table.td} whitespace-nowrap`}>
+                        {lead.phone ? (
+                          <div className="flex items-center gap-[4px]">
+                            <a href={`tel:${lead.phone}`} className="hover:underline">
+                              {lead.phone}
+                            </a>
+                            <RoundIconButton
+                              icon={copiedKey === `phone_${lead._id}` ? Check : Copy}
+                              title="Copy phone number"
+                              tone="brand"
+                              onClick={() => handleCopy(lead.phone, `phone_${lead._id}`)}
+                            />
+                          </div>
+                        ) : (
+                          '-'
+                        )}
+                      </td>
+                      <td className={table.td}>
+                        {lead.email ? (
+                          <a href={`mailto:${lead.email}`} className="hover:underline">
                             {lead.email}
                           </a>
-                        </div>
-                      )}
-
-                      <span className="text-[10px] text-ink-500">
-                        {new Date(lead.createdAt).toLocaleDateString()} at{' '}
-                        {new Date(lead.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                      </span>
-                    </div>
-
-                    {lead.note && (
-                      <p className="text-xs text-ink-500 italic bg-white p-2 rounded-md border-[0.5px] border-line line-clamp-2">
-                        &quot;{lead.note}&quot;
-                      </p>
-                    )}
-                  </div>
-
-                  <div className="flex items-center gap-2 shrink-0">
-                    {/* Manual Sync to Google Contacts Button */}
-                    {!lead.syncedToGoogleContacts && (
-                      <button
-                        onClick={() => handleSyncLead(lead)}
-                        disabled={isSyncing}
-                        className="tb-btn tb-btn-ghost text-xs px-2.5 py-1.5 text-brand-500 border-[0.5px] border-line flex items-center gap-1 rounded-sm cursor-pointer"
-                        title="Sync to connected Google Contacts account"
-                      >
-                        {isSyncing ? (
-                          <Loader2 className="w-3 h-3 animate-spin" />
                         ) : (
-                          <Sparkles className="w-3 h-3 text-brand-500" />
+                          '-'
                         )}
-                        <span>Sync to Google</span>
-                      </button>
-                    )}
-
-                    {/* Delete Lead Button */}
-                    <button
-                      onClick={() => handleDeleteLead(lead._id, lead.fullName)}
-                      className="p-2 rounded-sm bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 transition-all cursor-pointer"
-                      title="Delete contact lead"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
+                      </td>
+                      <td className={table.td}>
+                        <span className="line-clamp-2 max-w-[180px]" title={lead.note}>{lead.note || '-'}</span>
+                      </td>
+                      <td className={`${table.td} whitespace-nowrap`}>
+                        {new Date(lead.createdAt).toLocaleDateString()}
+                        <span className="block text-[10px] text-[#808080]">
+                          {new Date(lead.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </span>
+                      </td>
+                      <td className={table.td}>
+                        {lead.syncedToGoogleContacts ? (
+                          <span className="whitespace-nowrap rounded-[4px] bg-[#E8F7EE] px-[6px] py-[2px] text-[10px] font-medium text-[#16A34A]">Synced</span>
+                        ) : (
+                          <span className="whitespace-nowrap rounded-[4px] bg-[#FFF8E1] px-[6px] py-[2px] text-[10px] font-medium text-[#92400E]">Pending</span>
+                        )}
+                      </td>
+                      <td className={table.td}>
+                        <div className="flex items-center justify-end gap-[6px]">
+                          {!lead.syncedToGoogleContacts && (
+                            <button
+                              type="button"
+                              onClick={() => handleSyncLead(lead)}
+                              disabled={isSyncing}
+                              title="Sync to connected Google Contacts account"
+                              className="flex items-center gap-[4px] whitespace-nowrap rounded-[50px] border-[1px] border-[#C4C4C4] px-[10px] py-[4px] text-[10px] hover:bg-[#F8F8F9] disabled:opacity-50"
+                            >
+                              {isSyncing && <Loader2 size={12} className="animate-spin" />}
+                              Sync
+                            </button>
+                          )}
+                          <RoundIconButton
+                            icon={Trash2}
+                            title="Delete lead"
+                            tone="danger"
+                            onClick={() => handleDeleteLead(lead._id, lead.fullName)}
+                          />
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
           </div>
         )}
       </div>
-    </div>
+    </Modal>
   );
 }

@@ -1,24 +1,9 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { 
-  Calendar, 
-  Clock, 
-  Video, 
-  CheckCircle2, 
-  AlertCircle, 
-  X, 
-  Sparkles, 
-  ChevronRight, 
-  ExternalLink, 
-  User, 
-  Mail, 
-  Phone, 
-  FileText,
-  Copy,
-  Check,
-  CalendarCheck
-} from '@/components/icons';
+import { Copy, Check } from '@/components/icons';
+import Modal, { ModalButton, Field, inputClass } from '@/components/ui/Modal';
+import { PillTab } from '@/components/ui/patterns';
 
 const DAYS_OF_WEEK = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
@@ -201,340 +186,236 @@ export default function ScheduleMeetingModal({ profile, onClose, onBookingSucces
     return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&details=${details}&location=${location}`;
   }, [confirmedBooking, meetingConfig.title, profile.name, profile.title]);
 
+  const linkButton = 'flex h-[34px] flex-1 items-center justify-center rounded-[5px] border-[0.5px] text-[12px] font-medium';
+
+  let footer = null;
+  if (step === 1) {
+    footer = (
+      <>
+        <ModalButton variant="secondary" className="w-[50%]" onClick={onClose}>Cancel</ModalButton>
+        <ModalButton className="w-[50%]" onClick={handleNextToInfo} disabled={!selectedSlot}>
+          {selectedSlot ? `Continue with ${selectedSlot}` : 'Continue'}
+        </ModalButton>
+      </>
+    );
+  } else if (step === 2) {
+    footer = (
+      <>
+        <ModalButton variant="secondary" className="w-[50%]" onClick={() => setStep(1)}>Back</ModalButton>
+        <ModalButton type="submit" form="schedule-meeting-form" className="w-[50%]" disabled={submitting}>
+          {submitting ? 'Sending...' : 'Request Booking'}
+        </ModalButton>
+      </>
+    );
+  } else if (step === 3 && confirmedBooking) {
+    footer = (
+      <>
+        <ModalButton variant="secondary" className="flex-1" onClick={onClose}>Done</ModalButton>
+        {confirmedBooking.status === 'confirmed' && confirmedBooking.meetingUrl && (
+          <a
+            href={googleCalendarUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`${linkButton} border-black bg-black text-white hover:bg-[#222222]`}
+          >
+            Add to Calendar
+          </a>
+        )}
+        {confirmedBooking.status === 'confirmed' && confirmedBooking.meetingUrl && confirmedBooking.meetingUrl.startsWith('http') && (
+          <a
+            href={confirmedBooking.meetingUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`${linkButton} border-[#16A34A] bg-[#16A34A] text-white hover:bg-[#15803D]`}
+          >
+            Join Meeting
+          </a>
+        )}
+      </>
+    );
+  }
+
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div 
-        className="modal-content max-w-lg w-full rounded-2xl bg-white border-[0.5px] border-line shadow-modal overflow-hidden flex flex-col max-h-[92vh] text-ink-700"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Modal Header */}
-        <div className="px-5 py-4 border-b-[0.5px] border-line flex items-center justify-between bg-surface-2/60">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-brand-500/10 border border-brand-500/20 flex items-center justify-center text-brand-500 shrink-0">
-              <Calendar className="w-5 h-5 text-brand-500" />
+    <Modal
+      onClose={onClose}
+      title={meetingConfig.title || 'Book a Call'}
+      headerExtra={
+        <span className="shrink-0 rounded-[4px] bg-[#F8F8F9] px-[6px] py-[2px] text-[10px] capitalize text-[#333333]">
+          {price} · {duration} min · {platform.replace('_', ' ')}
+        </span>
+      }
+      width="md"
+      footer={footer}
+      bodyClassName="flex flex-col gap-[15px]"
+    >
+      {errorMsg && (
+        <div className="rounded-[5px] border-[0.5px] border-[#FFC2CA] bg-[#FFEDEF] px-[12px] py-[8px] text-[11px] text-[#FF4359]">
+          {errorMsg}
+        </div>
+      )}
+
+      {step === 1 && (
+        <>
+          <div className="flex flex-col gap-[8px]">
+            <div className="flex items-center justify-between">
+              <span className="text-[14px] font-medium text-black">Date</span>
+              <span className="text-[10px] text-[#808080]">Next 14 days</span>
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h3 className="text-[14px] font-sans font-semibold text-ink-700">
-                  {meetingConfig.title || "Book a 1:1 Consultation"}
-                </h3>
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-brand-50 text-ink-700 border-[0.5px] border-line">
-                  {price}
-                </span>
-              </div>
-              <p className="text-xs text-ink-500 mt-1 flex items-center gap-2 font-medium">
-                <span className="flex items-center gap-1 text-ink-500">
-                  <Clock className="w-3.5 h-3.5 text-brand-500" /> {duration} Mins
-                </span>
-                <span className="text-line">•</span>
-                <span className="flex items-center gap-1 capitalize text-ink-500">
-                  <Video className="w-3.5 h-3.5 text-brand-500" /> {platform.replace('_', ' ')}
-                </span>
-              </p>
+            <div className="grid grid-cols-4 gap-[8px] sm:grid-cols-7">
+              {upcomingDates.map((item) => {
+                const isSelected = selectedDate === item.dateStr;
+                return (
+                  <button
+                    key={item.dateStr}
+                    type="button"
+                    disabled={!item.isAvailableDay}
+                    onClick={() => {
+                      setSelectedDate(item.dateStr);
+                      setSelectedSlot('');
+                    }}
+                    className={`flex flex-col items-center justify-center rounded-[5px] border-[0.5px] py-[6px] text-center disabled:cursor-not-allowed disabled:opacity-40 ${
+                      isSelected
+                        ? 'border-[#000] bg-[#F8F8F9BF] text-black'
+                        : 'border-[#DCDCDC] bg-white text-[#333333] hover:bg-[#F8F8F9BF]'
+                    }`}
+                  >
+                    <span className="text-[9px] text-[#808080]">{item.dayName}</span>
+                    <span className="text-[14px] font-medium">{item.dayNumber}</span>
+                    <span className="text-[9px] text-[#808080]">{item.monthName}</span>
+                  </button>
+                );
+              })}
             </div>
           </div>
-          <button
-            onClick={onClose}
-            className="w-8 h-8 rounded-full text-ink-500 hover:text-ink-700 hover:bg-surface-3 flex items-center justify-center transition-all cursor-pointer"
-            aria-label="Close booking modal"
-          >
-            <X className="w-4 h-4 text-ink-500" />
-          </button>
-        </div>
 
-        {/* Modal Body */}
-        <div className="p-5 overflow-y-auto flex-1 space-y-4">
-          {errorMsg && (
-            <div className="p-3 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
-              <span>{errorMsg}</span>
+          <div className="flex flex-col gap-[8px]">
+            <div className="flex items-center justify-between">
+              <span className="text-[14px] font-medium text-black">Time</span>
+              <span className="text-[10px] text-[#808080]">
+                {loadingSlots ? 'Checking...' : `${allSlots.length - bookedSlots.length} open`}
+              </span>
             </div>
-          )}
-
-          {/* Step 1: Date & Time Slot Picker */}
-          {step === 1 && (
-            <div className="space-y-4">
-              <div>
-                <label className="text-xs font-semibold text-ink-700 flex items-center justify-between mb-2">
-                  <span className="text-ink-700">1. Select Date</span>
-                  <span className="text-[11px] text-ink-500 font-normal">Next 14 Days</span>
-                </label>
-
-                {/* Horizontal Date Slider */}
-                <div className="grid grid-cols-4 sm:grid-cols-7 gap-2">
-                  {upcomingDates.map((item) => {
-                    const isSelected = selectedDate === item.dateStr;
-                    return (
-                      <button
-                        key={item.dateStr}
-                        type="button"
-                        disabled={!item.isAvailableDay}
-                        onClick={() => {
-                          setSelectedDate(item.dateStr);
-                          setSelectedSlot('');
-                        }}
-                        className={`p-2.5 rounded-xl flex flex-col items-center justify-center text-center transition-all cursor-pointer ${
-                          isSelected
-                            ? 'bg-brand-500 text-white font-semibold scale-102'
-                            : item.isAvailableDay
-                            ? 'bg-surface-2 hover:bg-surface-3 text-ink-700 border-[0.5px] border-line'
-                            : 'bg-surface-2/40 text-ink-500/50 border-[0.5px] border-line cursor-not-allowed opacity-50'
-                        }`}
-                      >
-                        <span className={`text-[10px] uppercase font-semibold tracking-wider ${isSelected ? 'text-white' : 'text-ink-500'}`}>{item.dayName}</span>
-                        <span className={`text-base font-semibold my-0.5 ${isSelected ? 'text-white' : 'text-ink-700'}`}>{item.dayNumber}</span>
-                        <span className={`text-[9px] font-medium ${isSelected ? 'text-white/80' : 'text-ink-500'}`}>{item.monthName}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Time Slots Section */}
-              <div>
-                <label className="text-xs font-semibold text-ink-700 flex items-center justify-between mb-2">
-                  <span className="text-ink-700">2. Pick Available Free Time</span>
-                  <span className="text-[11px] text-ink-500 font-normal">
-                    {loadingSlots ? 'Checking calendar...' : `${allSlots.length - bookedSlots.length} slots open`}
-                  </span>
-                </label>
-
-                {allSlots.length === 0 ? (
-                  <p className="text-xs text-ink-500 py-4 text-center">No hours configured for this day.</p>
-                ) : (
-                  <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 max-h-48 overflow-y-auto pr-1">
-                    {allSlots.map((slot) => {
-                      const isBooked = bookedSlots.includes(slot);
-                      const isSelected = selectedSlot === slot;
-
-                      return (
-                        <button
-                          key={slot}
-                          type="button"
-                          disabled={isBooked}
-                          onClick={() => setSelectedSlot(slot)}
-                          className={`py-2 px-2.5 rounded-lg text-xs font-semibold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
-                            isSelected
-                              ? 'bg-brand-500 text-white font-semibold '
-                              : isBooked
-                              ? 'bg-surface-2/40 text-ink-500/40 border-[0.5px] border-line line-through cursor-not-allowed'
-                              : 'bg-surface-2 hover:bg-surface-3 text-ink-700 border-[0.5px] border-line'
-                          }`}
-                        >
-                          <Clock className={`w-3 h-3 shrink-0 ${isSelected ? 'text-white' : 'text-brand-500'}`} />
-                          <span className={isSelected ? 'text-white' : 'text-ink-700'}>{slot}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-
-              {/* Proceed Button */}
-              <button
-                type="button"
-                onClick={handleNextToInfo}
-                disabled={!selectedSlot}
-                className={`w-full py-2.5 rounded-sm font-semibold text-xs flex items-center justify-center gap-2 cursor-pointer transition-all ${
-                  selectedSlot
-                    ? 'bg-brand-500 hover:bg-brand-600 text-white '
-                    : 'bg-surface-2 text-ink-500 border-[0.5px] border-line cursor-not-allowed'
-                }`}
-              >
-                <span>Continue with {selectedSlot || 'Selected Time'}</span>
-                <ChevronRight className="w-4 h-4" />
-              </button>
-            </div>
-          )}
-
-          {/* Step 2: Attendee Details Form */}
-          {step === 2 && (
-            <form onSubmit={handleConfirmBooking} className="space-y-3.5">
-              <div className="p-3.5 rounded-xl bg-surface-2 border-[0.5px] border-line flex items-center justify-between text-xs text-ink-700">
-                <div>
-                  <span className="font-semibold text-ink-700 block text-sm">{selectedDate}</span>
-                  <span className="text-ink-500 font-medium">{selectedSlot} ({duration} mins)</span>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setStep(1)}
-                  className="text-xs text-brand-500 underline hover:text-brand-600 cursor-pointer font-semibold"
-                >
-                  Change Time
-                </button>
-              </div>
-
-              <div>
-                <label className="text-[11px] font-semibold text-ink-700 flex items-center gap-1 mb-1">
-                  <User className="w-3 h-3 text-brand-500" /> Full Name <span className="text-rose-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  placeholder="e.g. Sarah Connor"
-                  className="tb-input text-xs w-full"
-                />
-              </div>
-
-              <div>
-                <label className="text-[11px] font-semibold text-ink-700 flex items-center gap-1 mb-1">
-                  <Mail className="w-3 h-3 text-brand-500" /> Email Address <span className="text-rose-500">*</span>
-                </label>
-                <input
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="e.g. sarah@production.com"
-                  className="tb-input text-xs w-full"
-                />
-              </div>
-
-              <div>
-                <label className="text-[11px] font-semibold text-ink-700 flex items-center gap-1 mb-1">
-                  <Phone className="w-3 h-3 text-brand-500" /> Phone Number (Optional)
-                </label>
-                <input
-                  type="tel"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  placeholder="e.g. +1 (555) 019-2831"
-                  className="tb-input text-xs w-full"
-                />
-              </div>
-
-              <div>
-                <label className="text-[11px] font-semibold text-ink-700 flex items-center gap-1 mb-1">
-                  <FileText className="w-3 h-3 text-brand-500" /> Meeting Goal or Topic
-                </label>
-                <textarea
-                  rows={2}
-                  value={topic}
-                  onChange={(e) => setTopic(e.target.value)}
-                  placeholder="e.g. Discuss script read-through, brand campaign, or podcast interview..."
-                  className="tb-input text-xs w-full resize-none"
-                />
-              </div>
-
-              <div className="pt-2 flex items-center gap-2.5">
-                <button
-                  type="button"
-                  onClick={() => setStep(1)}
-                  className="w-1/3 py-2.5 rounded-sm bg-surface-2 hover:bg-surface-3 text-ink-700 border-[0.5px] border-line font-semibold text-xs cursor-pointer transition-all"
-                >
-                  Back
-                </button>
-                <button
-                  type="submit"
-                  disabled={submitting}
-                  className="w-2/3 py-2.5 rounded-sm bg-brand-500 hover:bg-brand-600 text-white font-semibold text-xs flex items-center justify-center gap-2 cursor-pointer transition-all"
-                >
-                  {submitting ? (
-                    <span>Sending Request...</span>
-                  ) : (
-                    <>
-                      <Sparkles className="w-3.5 h-3.5 fill-white" />
-                      <span>Request Booking</span>
-                    </>
-                  )}
-                </button>
-              </div>
-            </form>
-          )}
-
-          {/* Step 3: Booking Confirmation Screen */}
-          {step === 3 && confirmedBooking && (
-            <div className="py-2 text-center space-y-4">
-              <div className="w-14 h-14 rounded-full bg-brand-500/10 border border-brand-500/30 flex items-center justify-center mx-auto text-brand-500 ">
-                <CheckCircle2 className="w-7 h-7 text-brand-500" />
-              </div>
-
-              <div>
-                <h4 className="text-[12px] font-sans font-semibold text-ink-700">Booking Request Sent</h4>
-                <p className="text-xs text-ink-500 mt-1">
-                  @{profile.username} needs to confirm this time. Meeting details will be shared after confirmation.
-                </p>
-              </div>
-
-              {/* Summary Card */}
-              <div className="p-4 rounded-xl bg-surface-2 border-[0.5px] border-line text-left space-y-2.5">
-                <div className="flex items-center justify-between border-b-[0.5px] border-line pb-2">
-                  <span className="text-[11px] text-ink-500">Date &amp; Time</span>
-                  <span className="text-xs font-semibold text-ink-700">
-                    {confirmedBooking.date} at {confirmedBooking.timeSlot}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between border-b-[0.5px] border-line pb-2">
-                  <span className="text-[11px] text-ink-500">Guest</span>
-                  <span className="text-xs font-semibold text-ink-700">{confirmedBooking.clientName}</span>
-                </div>
-                <div className="flex items-center justify-between border-b-[0.5px] border-line pb-2">
-                  <span className="text-[11px] text-ink-500">Duration &amp; Fee</span>
-                  <span className="text-xs font-semibold text-brand-500">
-                    {confirmedBooking.durationMinutes} mins • {confirmedBooking.price}
-                  </span>
-                </div>
-
-                {confirmedBooking.meetingUrl && (
-                <div className="pt-1">
-                  <span className="text-[11px] text-ink-500 block mb-1">Meeting details:</span>
-                  <div className="flex items-center gap-2 p-2 rounded-lg bg-white border-[0.5px] border-line">
-                    <Video className="w-4 h-4 text-brand-500 shrink-0" />
-                    <span className="text-xs text-ink-700 font-mono truncate flex-1">
-                      {confirmedBooking.meetingUrl}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={handleCopyLink}
-                      className="px-2 py-1 rounded-sm bg-surface-2 hover:bg-surface-3 text-ink-700 border-[0.5px] border-line text-[10px] font-semibold flex items-center gap-1 cursor-pointer transition-all"
+            {allSlots.length === 0 ? (
+              <p className="py-[15px] text-center text-[12px] text-[#808080]">No hours set for this day.</p>
+            ) : (
+              <div className="customScrollBar grid max-h-[192px] grid-cols-3 gap-[8px] overflow-y-auto pr-[4px] sm:grid-cols-4">
+                {allSlots.map((slot) => {
+                  const isBooked = bookedSlots.includes(slot);
+                  const isSelected = selectedSlot === slot;
+                  return (
+                    <PillTab
+                      key={slot}
+                      active={isSelected}
+                      disabled={isBooked}
+                      onClick={() => setSelectedSlot(slot)}
+                      className="justify-center disabled:cursor-not-allowed disabled:line-through disabled:opacity-40"
                     >
-                      {copiedLink ? <Check className="w-3 h-3 text-brand-500" /> : <Copy className="w-3 h-3" />}
-                      <span>{copiedLink ? 'Copied' : 'Copy'}</span>
-                    </button>
-                  </div>
-                </div>
-                )}
+                      {slot}
+                    </PillTab>
+                  );
+                })}
               </div>
+            )}
+          </div>
+        </>
+      )}
 
-              {/* Action Buttons */}
-              <div className="space-y-2">
-                {confirmedBooking.status === 'confirmed' && confirmedBooking.meetingUrl && <a
-                  href={googleCalendarUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-full py-2.5 rounded-sm bg-ink-900 hover:bg-[#1E2723] text-white font-semibold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer"
-                >
-                  <CalendarCheck className="w-4 h-4" />
-                  <span>Add to Google Calendar</span>
-                  <ExternalLink className="w-3 h-3 opacity-70" />
-                </a>}
-
-                {confirmedBooking.status === 'confirmed' && confirmedBooking.meetingUrl && confirmedBooking.meetingUrl.startsWith('http') && (
-                  <a
-                    href={confirmedBooking.meetingUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-full py-2.5 rounded-sm bg-brand-500 hover:bg-brand-600 text-white font-semibold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer"
-                  >
-                    <Video className="w-4 h-4" />
-                    <span>Join Video Meeting Now</span>
-                  </a>
-                )}
-
-                <button
-                  type="button"
-                  onClick={onClose}
-                  className="w-full py-2 rounded-sm text-ink-500 hover:text-ink-700 text-xs font-medium cursor-pointer transition-colors"
-                >
-                  Done &amp; Close
-                </button>
-              </div>
+      {step === 2 && (
+        <form id="schedule-meeting-form" onSubmit={handleConfirmBooking} className="flex flex-col gap-[15px]">
+          <div className="flex items-center justify-between rounded-[5px] border-[0.5px] border-[#DCDCDC] bg-[#FAFAFA] px-[10px] py-[8px]">
+            <div className="flex flex-col">
+              <span className="text-[12px] font-medium text-black">{selectedDate}</span>
+              <span className="text-[10px] text-[#808080]">{selectedSlot} ({duration} min)</span>
             </div>
-          )}
+            <button type="button" onClick={() => setStep(1)} className="text-[12px] text-[#16A34A] hover:underline">
+              Change
+            </button>
+          </div>
+
+          <Field label="Name">
+            <input
+              type="text"
+              required
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              placeholder="e.g. Sarah Connor"
+              className={inputClass}
+            />
+          </Field>
+
+          <Field label="Email">
+            <input
+              type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="e.g. sarah@production.com"
+              className={inputClass}
+            />
+          </Field>
+
+          <Field label="Phone (optional)">
+            <input
+              type="tel"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="e.g. +1 (555) 019-2831"
+              className={inputClass}
+            />
+          </Field>
+
+          <Field label="Topic">
+            <textarea
+              rows={2}
+              value={topic}
+              onChange={(e) => setTopic(e.target.value)}
+              placeholder="What would you like to discuss?"
+              className={`${inputClass} resize-none`}
+            />
+          </Field>
+        </form>
+      )}
+
+      {step === 3 && confirmedBooking && (
+        <div className="flex flex-col gap-[15px]">
+          <div className="text-center">
+            <p className="text-[14px] font-semibold text-black">Request Sent</p>
+            <p className="mt-[4px] text-[12px] text-[#808080]">@{profile.username} needs to confirm this time.</p>
+          </div>
+
+          <div className="flex flex-col rounded-[10px] border-[0.5px] border-[#dcdcdc] px-[12px]">
+            <div className="flex items-center justify-between border-b-[0.5px] border-[#F0F0F0] py-[8px]">
+              <span className="text-[#808080]">Date &amp; Time</span>
+              <span className="font-medium">{confirmedBooking.date} at {confirmedBooking.timeSlot}</span>
+            </div>
+            <div className="flex items-center justify-between border-b-[0.5px] border-[#F0F0F0] py-[8px]">
+              <span className="text-[#808080]">Guest</span>
+              <span className="font-medium">{confirmedBooking.clientName}</span>
+            </div>
+            <div className={`flex items-center justify-between py-[8px] ${confirmedBooking.meetingUrl ? 'border-b-[0.5px] border-[#F0F0F0]' : ''}`}>
+              <span className="text-[#808080]">Duration &amp; Fee</span>
+              <span className="font-medium">{confirmedBooking.durationMinutes} min · {confirmedBooking.price}</span>
+            </div>
+            {confirmedBooking.meetingUrl && (
+              <div className="flex items-center justify-between gap-[10px] py-[8px]">
+                <span className="shrink-0 text-[#808080]">Meeting</span>
+                <span className="flex min-w-0 items-center gap-[6px]">
+                  <span className="truncate font-medium" title={confirmedBooking.meetingUrl}>{confirmedBooking.meetingUrl}</span>
+                  <button
+                    type="button"
+                    onClick={handleCopyLink}
+                    title={copiedLink ? 'Copied' : 'Copy link'}
+                    aria-label="Copy meeting link"
+                    className="shrink-0 text-[#808080] hover:text-[#333333]"
+                  >
+                    {copiedLink ? <Check size={14} color="#16A34A" /> : <Copy size={14} />}
+                  </button>
+                </span>
+              </div>
+            )}
+          </div>
         </div>
-      </div>
-    </div>
+      )}
+    </Modal>
   );
 }
