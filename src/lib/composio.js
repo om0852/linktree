@@ -19,6 +19,26 @@ export function getComposioClient(apiKeyOverride) {
   return cachedClient;
 }
 
+// Composio requires an explicit toolkit version for direct tool calls. Look
+// up each tool's current version once an hour and pin the call to it.
+const TOOL_VERSION_TTL_MS = 60 * 60 * 1000;
+const toolVersions = new Map();
+
+async function currentToolVersion(client, toolSlug) {
+  const cached = toolVersions.get(toolSlug);
+  if (cached && Date.now() - cached.at < TOOL_VERSION_TTL_MS) return cached.version;
+  const tool = await client.tools.getRawComposioToolBySlug(toolSlug);
+  const version = tool?.version;
+  if (version) toolVersions.set(toolSlug, { version, at: Date.now() });
+  return version;
+}
+
+/** client.tools.execute with the tool's current toolkit version. */
+export async function executeComposioTool(client, toolSlug, params) {
+  const version = await currentToolVersion(client, toolSlug);
+  return client.tools.execute(toolSlug, version ? { ...params, version } : params);
+}
+
 export function isComposioConfigured() {
   const key = process.env.COMPOSIO_API_KEY;
   return Boolean(key && key.trim().length > 5);

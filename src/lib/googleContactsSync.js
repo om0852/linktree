@@ -1,4 +1,4 @@
-import { getComposioClient, isComposioConfigured } from './composio.js';
+import { getComposioClient, isComposioConfigured, executeComposioTool } from './composio.js';
 
 /**
  * Syncs a captured lead directly to the creator's connected Google Contacts / Gmail account via Composio.
@@ -87,12 +87,12 @@ export async function syncLeadToGoogleContacts(lead, creatorUsername = 'creator_
     // 3. Execute sync depending on connected capability (Google Contacts vs Gmail)
     if (appSlug.includes('contact')) {
       try {
-        result = await client.tools.execute('googlecontacts_create_contact', {
+        result = await executeComposioTool(client, 'googlecontacts_create_contact', {
           userId,
           arguments: contactParams,
         });
       } catch (primaryErr) {
-        result = await client.tools.execute('GOOGLECONTACTS_CREATE_CONTACT', {
+        result = await executeComposioTool(client, 'GOOGLECONTACTS_CREATE_CONTACT', {
           userId,
           arguments: contactParams,
         });
@@ -102,7 +102,7 @@ export async function syncLeadToGoogleContacts(lead, creatorUsername = 'creator_
       const draftSubject = `[TreeInBio Lead] ${lead.fullName || 'New Contact Submission'}`;
       const draftBody = `Hi ${givenName},\n\nThank you for reaching out via my TreeInBio profile.\n\nCaptured Lead Details:\n• Name: ${lead.fullName || 'N/A'}\n• Email: ${email || 'N/A'}\n• Phone: ${phone || 'N/A'}\n• Company: ${company || 'N/A'}\n• Note: ${note || 'N/A'}\n\nBest regards,\n${creatorUsername}`;
 
-      result = await client.tools.execute('GMAIL_CREATE_EMAIL_DRAFT', {
+      result = await executeComposioTool(client, 'GMAIL_CREATE_EMAIL_DRAFT', {
         userId,
         arguments: {
           recipient_email: email || connectedGoogleAcc.data?.displayName || 'lead@example.com',

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getComposioClient, isComposioConfigured } from '@/lib/composio';
+import { getComposioClient, isComposioConfigured, executeComposioTool } from '@/lib/composio';
 import { requireAuth, requireProfileOwner } from '@/lib/authorization';
 
 export async function POST(req) {
@@ -25,7 +25,7 @@ export async function POST(req) {
     }
 
     const client = getComposioClient();
-    const result = await client.tools.execute(toolSlug, {
+    const result = await executeComposioTool(client, toolSlug, {
       userId,
       arguments: params
     });

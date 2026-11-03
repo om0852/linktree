@@ -3,7 +3,7 @@ import connectMongo from '@/lib/mongodb';
 import Profile from '@/models/Profile';
 import Subscriber from '@/models/Subscriber';
 import AnalyticsEvent from '@/models/AnalyticsEvent';
-import { getComposioClient, isComposioConfigured } from '@/lib/composio';
+import { getComposioClient, isComposioConfigured, executeComposioTool } from '@/lib/composio';
 import { extractVisitorTelemetry } from '@/lib/telemetry';
 import { consumeRateLimit } from '@/lib/rateLimit';
 
@@ -82,7 +82,7 @@ export async function POST(req) {
           const client = getComposioClient();
           // Best effort sync to marketing tool if available
           if (leadMagnet.marketingPlatform === 'mailchimp') {
-            const syncResult = await client.tools.execute('MAILCHIMP_ADD_LIST_MEMBER', {
+            const syncResult = await executeComposioTool(client, 'MAILCHIMP_ADD_LIST_MEMBER', {
               userId: username.toLowerCase(),
               arguments: {
                 list_id: leadMagnet.marketingListId || 'default',

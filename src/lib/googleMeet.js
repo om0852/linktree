@@ -1,4 +1,4 @@
-import { getComposioClient, isComposioConfigured } from './composio.js';
+import { getComposioClient, isComposioConfigured, executeComposioTool } from './composio.js';
 
 // Google Meet links for bookings: a Google Calendar event with a Meet room is
 // created in the creator's connected Google account (via Composio), with the
@@ -73,7 +73,7 @@ export async function createGoogleMeetForBooking(booking, { creatorUsername, tim
   }
 
   const minutes = Math.max(15, Number(booking.durationMinutes) || 30);
-  const result = await client.tools.execute('GOOGLECALENDAR_CREATE_EVENT', {
+  const result = await executeComposioTool(client, 'GOOGLECALENDAR_CREATE_EVENT', {
     userId,
     arguments: {
       calendar_id: 'primary',
