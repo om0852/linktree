@@ -204,6 +204,11 @@ export function bentoWideFlags(links) {
   return wide;
 }
 
+// The media-kit stats bar only shows when at least one number is real
+// (not empty, "0" or "0%").
+export const hasMediaKitStats = (stats) => Boolean(stats) && Object.values(stats)
+  .some((value) => String(value ?? '').trim() !== '' && !/^0+(\.0+)?%?$/.test(String(value).trim()));
+
 export const AVATAR_SHAPES = [
   { id: 'circle', name: 'Circle', label: 'Circle', class: 'rounded-full' },
   { id: 'rounded', name: 'Rounded', label: 'Rounded', class: 'rounded-2xl' },

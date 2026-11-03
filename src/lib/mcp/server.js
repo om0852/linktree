@@ -21,7 +21,7 @@ import McpActivity from '@/models/McpActivity';
 import { callRoute, ToolError } from './routeCall';
 
 // Icon names the renderers know (ICON_MAP in PhoneMockup / PublicBioView).
-export const LINK_ICONS = ['Globe', 'Video', 'Star', 'Mail', 'FileText', 'Music', 'ShoppingBag', 'Zap', 'Briefcase', 'BookOpen', 'Calendar', 'MessageSquare', 'TrendingUp', 'Ticket', 'Youtube', 'Instagram', 'Twitter', 'Linkedin', 'Spotify', 'Imdb'];
+export const LINK_ICONS = ['Globe', 'Video', 'Star', 'Mail', 'FileText', 'Music', 'ShoppingBag', 'Zap', 'Briefcase', 'BookOpen', 'Calendar', 'MessageSquare', 'TrendingUp', 'Ticket', 'Youtube', 'Instagram', 'Twitter', 'Linkedin', 'Github', 'Spotify', 'Imdb'];
 const HEADER_LAYOUTS = ['classic', 'banner', 'hero'];
 const BUTTON_STYLES = ['solid', 'glass', 'outline'];
 const BUTTON_ROUNDNESS = ['sharp', 'slight', 'rounded', 'full'];
@@ -337,7 +337,7 @@ export function createTreeInBioMcpServer({ request, session }) {
       location: z.string().max(80).optional(),
       avatar_url: z.string().url().optional(),
       cover_image_url: z.string().url().optional(),
-      socials: z.record(z.string(), z.string()).optional().describe('e.g. {"instagram":"handle","youtube":"@channel"}; empty string removes one'),
+      socials: z.record(z.string(), z.string()).optional().describe('Handles only, e.g. {"instagram":"handle","linkedin":"in-slug","github":"user","youtube":"@channel","twitter":"handle"}; empty string removes one'),
       layout: z.enum(['bento', 'stack']).optional(),
       header_layout: z.enum(HEADER_LAYOUTS).optional(),
       avatar_shape: z.enum(AVATAR_SHAPES.map((shape) => shape.id)).optional(),

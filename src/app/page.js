@@ -141,7 +141,7 @@ const MATERIAL_SYMBOLS = {
   Video: 'videocam', Star: 'star', Mail: 'mail', FileText: 'description', Music: 'music_note',
   ShoppingBag: 'shopping_bag', Zap: 'bolt', Briefcase: 'work', BookOpen: 'menu_book', Calendar: 'calendar_month',
   MessageSquare: 'chat', TrendingUp: 'trending_up', Ticket: 'confirmation_number', Globe: 'public',
-  Youtube: 'smart_display', Instagram: 'photo_camera', Twitter: 'alternate_email', Linkedin: 'work',
+  Youtube: 'smart_display', Instagram: 'photo_camera', Twitter: 'alternate_email', Linkedin: 'work', Github: 'code',
   Spotify: 'headphones', Imdb: 'movie',
 };
 function toMaterialSymbol(icon) {

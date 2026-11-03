@@ -7,7 +7,7 @@ import { THEME_PRESETS, CURATED_THEMES, AVATAR_SHAPE_IDS, GOOGLE_FONTS_LIST, PAG
 const THEME_IDS = [...THEME_PRESETS, ...CURATED_THEMES].map((t) => t.id);
 const TITLE_FONTS = [...GOOGLE_FONTS_LIST.suggested, ...GOOGLE_FONTS_LIST.other].map((f) => f.name);
 // Keys of ICON_MAP in the renderers (PhoneMockup / PublicBioView).
-const ICONS = ['Video', 'Star', 'Mail', 'FileText', 'Music', 'ShoppingBag', 'Zap', 'Briefcase', 'BookOpen', 'Calendar', 'MessageSquare', 'TrendingUp', 'Ticket', 'Globe', 'Youtube', 'Instagram', 'Twitter', 'Linkedin', 'Spotify', 'Imdb'];
+const ICONS = ['Video', 'Star', 'Mail', 'FileText', 'Music', 'ShoppingBag', 'Zap', 'Briefcase', 'BookOpen', 'Calendar', 'MessageSquare', 'TrendingUp', 'Ticket', 'Globe', 'Youtube', 'Instagram', 'Twitter', 'Linkedin', 'Github', 'Spotify', 'Imdb'];
 
 describe('Profile templates', () => {
   it('only use themes, fonts, shapes, corners, icons and highlights that exist', () => {
@@ -49,5 +49,15 @@ describe('Profile templates', () => {
     // a single card never spans (its grid has one column)
     assert.deepEqual(bentoWideFlags([L]), [false]);
     assert.deepEqual(bentoWideFlags([S, { embed: { enabled: true } }]), [true, true]);
+  });
+
+  it('hides the stats bar only when every number is empty or zero', async () => {
+    const { hasMediaKitStats } = await import('../src/constants/app.js');
+    assert.equal(hasMediaKitStats({ followers: '0', engagement: '0%', monthlyViews: '0' }), false);
+    assert.equal(hasMediaKitStats({ followers: '', engagement: '', monthlyViews: '' }), false);
+    assert.equal(hasMediaKitStats(undefined), false);
+    assert.equal(hasMediaKitStats({ followers: '336', engagement: '0%', monthlyViews: '0' }), true);
+    assert.equal(hasMediaKitStats({ followers: '0', engagement: '4.2%', monthlyViews: '0' }), true);
+    assert.equal(hasMediaKitStats({ followers: '12K', engagement: '', monthlyViews: '' }), true);
   });
 });

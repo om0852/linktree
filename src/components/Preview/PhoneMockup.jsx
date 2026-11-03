@@ -8,6 +8,7 @@ import {
   YoutubeIcon, 
   TwitterIcon, 
   LinkedinIcon, 
+  GithubIcon,
   SpotifyIcon, 
   ImdbIcon 
 } from '../Common/SocialIcons';
@@ -67,7 +68,7 @@ import SocialProofTicker from '../PublicBio/SocialProofTicker';
 import CarouselSlider from '../Common/CarouselSlider';
 import StickerBlockLayer, { getBlockStickerPositionStyle, findStickerBlockAt } from '../Common/StickerBlockLayer';
 import ScaledCanvas from '../Common/ScaledCanvas';
-import { THEME_PRESETS, CURATED_THEMES, getTitleFontName, getFontStack, loadGoogleFont, linkHighlightClass, bentoWideFlags, getStickerDeviceProps, getStickerPlacementKey, getStickerCanvasPositionStyle, getStickerGraphicSizeStyle, isImageUrl, parseTailwindGradient } from '../../constants/app';
+import { THEME_PRESETS, CURATED_THEMES, getTitleFontName, getFontStack, loadGoogleFont, linkHighlightClass, bentoWideFlags, hasMediaKitStats, getStickerDeviceProps, getStickerPlacementKey, getStickerCanvasPositionStyle, getStickerGraphicSizeStyle, isImageUrl, parseTailwindGradient } from '../../constants/app';
 
 const ICON_MAP = {
   Video, Star, Mail, FileText, Music, ShoppingBag, Zap, Briefcase, BookOpen, Calendar, MessageSquare, TrendingUp, Ticket, Globe,
@@ -75,6 +76,7 @@ const ICON_MAP = {
   Instagram: InstagramIcon,
   Twitter: TwitterIcon,
   Linkedin: LinkedinIcon,
+  Github: GithubIcon,
   Spotify: SpotifyIcon,
   Imdb: ImdbIcon
 };
@@ -1133,6 +1135,11 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
             <LinkedinIcon className="w-3.5 h-3.5" style={{ color: themeStyles.titleColor }} />
           </a>
         )}
+        {profile.socials.github && (
+          <a href={`https://github.com/${profile.socials.github}`} target="_blank" rel="noreferrer" style={themeStyles.iconBoxStyle} className="p-1.5 rounded-lg hover:scale-105 transition-all border shadow-2xs" title="GitHub">
+            <GithubIcon className="w-3.5 h-3.5" style={{ color: themeStyles.titleColor }} />
+          </a>
+        )}
         {profile.socials.spotify && (
           <a href="https://spotify.com" target="_blank" rel="noreferrer" style={themeStyles.iconBoxStyle} className="p-1.5 rounded-lg hover:scale-105 transition-all border shadow-2xs" title="Spotify">
             <SpotifyIcon className="w-3.5 h-3.5" style={{ color: themeStyles.accentColor }} />
@@ -1271,7 +1278,7 @@ export default function PhoneMockup({ profile, onIncrementClick, onUpdateSticker
           )}
 
           {/* Media Kit Live Stats Bar */}
-          {profile.widgets?.mediaKitStats && (
+          {hasMediaKitStats(profile.widgets?.mediaKitStats) && (
             <div 
               style={themeStyles.cardStyle}
               className="phone-stats-card w-full mt-3 p-3 border divide-x divide-white/10"

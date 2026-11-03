@@ -8,7 +8,8 @@ import {
   InstagramIcon, 
   YoutubeIcon, 
   TwitterIcon, 
-  LinkedinIcon, 
+  LinkedinIcon,
+  GithubIcon, 
   SpotifyIcon, 
   ImdbIcon 
 } from '../Common/SocialIcons';
@@ -57,7 +58,7 @@ import TrackingPixels from './TrackingPixels';
 import AccessGateScreen from '../Common/AccessGateScreen';
 import CarouselSlider from '../Common/CarouselSlider';
 import StickerBlockLayer, { getBlockStickerPositionStyle } from '../Common/StickerBlockLayer';
-import { THEME_PRESETS, CURATED_THEMES, getTitleFontName, getFontStack, loadGoogleFont, linkHighlightClass, bentoWideFlags, getStickerDeviceProps, getStickerCanvasPositionStyle, getStickerGraphicSizeStyle, isImageUrl, parseTailwindGradient } from '../../constants/app';
+import { THEME_PRESETS, CURATED_THEMES, getTitleFontName, getFontStack, loadGoogleFont, linkHighlightClass, bentoWideFlags, hasMediaKitStats, getStickerDeviceProps, getStickerCanvasPositionStyle, getStickerGraphicSizeStyle, isImageUrl, parseTailwindGradient } from '../../constants/app';
 import { safeLinkUrl } from '../../lib/safeUrl';
 
 const ICON_MAP = {
@@ -66,6 +67,7 @@ const ICON_MAP = {
   Instagram: InstagramIcon,
   Twitter: TwitterIcon,
   Linkedin: LinkedinIcon,
+  Github: GithubIcon,
   Spotify: SpotifyIcon,
   Imdb: ImdbIcon
 };
@@ -502,6 +504,11 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
             <LinkedinIcon className={`${deviceMode === 'mobile' ? 'w-3.5 h-3.5' : 'w-4 h-4'}`} style={{ color: themeStyles.titleColor }} />
           </a>
         )}
+        {profile.socials.github && (
+          <a href={`https://github.com/${profile.socials.github}`} target="_blank" rel="noreferrer" style={themeStyles.iconBoxStyle} className={`${deviceMode === 'mobile' ? 'p-1.5 rounded-lg' : 'p-2 sm:p-2.5 rounded-xl'} hover:scale-105 transition-all border shadow-2xs`} title="GitHub">
+            <GithubIcon className={`${deviceMode === 'mobile' ? 'w-3.5 h-3.5' : 'w-4 h-4'}`} style={{ color: themeStyles.titleColor }} />
+          </a>
+        )}
         {profile.socials.spotify && (
           <a href="https://spotify.com" target="_blank" rel="noreferrer" style={themeStyles.iconBoxStyle} className={`${deviceMode === 'mobile' ? 'p-1.5 rounded-lg' : 'p-2 sm:p-2.5 rounded-xl'} hover:scale-105 transition-all border shadow-2xs`} title="Spotify">
             <SpotifyIcon className={`${deviceMode === 'mobile' ? 'w-3.5 h-3.5' : 'w-4 h-4'}`} style={{ color: themeStyles.accentColor }} />
@@ -699,7 +706,7 @@ export default function PublicBioView({ profile: initialProfile, onBackToEditor,
           )}
 
           {/* Media Kit Stats Bar */}
-          {profile.widgets?.mediaKitStats && (
+          {hasMediaKitStats(profile.widgets?.mediaKitStats) && (
             <div 
               style={themeStyles.cardStyle}
               className={`${isMobileLayout ? 'phone-stats-card w-full mt-3 p-3 border divide-x divide-white/10' : 'p-3.5 sm:p-4 mt-4 rounded-2xl grid grid-cols-3 gap-2 text-center w-full border divide-x divide-white/10'}`}
